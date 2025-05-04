@@ -9,7 +9,10 @@ module.exports = {
         secondary: '#EEB211',
         neutral: '#FEFEFF',
         accent: '#284D79',
-      }
+      },
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
     },
   },
   plugins: [require("daisyui")],
@@ -18,7 +21,7 @@ module.exports = {
       {
         ligaya: {
           "primary": "#00254C",
-          "secondary": "#EEB211", 
+          "secondary": "#EEB211",
           "accent": "#284D79",
           "neutral": "#FEFEFF",
           "base-100": "#FEFEFF",
