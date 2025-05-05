@@ -4,82 +4,151 @@ import Footer from '../common/Footer';
 
 const Home = () => {
   return (
-<div className="font-poppins">
-{/* Hero Section */}
-      <section className="bg-primary text-neutral min-h-screen pt-16 shadow-lg">
-        <div className="container mx-auto px-4 flex flex-col justify-center min-h-[calc(100vh-4rem)] lg:flex-row items-center">
-          <div className="lg:w-1/2 mb-10 lg:mb-0 lg:pr-10">
-          <h1
-  className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-  style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 1)' }}>
-  Make a <span className="text-secondary">Difference</span> in Children's Lives
-</h1>
+    <div className="font-poppins">
+      {/* Hero Section with Background Image */}
+      <section className="relative h-screen">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ 
+            backgroundImage: 'url("/assets/home_hero.jpg")',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+        </div>
 
-            <p className="text-lg mb-8">
+        {/* Hero Content */}
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
+          <div className="max-w-2xl text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+              Your small help makes the world <span className="text-secondary">better</span>
+            </h1>
+            <p className="text-xl mb-8 text-white/90">
               Join Ligaya and UST UVU to advocate for children's rights, education, and well-being.
               Together, we can create lasting positive change.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/signup" className="btn btn-secondary text-primary font-bold">
-                Volunteer Now
-              </Link>
-            </div>
-          </div>
-          <div className="lg:w-1/2">
-            <div className="relative">
-              {/* Placeholder for hero image - you'll add the real one */}
-              <div className="w-full h-96 lg:h-[28rem] bg-accent rounded-lg overflow-hidden shadow-xl">
-                <img src="/assets/home_hero.jpg" alt="Children volunteers" className="w-full h-full object-cover" />
-              </div>
-              <div className="absolute -bottom-6 -right-6 bg-secondary p-4 rounded-lg shadow-lg">
-                <p className="text-primary font-bold">500+ Children Helped</p>
-              </div>
-            </div>
+            <Link to="/signup" className="btn btn-secondary text-primary font-bold px-8 py-3 text-lg">
+              Volunteer Now
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Mission Statement */}
-      <section className="py-16 bg-neutral">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-4"  style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)' }}>Our Mission</h2>
-          <p className="text-lg max-w-3xl mx-auto mb-10 text-gray-700">
-            Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
-            We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
-          </p>
-          <div className="flex flex-wrap justify-center gap-8">
-            <div className="stats shadow">
-              <div className="stat bg-primary text-neutral">
-                <div className="stat-figure text-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </div>
-                <div className="stat-title">Programs</div>
-                <div className="stat-value">20+</div>
-                <div className="stat-desc">Active initiatives</div>
+     {/* How You Could Take Part Section */}
+<section className="py-20 bg-gradient-to-b from-white to-gray-50">
+  <div className="container mx-auto px-4">
+    {/* Quote Section */}
+    <div className="text-center mb-16 max-w-3xl mx-auto">
+      <h2 className="text-4xl md:text-5xl font-bold text-yellow-500 mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
+      <p className="text-2xl text-yellow-500 mb-8 italic">- Garrison Keillor</p>
+      <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+      <p className="text-xl text-gray-700">Be part of our advocacy and help us make a difference.</p>
+    </div>    
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* Option 1 */}
+      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
+        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold text-primary mb-3">Be one of us</h3>
+        <p className="text-gray-600 mb-6">Help us to promote and uphold children's rights. Be part of our growing family!</p>
+        <Link to="/register" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+          Register Now
+        </Link>
+      </div>
+      
+      {/* Option 2 */}
+      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
+        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold text-primary mb-3">Be our Ally</h3>
+        <p className="text-gray-600 mb-6">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
+        <Link to="/events" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+          Find Events
+        </Link>
+      </div>
+      
+      {/* Option 3 */}
+      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
+        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold text-primary mb-3">Support our Advocacy</h3>
+        <p className="text-gray-600 mb-6">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
+        <Link to="/collaborate" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+          Start Now
+        </Link>
+      </div>
+      
+      {/* Option 4 */}
+      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
+        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold text-primary mb-3">Be a Blessing</h3>
+        <p className="text-gray-600 mb-6">As a volunteer, your gift brings hope—support our programs and brighten a child’s future.</p>
+        <Link to="/donate" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+          Lend a Hand
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* Mission Statement with Improved Layout */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+                <h2 className="text-3xl font-bold text-primary mb-4">Our Mission</h2>
+                <p className="text-lg text-gray-700 mb-6">
+                  Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
+                  We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
+                </p>
+                <Link to="/about" className="btn btn-primary">
+                  Learn More About Us
+                </Link>
               </div>
               
-              <div className="stat bg-primary text-neutral">
-                <div className="stat-figure text-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                  </svg>
+              <div className="md:w-1/2 grid grid-cols-2 gap-4">
+                {/* Stat Box 1 */}
+                <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">20+</div>
+                  <div className="text-secondary font-semibold">Programs</div>
+                  <p className="text-gray-600 text-sm">Active initiatives</p>
                 </div>
-                <div className="stat-title">Volunteers</div>
-                <div className="stat-value">700+</div>
-                <div className="stat-desc">And growing every day</div>
-              </div>
-              
-              <div className="stat bg-primary text-neutral">
-                <div className="stat-figure text-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                  </svg>
+                
+                {/* Stat Box 2 */}
+                <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">700+</div>
+                  <div className="text-secondary font-semibold">Volunteers</div>
+                  <p className="text-gray-600 text-sm">And growing every day</p>
                 </div>
-                <div className="stat-title">Events</div>
-                <div className="stat-value">50+</div>
-                <div className="stat-desc">Annual activities</div>
+                
+                {/* Stat Box 3 */}
+                <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">50+</div>
+                  <div className="text-secondary font-semibold">Events</div>
+                  <p className="text-gray-600 text-sm">Annual activities</p>
+                </div>
+                
+                {/* Stat Box 4 */}
+                <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-secondary font-semibold">Children</div>
+                  <p className="text-gray-600 text-sm">Helped so far</p>
+                </div>
               </div>
             </div>
           </div>
@@ -175,7 +244,6 @@ const Home = () => {
       </section>
       <Footer />
     </div>
-    
   );
 };
 
