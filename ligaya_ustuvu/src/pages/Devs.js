@@ -98,7 +98,7 @@ const Devs = () => {
   const fadeIn = isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10';
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-primary">
       {/* Hero Section - Compact */}
       <div className="bg-gradient-to-b from-primary/90 to-primary py-12">
         <div className="container mx-auto px-4">
