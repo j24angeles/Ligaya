@@ -39,62 +39,7 @@
     }
   ],
   "events": [
-    {
-      "id": 1,
-      "title": "Back-to-School Donation Drive",
-      "description": "Collecting school supplies for underprivileged children",
-      "date": "2023-08-15",
-      "time": "09:00",
-      "location": "UST Plaza Mayor",
-      "organizer": "UST UVU",
-      "volunteersNeeded": 20,
-      "volunteersRegistered": [
-        2
-      ],
-      "categories": [
-        "Education",
-        "Donation"
-      ],
-      "image": "",
-      "status": "upcoming"
-    },
-    {
-      "id": 2,
-      "title": "Child Health Awareness Seminar",
-      "description": "Educating parents about child nutrition and vaccination",
-      "date": "2023-09-10",
-      "time": "13:00",
-      "location": "Barangay 123 Community Center",
-      "organizer": "UST UVU with UNICEF",
-      "volunteersNeeded": 15,
-      "volunteersRegistered": [],
-      "categories": [
-        "Health",
-        "Seminar"
-      ],
-      "image": "",
-      "status": "upcoming"
-    }
-  ],
-  "donations": [
-    {
-      "id": 1,
-      "userId": 2,
-      "amount": 500,
-      "date": "2023-07-01",
-      "paymentMethod": "GCash",
-      "status": "completed",
-      "receiptNumber": "DON-2023-001"
-    }
-  ],
-  "volunteerHours": [
-    {
-      "id": 1,
-      "userId": 2,
-      "eventId": 1,
-      "hours": 4,
-      "date": "2023-08-15",
-      "verified": true
-    }
+
   ]
+ 
 }

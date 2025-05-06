@@ -3,6 +3,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Devs from './pages/Devs';
+import Privacy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+
 
 
 export default function App() {
@@ -17,6 +20,10 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/devs" element={<Devs />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+
+
 
         </Routes>
       </Router>
