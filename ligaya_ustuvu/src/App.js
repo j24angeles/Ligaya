@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Devs from './pages/Devs';
 import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import AdminEvent from './pages/admin/AdminEventPage';
+
 
 
 
@@ -22,6 +24,8 @@ export default function App() {
           <Route path="/devs" element={<Devs />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/event-management" element={<AdminEvent />} />
+
 
 
 
