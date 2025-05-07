@@ -13,7 +13,7 @@ const Devs = () => {
       id: 1,
       name: "Joaquin Angeles",
       role: "Full Stack Developer",
-      image: "/assets/dev1.png",
+      image: "/assets/dev-pics/joaq.png",
       bio: "Student developer passionate about building scalable web applications and exploring new technologies.",
       skills: ["React", "Kotlin", "ASP .NET", "MySQL", "PHP", "HTML/CSS"],
       github: "https://github.com/joaquindev",
@@ -25,7 +25,7 @@ const Devs = () => {
       id: 2,
       name: "Lyanna Cristobal",
       role: "Full Stack Developer",
-      image: "/assets/dev2.png",
+      image: "/assets/dev-pics/ly.png",
       bio: "Student developer focused on creating intuitive user interfaces and robust backend solutions.",
       skills: ["React", "Kotlin", "ASP .NET", "MySQL", "PHP", "HTML/CSS"],
       github: "https://github.com/lyannac",
@@ -98,9 +98,9 @@ const Devs = () => {
   const fadeIn = isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10';
 
   return (
-    <div className="min-h-screen flex flex-col bg-primary">
+    <div className="min-h-screen flex flex-col bg-[#FEFEFF]">
       {/* Hero Section - Compact */}
-      <div className="bg-gradient-to-b from-primary/90 to-primary py-12">
+      <div className="bg-gradient-to-b from-[#FEFEFF]/90 to-[#FEFEFF] py-12">
         <div className="container mx-auto px-4">
           <div className={`transition-all duration-1000 ${fadeIn}`}>
             <h1 className="text-5xl md:text-6xl font-bold text-center mb-4 text-neutral">
@@ -114,7 +114,7 @@ const Devs = () => {
       </div>
       
       {/* Main Team Section - Takes up most of the viewport */}
-      <section className="flex-grow py-12 flex items-center justify-center bg-primary">
+      <section className="flex-grow py-12 flex items-center justify-center bg-[#FEFEFF]">
         <div className="container mx-auto px-4">
           {/* Section heading */}
           <div className={`mb-12 transition-all duration-1000 delay-200 ${fadeIn}`}>
@@ -148,7 +148,7 @@ const Devs = () => {
                   </div>
                   
                   {/* Role overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 to-transparent p-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#FEFEFF]/90 to-transparent p-4">
                     <p className="text-secondary font-medium">{dev.role}</p>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ const Devs = () => {
                       {dev.skills.map((skill, idx) => (
                         <span 
                           key={idx}
-                          className="px-3 py-1 bg-primary/60 text-neutral/90 rounded-full text-xs font-medium"
+                          className="px-3 py-1 bg-[#FEFEFF]/60 text-neutral/90 rounded-full text-xs font-medium"
                         >
                           {skill}
                         </span>
