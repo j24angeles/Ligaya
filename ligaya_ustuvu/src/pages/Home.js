@@ -28,7 +28,7 @@ const Home = () => {
               Join Ligaya and UST UVU to advocate for children's rights, education, and well-being.
               Together, we can create lasting positive change.
             </p>
-            <Link to="/signup" className="btn btn-secondary text-primary font-bold px-8 py-3 text-lg">
+            <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-bold rounded-full text-lg hover:bg-secondary/80 transition-all duration-300">
               Volunteer Now
             </Link>
           </div>
@@ -40,8 +40,8 @@ const Home = () => {
   <div className="container mx-auto px-4">
     {/* Quote Section */}
     <div className="text-center mb-16 max-w-3xl mx-auto">
-      <h2 className="text-4xl md:text-5xl font-bold text-yellow-500 mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
-      <p className="text-2xl text-yellow-500 mb-8 italic">- Garrison Keillor</p>
+      <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
+      <p className="text-2xl text-primary mb-8 italic">- Garrison Keillor</p>
       <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
       <p className="text-xl text-gray-700">Be part of our advocacy and help us make a difference.</p>
     </div>    
@@ -55,7 +55,7 @@ const Home = () => {
         </div>
         <h3 className="text-2xl font-bold text-primary mb-3">Be one of us</h3>
         <p className="text-gray-600 mb-6">Help us to promote and uphold children's rights. Be part of our growing family!</p>
-        <Link to="/register" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+        <Link to="/register" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
           Register Now
         </Link>
       </div>
@@ -69,7 +69,7 @@ const Home = () => {
         </div>
         <h3 className="text-2xl font-bold text-primary mb-3">Be our Ally</h3>
         <p className="text-gray-600 mb-6">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
-        <Link to="/events" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+        <Link to="/events" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
           Find Events
         </Link>
       </div>
@@ -83,7 +83,7 @@ const Home = () => {
         </div>
         <h3 className="text-2xl font-bold text-primary mb-3">Support our Advocacy</h3>
         <p className="text-gray-600 mb-6">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
-        <Link to="/collaborate" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+        <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
           Start Now
         </Link>
       </div>
@@ -96,8 +96,8 @@ const Home = () => {
           </svg>
         </div>
         <h3 className="text-2xl font-bold text-primary mb-3">Be a Blessing</h3>
-        <p className="text-gray-600 mb-6">As a volunteer, your gift brings hope—support our programs and brighten a child’s future.</p>
-        <Link to="/donate" className="inline-block px-8 py-3 bg-blue-900 text-white font-semibold uppercase tracking-wider rounded-full hover:bg-blue-800 transition-all text-sm">
+        <p className="text-gray-600 mb-6">As a volunteer, your gift brings hope—support our programs and brighten a child's future.</p>
+        <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
           Lend a Hand
         </Link>
       </div>
@@ -116,8 +116,8 @@ const Home = () => {
                   Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
                   We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
                 </p>
-                <Link to="/about" className="btn btn-primary">
-                  Learn More About Us
+                <Link to="/about" className="inline-block px-8 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300">
+                  Learn More
                 </Link>
               </div>
               
@@ -176,7 +176,7 @@ const Home = () => {
                 </h3>
                 <p>Providing learning materials, tutoring, and educational activities to underprivileged children.</p>
                 <div className="card-actions justify-end mt-4">
-                  <button className="btn btn-primary btn-sm">Learn More</button>
+                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
                 </div>
               </div>
             </div>
@@ -193,7 +193,7 @@ const Home = () => {
                 </h3>
                 <p>Providing healthcare awareness, nutrition programs, and wellness activities for children.</p>
                 <div className="card-actions justify-end mt-4">
-                  <button className="btn btn-primary btn-sm">Learn More</button>
+                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
                 </div>
               </div>
             </div>
@@ -210,7 +210,7 @@ const Home = () => {
                 </h3>
                 <p>Raising awareness about children's rights and advocating for policies that protect their welfare.</p>
                 <div className="card-actions justify-end mt-4">
-                  <button className="btn btn-primary btn-sm">Learn More</button>
+                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
                 </div>
               </div>
             </div>
@@ -228,11 +228,8 @@ const Home = () => {
               Whether you have a few hours or a few days to spare, your contribution matters.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link to="/volunteer" className="btn btn-secondary text-primary btn-lg">
+              <Link to="/volunteer" className="inline-block px-8 py-3 bg-secondary text-white font-semibold rounded-full hover:bg-secondary/80 transition-all duration-300">
                 Become a Volunteer
-              </Link>
-              <Link to="/donate" className="btn btn-outline border-2 border-neutral text-neutral btn-lg hover:bg-accent">
-                Support Our Cause
               </Link>
             </div>
           </div>

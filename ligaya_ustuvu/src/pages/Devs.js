@@ -86,7 +86,7 @@ const Devs = () => {
         href={url} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="hover:scale-110 transform transition-all duration-300 bg-neutral/10 hover:bg-secondary/80 text-neutral hover:text-primary p-2 rounded-full"
+        className="hover:scale-110 transform transition-all duration-300 bg-primary hover:bg-secondary text-neutral p-2 rounded-full"
         aria-label={`${type} profile`}
       >
         <Icon />
@@ -96,47 +96,43 @@ const Devs = () => {
 
   // Fade-in animation class based on loading state
   const fadeIn = isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10';
+  
+  // Background grid pattern style
+  const gridPatternStyle = {
+    backgroundImage: `radial-gradient(#00254C 1px, transparent 1px)`,
+    backgroundSize: '20px 20px',
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FEFEFF]">
-      {/* Hero Section - Compact */}
-      <div className="bg-gradient-to-b from-[#FEFEFF]/90 to-[#FEFEFF] py-12">
-        <div className="container mx-auto px-4">
-          <div className={`transition-all duration-1000 ${fadeIn}`}>
-            <h1 className="text-5xl md:text-6xl font-bold text-center mb-4 text-neutral">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-accent/5 to-secondary/10 text-primary">
+      {/* Combined Section with header and content */}
+      <section className="flex-grow py-12 flex items-center justify-center relative">
+        <div className="absolute inset-0 opacity-5" style={gridPatternStyle}></div>
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Header Section */}
+          <div className={`mb-12 transition-all duration-1000 ${fadeIn}`}>
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-2 text-primary">
               The Team <span className="text-secondary">Behind</span> The Code
             </h1>
-            <p className="text-xl text-center text-neutral/80 max-w-3xl mx-auto">
+            <p className="text-lg text-center text-primary/80 max-w-2xl mx-auto mb-4">
               Meet the student developers bringing our digital solutions to life.
             </p>
-          </div>
-        </div>
-      </div>
-      
-      {/* Main Team Section - Takes up most of the viewport */}
-      <section className="flex-grow py-12 flex items-center justify-center bg-[#FEFEFF]">
-        <div className="container mx-auto px-4">
-          {/* Section heading */}
-          <div className={`mb-12 transition-all duration-1000 delay-200 ${fadeIn}`}>
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-neutral">
-              Meet Our Developers
-            </h2>
-            <div className="flex items-center justify-center mt-4">
-              <span className="h-1 w-24 bg-secondary mx-2 rounded-full"></span>
+            <div className="flex items-center justify-center">
+              <span className="h-1 w-16 bg-secondary mx-2 rounded-full"></span>
             </div>
           </div>
           
-          {/* Developer cards - centered */}
-          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-4xl mx-auto">
+          {/* Developer cards */}
+          <div className="flex flex-col md:flex-row justify-center gap-6 max-w-4xl mx-auto">
             {devTeam.map((dev, index) => (
               <div 
                 key={dev.id}
-                className={`group rounded-xl bg-accent shadow-lg hover:shadow-xl transition-all duration-500 w-full md:w-2/5 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`group rounded-lg bg-accent shadow-xl transition-all duration-500 w-full md:w-1/2 ${isLoaded ? 'opacity-100' : 'opacity-0'} hover:translate-y-[-5px]`}
                 style={{ transitionDelay: `${200 + index * 100}ms` }}
               >
-                <div className="relative overflow-hidden">
+                <div className="relative">
                   {/* Profile picture */}
-                  <div className="aspect-square overflow-hidden">
+                  <div className="aspect-video md:aspect-square overflow-hidden rounded-t-lg">
                     <img 
                       src={dev.image} 
                       alt={dev.name}
@@ -148,23 +144,23 @@ const Devs = () => {
                   </div>
                   
                   {/* Role overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#FEFEFF]/90 to-transparent p-4">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary to-transparent p-3">
                     <p className="text-secondary font-medium">{dev.role}</p>
                   </div>
                 </div>
                 
-                <div className="p-6">
+                <div className="p-4">
                   {/* Name and bio */}
-                  <h3 className="text-xl font-bold text-neutral mb-2">{dev.name}</h3>
-                  <p className="text-neutral/70 text-sm mb-4">{dev.bio}</p>
+                  <h3 className="text-xl font-bold text-neutral mb-1">{dev.name}</h3>
+                  <p className="text-neutral/80 text-sm mb-3">{dev.bio}</p>
                   
-                  {/* Skills - showing all skills */}
-                  <div className="mb-6">
-                    <div className="flex flex-wrap gap-2">
+                  {/* Skills - Tighter layout */}
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-1">
                       {dev.skills.map((skill, idx) => (
                         <span 
                           key={idx}
-                          className="px-3 py-1 bg-[#FEFEFF]/60 text-neutral/90 rounded-full text-xs font-medium"
+                          className="px-2 py-1 bg-primary text-neutral/90 rounded-md text-xs font-medium"
                         >
                           {skill}
                         </span>
@@ -173,7 +169,7 @@ const Devs = () => {
                   </div>
                   
                   {/* Social links */}
-                  <div className="flex gap-3 justify-center mt-4 pt-4 border-t border-neutral/10">
+                  <div className="flex gap-2 justify-center mt-3 pt-3 border-t border-primary/50">
                     <SocialIcon type="github" url={dev.github} />
                     <SocialIcon type="linkedin" url={dev.linkedin} />
                     <SocialIcon type="facebook" url={dev.facebook} />
