@@ -1,22 +1,47 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../api/auth';
+// Login.js
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { loginUser, isAuthenticated, getCurrentUser } from '../api/auth';
 import LoginForm from '../components/LoginForm';
 
 export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    // Check if user is already logged in
+    if (isAuthenticated()) {
+      const user = getCurrentUser();
+      redirectBasedOnRole(user.role);
+    }
+  }, []);
+  
+  // Handle redirection based on user role
+  const redirectBasedOnRole = (role) => {
+    // Get the intended destination from the location state or use default
+    const from = location.state?.from?.pathname || (role === 'admin' ? '/admin' : '/volunteer');
+    navigate(from, { replace: true });
+  };
 
   const handleLogin = async (credentials) => {
     setLoading(true);
     setError('');
     try {
       const user = await loginUser(credentials.email, credentials.password);
+      
+      // Store user in localStorage but without sensitive info
       localStorage.setItem('user', JSON.stringify(user));
-      navigate(user.role === 'admin' ? '/admin' : '/volunteer');
+      
+      // Set session timestamp (optional, for session expiry)
+      localStorage.setItem('sessionStart', Date.now());
+      
+      // Redirect based on role
+      redirectBasedOnRole(user.role);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }

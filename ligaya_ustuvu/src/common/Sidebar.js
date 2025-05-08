@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { logoutUser } from '../api/auth'; // Update path to point to api folder
 
 const Sidebar = ({ role = 'volunteer' }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   
-  // Handle logout
+  // Handle logout using the imported logoutUser function
   const handleLogout = () => {
-    // Add your logout logic here
+    logoutUser(); // Call the logoutUser function from auth.js
     console.log('Logging out...');
-    // Example: clear localStorage
-    localStorage.removeItem('authToken');
     // Redirect to login page
     navigate('/login');
   };
@@ -32,10 +31,8 @@ const Sidebar = ({ role = 'volunteer' }) => {
       { path: '/settings', label: 'Settings', icon: 'settings' }
     ]
   };
-
   // Get the correct items based on role
   const items = navItems[role] || navItems.volunteer;
-
   // Icon mapping
   const getIcon = (iconName) => {
     switch (iconName) {
@@ -74,7 +71,6 @@ const Sidebar = ({ role = 'volunteer' }) => {
         return null;
     }
   };
-
   return (
     <aside 
       className={`bg-primary text-neutral font-garet h-screen transition-all duration-300 ${
@@ -106,7 +102,6 @@ const Sidebar = ({ role = 'volunteer' }) => {
           )}
         </button>
       </div>
-
       {/* Role indicator */}
       <div className={`py-3 ${collapsed ? 'px-2 text-center' : 'px-4'} bg-primary/90 border-b border-accent/30`}>
         {collapsed ? (
@@ -122,7 +117,6 @@ const Sidebar = ({ role = 'volunteer' }) => {
           </div>
         )}
       </div>
-
       {/* Navigation Items */}
       <nav className="mt-4">
         <ul className="space-y-1 px-2">
@@ -152,7 +146,6 @@ const Sidebar = ({ role = 'volunteer' }) => {
           })}
         </ul>
       </nav>
-
       {/* Bottom section with #AllForTheKids and Logout button */}
       <div className={`absolute bottom-4 ${collapsed ? 'w-16' : 'w-64'}`}>
         {/* Logout button */}
@@ -180,5 +173,4 @@ const Sidebar = ({ role = 'volunteer' }) => {
     </aside>
   );
 };
-
 export default Sidebar;
