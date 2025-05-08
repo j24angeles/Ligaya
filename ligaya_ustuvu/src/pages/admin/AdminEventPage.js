@@ -9,29 +9,19 @@ const AdminEventPage = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
-    // Check for authenticated user
-    const checkAuth = () => {
-      const token = localStorage.getItem('authToken');
-      const userData = localStorage.getItem('userData');
-      
-      if (token && userData) {
-        try {
-          const parsedUser = JSON.parse(userData);
-          setUser(parsedUser);
-        } catch (error) {
-          console.error('Error parsing user data', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userData');
-        }
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing current user:', error);
+        localStorage.removeItem('currentUser');
       }
-      
-      setLoading(false);
-    };
-    
-    checkAuth();
+    }
+    setLoading(false);
   }, []);
 
-  // Handle sidebar collapse state
   const handleSidebarToggle = (collapsed) => {
     setSidebarCollapsed(collapsed);
   };
@@ -44,17 +34,13 @@ const AdminEventPage = () => {
     );
   }
 
-  // If not authenticated or not admin, redirect to login
   if (!user || user.role !== 'admin') {
     return <Navigate to="/login" replace />;
   }
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <Sidebar role="admin" onToggleCollapse={handleSidebarToggle} />
-      
-      {/* Main content */}
       <div className={`flex-1 overflow-auto transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         <EventManagement sidebarCollapsed={sidebarCollapsed} />
       </div>
