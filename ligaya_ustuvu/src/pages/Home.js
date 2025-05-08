@@ -38,74 +38,82 @@ const Home = () => {
       </section>
 
      {/* How You Could Take Part Section */}
-<section className="py-20 bg-gradient-to-b from-white to-gray-50">
-  <div className="container mx-auto px-4">
-    {/* Quote Section */}
-    <div className="text-center mb-16 max-w-3xl mx-auto">
-      <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
-      <p className="text-2xl text-primary mb-8 italic">- Garrison Keillor</p>
-      <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
-      <p className="text-xl text-gray-700">Be part of our advocacy and help us make a difference.</p>
-    </div>    
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-      {/* Option 1 */}
-      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
-        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+     <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+      <div className="container mx-auto px-4">
+        {/* Quote Section */}
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
+          <p className="text-2xl text-primary mb-8 italic">- Garrison Keillor</p>
+          <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+          <p className="text-xl text-gray-700">Be part of our advocacy and help us make a difference.</p>
+        </div>    
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Option 1 */}
+          <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1 flex flex-col h-full">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-primary mb-3">Be one of us</h3>
+            <p className="text-gray-600 mb-6 flex-grow">Help us to promote and uphold children's rights. Be part of our growing family!</p>
+            <div className="mt-auto">
+              <Link to="/register" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+                Register Now
+              </Link>
+            </div>
+          </div>
+          
+          {/* Option 2 */}
+          <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1 flex flex-col h-full">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-primary mb-3">Be our Ally</h3>
+            <p className="text-gray-600 mb-6 flex-grow">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
+            <div className="mt-auto">
+              <Link to="/events" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+                Find Events
+              </Link>
+            </div>
+          </div>
+          
+          {/* Option 3 */}
+          <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1 flex flex-col h-full">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-primary mb-3">Support our Advocacy</h3>
+            <p className="text-gray-600 mb-6 flex-grow">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
+            <div className="mt-auto">
+              <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+                Start Now
+              </Link>
+            </div>
+          </div>
+          
+          {/* Option 4 */}
+          <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1 flex flex-col h-full">
+            <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-primary mb-3">Be a Blessing</h3>
+            <p className="text-gray-600 mb-6 flex-grow">As a volunteer, your gift brings hope—support our programs and brighten a child's future.</p>
+            <div className="mt-auto">
+              <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+                Lend a Hand
+              </Link>
+            </div>
+          </div>
         </div>
-        <h3 className="text-2xl font-bold text-primary mb-3">Be one of us</h3>
-        <p className="text-gray-600 mb-6">Help us to promote and uphold children's rights. Be part of our growing family!</p>
-        <Link to="/register" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
-          Register Now
-        </Link>
       </div>
-      
-      {/* Option 2 */}
-      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
-        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <h3 className="text-2xl font-bold text-primary mb-3">Be our Ally</h3>
-        <p className="text-gray-600 mb-6">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
-        <Link to="/events" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
-          Find Events
-        </Link>
-      </div>
-      
-      {/* Option 3 */}
-      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
-        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </div>
-        <h3 className="text-2xl font-bold text-primary mb-3">Support our Advocacy</h3>
-        <p className="text-gray-600 mb-6">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
-        <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
-          Start Now
-        </Link>
-      </div>
-      
-      {/* Option 4 */}
-      <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 border-t-4 border-primary transform hover:-translate-y-1">
-        <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h3 className="text-2xl font-bold text-primary mb-3">Be a Blessing</h3>
-        <p className="text-gray-600 mb-6">As a volunteer, your gift brings hope—support our programs and brighten a child's future.</p>
-        <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
-          Lend a Hand
-        </Link>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
       {/* Mission Statement with Improved Layout */}
       <section className="py-16 bg-blue-50">
@@ -177,9 +185,6 @@ const Home = () => {
                   <div className="badge badge-secondary">SDG 4</div>
                 </h3>
                 <p>Providing learning materials, tutoring, and educational activities to underprivileged children.</p>
-                <div className="card-actions justify-end mt-4">
-                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
-                </div>
               </div>
             </div>
             
@@ -194,9 +199,6 @@ const Home = () => {
                   <div className="badge badge-secondary">SDG 3</div>
                 </h3>
                 <p>Providing healthcare awareness, nutrition programs, and wellness activities for children.</p>
-                <div className="card-actions justify-end mt-4">
-                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
-                </div>
               </div>
             </div>
             
@@ -211,9 +213,6 @@ const Home = () => {
                   <div className="badge badge-secondary">SDG 3 & 4</div>
                 </h3>
                 <p>Raising awareness about children's rights and advocating for policies that protect their welfare.</p>
-                <div className="card-actions justify-end mt-4">
-                  <button className="inline-block px-6 py-2 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300 text-sm">Learn More</button>
-                </div>
               </div>
             </div>
           </div>
