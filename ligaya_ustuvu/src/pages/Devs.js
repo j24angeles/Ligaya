@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '../common/Footer';
+import Navbar from '../common/Navbar';
 
 const Devs = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -105,6 +106,7 @@ const Devs = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-accent/5 to-secondary/10 text-primary">
+      <Navbar />
       {/* Combined Section with header and content */}
       <section className="flex-grow py-12 flex items-center justify-center relative">
         <div className="absolute inset-0 opacity-5" style={gridPatternStyle}></div>

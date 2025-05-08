@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../common/Footer';
+import Navbar from '../common/Navbar';
 
 const Home = () => {
   return (
     <div className="font-poppins">
+      <Navbar />
       {/* Hero Section with Background Image */}
       <section className="relative h-screen">
         {/* Background Image with Overlay */}
