@@ -94,15 +94,15 @@ const EventManagement = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">Event Management</h1>
         <button
-          onClick={() => {
-            setCurrentEvent(null);
-            setShowModal(true);
-          }}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus size={18} />
-          <span>Add New Event</span>
-        </button>
+  onClick={() => {
+    setCurrentEvent(null);
+    setShowModal(true);
+  }}
+  className="flex items-center gap-2 bg-primary text-white p-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors"
+>
+  <Plus size={18} />
+  <span className="hidden sm:inline">Add New Event</span>
+</button>
       </div>
 
       {/* Error alert */}

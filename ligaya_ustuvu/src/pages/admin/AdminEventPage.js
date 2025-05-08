@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../common/Sidebar';
 import EventManagement from '../../components/EventManagement';
@@ -6,7 +6,6 @@ import EventManagement from '../../components/EventManagement';
 const AdminEventPage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -22,10 +21,6 @@ const AdminEventPage = () => {
     setLoading(false);
   }, []);
 
-  const handleSidebarToggle = (collapsed) => {
-    setSidebarCollapsed(collapsed);
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -40,10 +35,15 @@ const AdminEventPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar role="admin" onToggleCollapse={handleSidebarToggle} />
-      <div className={`flex-1 overflow-auto transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
-        <EventManagement sidebarCollapsed={sidebarCollapsed} />
-      </div>
+      {/* Sidebar component with responsive behavior built-in */}
+      <Sidebar role="admin" />
+      
+      {/* Main Content - with proper padding to avoid overlap */}
+      <main className="flex-1 overflow-auto lg:ml-64 pt-16 lg:pt-4 px-4">
+        <div className="container mx-auto">
+          <EventManagement />
+        </div>
+      </main>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
@@ -9,18 +8,16 @@ import Terms from './pages/Terms';
 import AdminEvent from './pages/admin/AdminEventPage';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 
-// ProtectedRoute must be declared as a separate component that can use hooks
+// ✅ Move ProtectedRoute OUTSIDE the App component
 const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const currentUser = getCurrentUser();
 
   if (!isLoggedIn() || !currentUser) {
-    // Redirect to login, preserving attempted route
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (currentUser.role !== 'admin') {
-    // Redirect non-admins to home
     return <Navigate to="/home" replace />;
   }
 

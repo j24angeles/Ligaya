@@ -1,4 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  isLoggedIn,
+  logoutUser as authLogout,
+  storeUserSession
+} from '../api/auth'; // Assuming auth.js is in the same directory
 
 // Create context
 const AuthContext = createContext();
@@ -18,44 +26,63 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is already logged in on component mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Failed to parse stored user data:', error);
-        localStorage.removeItem('user');
-      }
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
     }
     setLoading(false);
   }, []);
+
+  // Login function
+  const login = async (email, password) => {
+    try {
+      const userData = await loginUser(email, password);
+      setUser(userData);
+      return userData;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Register function
+  const register = async (userData) => {
+    try {
+      const newUser = await registerUser(userData);
+      setUser(newUser);
+      return newUser;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   // Update user in state and localStorage
   const updateUser = (userData) => {
     setUser(userData);
     if (userData) {
-      localStorage.setItem('user', JSON.stringify(userData));
+      storeUserSession(userData);
     } else {
-      localStorage.removeItem('user');
+      authLogout();
     }
   };
 
   // Logout function
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    authLogout();
   };
 
   // Check if user is authenticated
-  const isAuthenticated = !!user;
+  const isAuthenticated = isLoggedIn();
 
   // Check if user has a specific role
   const hasRole = (role) => {
-    return isAuthenticated && user.role === role;
+    return isAuthenticated && user?.role === role;
   };
 
   const value = {
     user,
+    login,
+    register,
     updateUser,
     logout,
     isAuthenticated,
