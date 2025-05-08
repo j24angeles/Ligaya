@@ -11,19 +11,28 @@ export const registerUser = async (userData) => {
   // Check if user exists
   const checkResponse = await fetch(`${API_URL}/users?email=${userData.email}`);
   const existingUsers = await checkResponse.json();
+  
   if (existingUsers.length > 0) throw new Error('User already exists');
 
+  // Create full name from first and last name
+  const fullName = `${userData.firstName} ${userData.lastName}`;
+  
+  // Remove confirmPassword if it exists in userData
+  const { confirmPassword, ...userDataToSave } = userData;
+  
   const response = await fetch(`${API_URL}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      ...userData,
+      ...userDataToSave,
+      name: fullName, // Add full name field
       id: Date.now(),
       role: 'volunteer',
       createdAt: new Date().toISOString()
     })
   });
+  
   return await response.json();
 };
