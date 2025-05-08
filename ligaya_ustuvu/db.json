@@ -47,6 +47,28 @@
       "id": 1746631399351,
       "role": "volunteer",
       "createdAt": "2025-05-07T15:23:19.351Z"
+    },
+    {
+      "firstName": "joaquin",
+      "lastName": "angeles",
+      "email": "joaquin111@gmail.com",
+      "password": "Happ1ness!",
+      "birthdate": "2000-12-12",
+      "name": "joaquin angeles",
+      "id": 1746706656350,
+      "role": "volunteer",
+      "createdAt": "2025-05-08T12:17:36.350Z"
+    },
+    {
+      "firstName": "joaquin",
+      "lastName": "angelesss",
+      "email": "joaquin123@gmail.com",
+      "password": "Happ1ness!",
+      "birthdate": "2000-12-12",
+      "name": "joaquin angelesss",
+      "id": 1746707173823,
+      "role": "volunteer",
+      "createdAt": "2025-05-08T12:26:13.823Z"
     }
   ],
   "events": []

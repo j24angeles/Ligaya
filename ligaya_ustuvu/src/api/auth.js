@@ -1,38 +1,123 @@
 const API_URL = 'http://localhost:3001';
 
+/**
+ * Login a user with email and password
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise<Object>} - User data
+ */
 export const loginUser = async (email, password) => {
-  const response = await fetch(`${API_URL}/users?email=${email}&password=${password}`);
-  const data = await response.json();
-  if (data.length === 0) throw new Error('Invalid credentials');
-  return data[0];
+  try {
+    const response = await fetch(`${API_URL}/users?email=${encodeURIComponent(email)}`);
+    
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    
+    const users = await response.json();
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+      throw new Error('Invalid email or password');
+    }
+    
+    // Store user data in localStorage for session persistence
+    // Note: In a production app, you'd typically store a token instead of the full user object
+    storeUserSession(user);
+    
+    return user;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
 };
 
+/**
+ * Register a new user
+ * @param {Object} userData - User data including firstName, lastName, email, password, birthdate
+ * @returns {Promise<Object>} - Created user data
+ */
 export const registerUser = async (userData) => {
-  // Check if user exists
-  const checkResponse = await fetch(`${API_URL}/users?email=${userData.email}`);
-  const existingUsers = await checkResponse.json();
-  
-  if (existingUsers.length > 0) throw new Error('User already exists');
+  try {
+    // Check if user already exists
+    const checkResponse = await fetch(`${API_URL}/users?email=${encodeURIComponent(userData.email)}`);
+    
+    if (!checkResponse.ok) {
+      throw new Error('Failed to check for existing user');
+    }
+    
+    const existingUsers = await checkResponse.json();
+    if (existingUsers.length > 0) {
+      throw new Error('User with this email already exists');
+    }
 
-  // Create full name from first and last name
-  const fullName = `${userData.firstName} ${userData.lastName}`;
-  
-  // Remove confirmPassword if it exists in userData
-  const { confirmPassword, ...userDataToSave } = userData;
-  
-  const response = await fetch(`${API_URL}/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      ...userDataToSave,
-      name: fullName, // Add full name field
+    // Create full name from first and last name
+    const fullName = `${userData.firstName} ${userData.lastName}`;
+    
+    // Prepare user data for saving
+    const userDataToSave = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      password: userData.password,
+      birthdate: userData.birthdate,
+      name: fullName,
       id: Date.now(),
       role: 'volunteer',
       createdAt: new Date().toISOString()
-    })
-  });
-  
-  return await response.json();
+    };
+    
+    // Send POST request to create new user
+    const createResponse = await fetch(`${API_URL}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userDataToSave)
+    });
+    
+    if (!createResponse.ok) {
+      throw new Error('Failed to create user account');
+    }
+    
+    return await createResponse.json();
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Store user session data in localStorage
+ * @param {Object} user - User data to store
+ */
+export const storeUserSession = (user) => {
+  // Remove sensitive information before storing
+  const { password, ...userWithoutPassword } = user;
+  localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+};
+
+/**
+ * Get the current logged-in user from localStorage
+ * @returns {Object|null} - User data or null if not logged in
+ */
+export const getCurrentUser = () => {
+  const userJson = localStorage.getItem('currentUser');
+  return userJson ? JSON.parse(userJson) : null;
+};
+
+/**
+ * Check if a user is currently logged in
+ * @returns {boolean} - True if a user is logged in
+ */
+export const isLoggedIn = () => {
+  return localStorage.getItem('currentUser') !== null;
+};
+
+/**
+ * Log out the current user
+ */
+export const logoutUser = () => {
+  localStorage.removeItem('currentUser');
+  // You might want to redirect to the login page here or handle it in the component
 };
