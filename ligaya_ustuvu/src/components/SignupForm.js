@@ -343,7 +343,7 @@ export default function SignupForm() {
         <div className="form-control mt-4">
           <button 
             type="submit"
-            className="font-bold btn btn-secondary btn-sm rounded-lg shadow-md" 
+            className="text-neutral font-bold btn btn-secondary btn-sm rounded-full shadow-md" 
             disabled={loading}
           >
             {loading ? 'Creating account...' : 'Sign Up'}

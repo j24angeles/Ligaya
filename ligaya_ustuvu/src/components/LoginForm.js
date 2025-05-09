@@ -112,7 +112,7 @@ export default function LoginForm() {
         <div className="form-control mt-0">
           <button 
             type="submit"
-            className="font-bold btn btn-secondary btn-sm rounded-lg shadow-md" 
+            className="text-neutral font-bold btn btn-secondary btn-sm rounded-full shadow-md" 
             disabled={loading}
           >
             {loading ? 'Signing in...' : 'Sign In'}
