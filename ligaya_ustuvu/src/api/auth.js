@@ -1,4 +1,14 @@
+import axios from 'axios';
+
 const API_URL = 'http://localhost:3001';
+
+// Create an axios instance with common configuration
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
 /**
  * Login a user with email and password
@@ -8,27 +18,25 @@ const API_URL = 'http://localhost:3001';
  */
 export const loginUser = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/users?email=${encodeURIComponent(email)}`);
+    // Get users with matching email
+    const response = await api.get(`/users`, {
+      params: { email }
+    });
     
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    
-    const users = await response.json();
-    const user = users.find(u => u.email === email && u.password === password);
+    // Find user with matching email and password
+    const user = response.data.find(u => u.email === email && u.password === password);
     
     if (!user) {
       throw new Error('Invalid email or password');
     }
     
     // Store user data in localStorage for session persistence
-    // Note: In a production app, you'd typically store a token instead of the full user object
     storeUserSession(user);
     
     return user;
   } catch (error) {
     console.error('Login error:', error);
-    throw error;
+    throw error.response?.data || error;
   }
 };
 
@@ -40,13 +48,11 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (userData) => {
   try {
     // Check if user already exists
-    const checkResponse = await fetch(`${API_URL}/users?email=${encodeURIComponent(userData.email)}`);
+    const checkResponse = await api.get(`/users`, {
+      params: { email: userData.email }
+    });
     
-    if (!checkResponse.ok) {
-      throw new Error('Failed to check for existing user');
-    }
-    
-    const existingUsers = await checkResponse.json();
+    const existingUsers = checkResponse.data;
     if (existingUsers.length > 0) {
       throw new Error('User with this email already exists');
     }
@@ -67,23 +73,13 @@ export const registerUser = async (userData) => {
       createdAt: new Date().toISOString()
     };
     
-    // Send POST request to create new user
-    const createResponse = await fetch(`${API_URL}/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userDataToSave)
-    });
+    // Create new user
+    const createResponse = await api.post('/users', userDataToSave);
     
-    if (!createResponse.ok) {
-      throw new Error('Failed to create user account');
-    }
-    
-    return await createResponse.json();
+    return createResponse.data;
   } catch (error) {
     console.error('Registration error:', error);
-    throw error;
+    throw error.response?.data || error;
   }
 };
 

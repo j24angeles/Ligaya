@@ -2,17 +2,18 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../hooks/ToastProvider';
 
 export default function LoginForm() {
   const navigate = useNavigate();
   const { updateUser } = useAuth();
+  const { showError, showSuccess } = useToast();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,23 +21,20 @@ export default function LoginForm() {
       ...prev,
       [name]: value
     }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    if (!formData.email.trim()) {
+      showError('Email is required.');
+      return false;
+    }
     
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.password) newErrors.password = 'Password is required';
+    if (!formData.password) {
+      showError('Password is required.');
+      return false;
+    }
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +43,6 @@ export default function LoginForm() {
     if (!validateForm()) return;
     
     setLoading(true);
-    setApiError('');
     
     try {
       // Login user
@@ -54,10 +51,13 @@ export default function LoginForm() {
       // Update auth context with logged in user
       updateUser(user);
       
+      // Show success toast
+      showSuccess('Login successful!');
+      
       // Redirect to dashboard or home page
       navigate('/dashboard');
     } catch (error) {
-      setApiError(error.message || 'Failed to login. Please check your credentials.');
+      showError(error.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -67,15 +67,9 @@ export default function LoginForm() {
   const RequiredMark = () => <span className="text-error ml-1">*</span>;
   
   return (
-    <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg">
-      <div className="px-6 pt-6">
+    <div className="w-full max-w-sm mx-auto bg-base-100 shadow-xl rounded-lg pt-0">
+      <div className="px-6 pt-10">
         <h2 className="text-2xl font-bold text-secondary text-shadow mb-4">Sign In</h2>
-        
-        {apiError && (
-          <div className="alert alert-error mb-4 text-xs p-2">
-            <span>{apiError}</span>
-          </div>
-        )}
       </div>
       
       <form onSubmit={handleSubmit} className="card-body pt-0">
@@ -88,13 +82,10 @@ export default function LoginForm() {
             type="email"
             name="email"
             placeholder="email@example.com"
-            className={`input input-bordered input-sm text-xs w-full ${errors.email ? 'input-error' : ''}`}
+            className="input input-bordered input-sm text-xs w-full"
             value={formData.email}
             onChange={handleChange}
           />
-          {errors.email && (
-            <div className="text-error text-xs mt-1">{errors.email}</div>
-          )}
         </div>
         
         {/* Password */}
@@ -106,23 +97,22 @@ export default function LoginForm() {
             type="password"
             name="password"
             placeholder="Enter password"
-            className={`input input-bordered input-sm text-xs w-full ${errors.password ? 'input-error' : ''}`}
+            className="input input-bordered input-sm text-xs w-full"
             value={formData.password}
             onChange={handleChange}
           />
-          {errors.password && (
-            <div className="text-error text-xs mt-1">{errors.password}</div>
-          )}
-          <label className="label">
-            <Link to="/forgot-password" className="label-text-alt text-xs text-primary hover:underline">Forgot password?</Link>
+          <label className="text-right mt-1">
+            <Link to="/forgot-password" className="label-text-alt text-xs text-primary hover:underline">
+              Forgot password?
+            </Link>
           </label>
         </div>
         
         {/* Submit Button */}
-        <div className="form-control mt-4">
+        <div className="form-control mt-0">
           <button 
             type="submit"
-            className="btn btn-secondary btn-sm rounded-lg shadow-md" 
+            className="font-bold btn btn-secondary btn-sm rounded-lg shadow-md" 
             disabled={loading}
           >
             {loading ? 'Signing in...' : 'Sign In'}
@@ -132,7 +122,7 @@ export default function LoginForm() {
         {/* Sign Up Link */}
         <div className="text-center mt-2">
           <p className="text-xs text-shadow">Don't have an account? {' '}
-            <Link to="/signup" className="text-primary font-semibold hover:underline">
+            <Link to="/signup" className="text-secondary font-semibold hover:underline">
               Sign Up
             </Link>
           </p>

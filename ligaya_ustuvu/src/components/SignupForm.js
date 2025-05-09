@@ -195,7 +195,7 @@ export default function SignupForm() {
   const hasRequiredFieldsError = errors.requiredFields && attemptedSubmit;
   
   return (
-    <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg p-4 mt-8"> {/* Added mt-8 for top spacing */}
+    <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg p-4 mt-8">
       <div className="px-6 pt-6">
         <h2 className="text-2xl font-bold text-secondary text-shadow mb-4">Create an Account</h2>
       </div>
@@ -288,7 +288,7 @@ export default function SignupForm() {
       />
     </div>
     <span 
-      className="text-xs whitespace-nowrap"
+      className="text-[0.60rem] leading-none whitespace-nowrap"
       style={{ color: getStrengthInfo(passwordStrength).color }}
     >
       {passwordStrength === 0 && 'Very weak'}
@@ -343,7 +343,7 @@ export default function SignupForm() {
         <div className="form-control mt-4">
           <button 
             type="submit"
-            className="btn btn-secondary btn-sm rounded-lg shadow-md" 
+            className="font-bold btn btn-secondary btn-sm rounded-lg shadow-md" 
             disabled={loading}
           >
             {loading ? 'Creating account...' : 'Sign Up'}
