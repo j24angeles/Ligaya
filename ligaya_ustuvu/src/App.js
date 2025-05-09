@@ -8,7 +8,9 @@ import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import AdminEvent from './pages/admin/AdminEventPage';
 import { isLoggedIn, getCurrentUser } from './api/auth';
-import { ToastProvider } from './hooks/ToastProvider'; // Import the ToastProvider
+import { ToastProvider } from './hooks/ToastProvider'; 
+import AboutUs from './pages/AboutUs';
+
 
 // ProtectedRoute must be declared as a separate component that can use hooks
 const ProtectedRoute = ({ children }) => {
@@ -42,6 +44,8 @@ export default function App() {
             <Route path="/devs" element={<Devs />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/about-us" element={<AboutUs />} />
+
             <Route
               path="/event-management"
               element={

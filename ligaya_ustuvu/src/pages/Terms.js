@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../common/Footer';
+import Navbar from '../common/Navbar';
+
 
 const TermsAndConditions = () => {
   React.useEffect(() => {
@@ -9,6 +11,7 @@ const TermsAndConditions = () => {
 
   return (
     <div className="font-poppins">
+       <Navbar />
       {/* Header Banner */}
       <div className="bg-primary text-white py-16">
         <div className="container mx-auto px-4">
