@@ -195,7 +195,7 @@ export default function SignupForm() {
   const hasRequiredFieldsError = errors.requiredFields && attemptedSubmit;
   
   return (
-    <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg p-4 mt-8">
+    <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg p-4 mt-4">
       <div className="px-6 pt-6">
         <h2 className="text-2xl font-bold text-secondary text-shadow mb-4">Create an Account</h2>
       </div>

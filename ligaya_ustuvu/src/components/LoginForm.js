@@ -39,29 +39,36 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (!validateForm()) return;
-    
+  
     setLoading(true);
-    
+  
     try {
       // Login user
       const user = await loginUser(formData.email, formData.password);
-      
+  
       // Update auth context with logged in user
       updateUser(user);
-      
+  
       // Show success toast
       showSuccess('Login successful!');
-      
-      // Redirect to dashboard or home page
-      navigate('/dashboard');
+  
+      // Check user role and redirect accordingly
+      if (user.role === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (user.role === 'volunteer') {
+        navigate('/volunteer-dashboard');
+      } else {
+        navigate('/dashboard'); // Fallback route in case no role is matched
+      }
     } catch (error) {
       showError(error.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
+  
 
   // Required field marker
   const RequiredMark = () => <span className="text-error ml-1">*</span>;

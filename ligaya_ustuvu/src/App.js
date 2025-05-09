@@ -11,6 +11,11 @@ import AdminUserMgmt from './pages/admin/AdminUserPage';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider'; 
 import AboutUs from './pages/AboutUs';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import VolunteerDashboard from './pages/VolunteerDashboard';
+
+
+
 
 
 // ProtectedRoute must be declared as a separate component that can use hooks
@@ -46,6 +51,8 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
 
             <Route
               path="/event-management"

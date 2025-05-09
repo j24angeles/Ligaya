@@ -8,8 +8,8 @@ export default function Login() {
     <>
       <Navbar />
       <div
-        className="min-h-screen py-12 bg-cover bg-center flex items-center justify-center"
-        style={{ backgroundImage: "url('/assets/login_bg.png')" }}
+className="h-[42rem] py-12 bg-cover bg-center flex items-center justify-center"
+style={{ backgroundImage: "url('/assets/login_bg.png')" }}
       >
         <div className="w-full max-w-md">
           <LoginForm />
