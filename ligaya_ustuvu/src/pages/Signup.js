@@ -14,14 +14,7 @@ export default function Signup() {
         <div className="w-full max-w-md">
           <SignupForm />
           
-          {/* Sign In Link */}
-          <div className="text-center mt-4 bg-base-100 p-4 rounded-lg shadow-lg">
-            <p className="text-sm">Already have an account? {' '}
-              <Link to="/login" className="text-primary font-semibold text-secondary hover:underline">
-                Sign In
-              </Link>
-            </p>
-          </div>
+        
         </div>
       </div>
       <Footer />

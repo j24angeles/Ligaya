@@ -10,8 +10,8 @@ const Navbar = () => {
   const textShadowStyle = { textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)' };
 
   return (
-    <nav className="bg-white text-primary shadow-md">
-      <div className="max-w-full mx-auto px-6 sm:px-8 lg:px-12">
+<nav className="sticky top-0 z-50 bg-white text-primary shadow-md">
+<div className="max-w-full mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Left section: Logo and nav links */}
           <div className="flex items-center">

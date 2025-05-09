@@ -8,6 +8,7 @@ import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import AdminEvent from './pages/admin/AdminEventPage';
 import { isLoggedIn, getCurrentUser } from './api/auth';
+import { ToastProvider } from './hooks/ToastProvider'; // Import the ToastProvider
 
 // ProtectedRoute must be declared as a separate component that can use hooks
 const ProtectedRoute = ({ children }) => {
@@ -30,25 +31,28 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   return (
     <div className="font-poppins">
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/devs" element={<Devs />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route
-            path="/event-management"
-            element={
-              <ProtectedRoute>
-                <AdminEvent />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
+      {/* Wrap the Router with ToastProvider so toasts are available throughout the app */}
+      <ToastProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/devs" element={<Devs />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route
+              path="/event-management"
+              element={
+                <ProtectedRoute>
+                  <AdminEvent />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </ToastProvider>
     </div>
   );
 }
