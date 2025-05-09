@@ -23,14 +23,14 @@ const Home = () => {
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center">
           <div className="max-w-2xl text-white">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
               Your small help makes the world <span className="text-secondary">better</span>
             </h1>
             <p className="text-xl mb-8 text-white/90">
               Join Ligaya and UST UVU to advocate for children's rights, education, and well-being.
               Together, we can create lasting positive change.
             </p>
-            <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-bold rounded-full text-lg hover:bg-secondary/80 transition-all duration-300">
+            <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-bold rounded-full text-lg hover:bg-secondary/80 transition-all duration-300 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
               Volunteer Now
             </Link>
           </div>
@@ -42,10 +42,10 @@ const Home = () => {
       <div className="container mx-auto px-4">
         {/* Quote Section */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic">"Nothing You Do For Children Is Ever Wasted"</h2>
-          <p className="text-2xl text-primary mb-8 italic">- Garrison Keillor</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">"Nothing You Do For Children Is Ever Wasted"</h2>
+          <p className="text-2xl text-primary mb-8 italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">- Garrison Keillor</p>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
-          <p className="text-xl text-gray-700">Be part of our advocacy and help us make a difference.</p>
+          <p className="text-xl text-gray-700 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be part of our advocacy and help us make a difference.</p>
         </div>    
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Option 1 */}
@@ -55,8 +55,8 @@ const Home = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-primary mb-3">Be one of us</h3>
-            <p className="text-gray-600 mb-6 flex-grow">Help us to promote and uphold children's rights. Be part of our growing family!</p>
+            <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be one of us</h3>
+            <p className="text-gray-600 mb-6 flex-grow [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Help us to promote and uphold children's rights. Be part of our growing family!</p>
             <div className="mt-auto">
               <Link to="/register" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
                 Register Now
@@ -71,10 +71,10 @@ const Home = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-primary mb-3">Be our Ally</h3>
-            <p className="text-gray-600 mb-6 flex-grow">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
+            <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be our Ally</h3>
+            <p className="text-gray-600 mb-6 flex-grow [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Collaborate with us and help each other fulfill the advocacies of our organizations!</p>
             <div className="mt-auto">
-              <Link to="/events" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+              <Link to="/events" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
                 Find Events
               </Link>
             </div>
@@ -87,10 +87,10 @@ const Home = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-primary mb-3">Support our Advocacy</h3>
-            <p className="text-gray-600 mb-6 flex-grow">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
+            <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Support our Advocacy</h3>
+            <p className="text-gray-600 mb-6 flex-grow [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
             <div className="mt-auto">
-              <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+              <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
                 Start Now
               </Link>
             </div>
@@ -103,10 +103,10 @@ const Home = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-primary mb-3">Be a Blessing</h3>
+            <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be a Blessing</h3>
             <p className="text-gray-600 mb-6 flex-grow">As a volunteer, your gift brings hope—support our programs and brighten a child's future.</p>
             <div className="mt-auto">
-              <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+              <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
                 Lend a Hand
               </Link>
             </div>
@@ -121,7 +121,7 @@ const Home = () => {
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                <h2 className="text-3xl font-bold text-primary mb-4">Our Mission</h2>
+                <h2 className="text-3xl font-bold text-primary mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Our Mission</h2>
                 <p className="text-lg text-gray-700 mb-6">
                   Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
                   We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
