@@ -81,7 +81,11 @@
       "name": "lyanna cristobal",
       "id": 1746756272010,
       "role": "volunteer",
-      "createdAt": "2025-05-09T02:04:32.010Z"
+      "createdAt": "2025-05-09T02:04:32.010Z",
+      "eventsJoined": [
+        1746799885524
+      ],
+      "updatedAt": "2025-05-09T14:20:35.246Z"
     },
     {
       "firstName": "",
@@ -114,8 +118,39 @@
       "name": "joaquin angeles",
       "id": 1746776568076,
       "role": "volunteer",
-      "createdAt": "2025-05-09T07:42:48.076Z"
+      "createdAt": "2025-05-09T07:42:48.076Z",
+      "eventsJoined": [
+        1746799885524
+      ],
+      "updatedAt": "2025-05-09T14:12:19.476Z"
     }
   ],
-  "events": []
+  "events": [
+    {
+      "title": "12321321",
+      "description": "dasdsadasdasdsadasdsa",
+      "location": "213123213",
+      "date": "2026-11-11",
+      "time": "00:32",
+      "bannerImage": "",
+      "isPublished": true,
+      "id": 1746799885524,
+      "createdAt": "2025-05-09T14:11:25.524Z",
+      "volunteers": [
+        {
+          "id": 1746776568076,
+          "name": "joaquin angeles",
+          "email": "joaquinmiguel.angeles.cics@ust.edu.ph",
+          "registeredAt": "2025-05-09T14:12:19.461Z"
+        },
+        {
+          "id": 1746756272010,
+          "name": "lyanna cristobal",
+          "email": "lyannacristobal@gmail.comm",
+          "registeredAt": "2025-05-09T14:20:35.232Z"
+        }
+      ],
+      "updatedAt": "2025-05-09T14:21:39.590Z"
+    }
+  ]
 }

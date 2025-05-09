@@ -6,30 +6,25 @@ import Home from './pages/Home';
 import Devs from './pages/Devs';
 import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import AboutUs from './pages/AboutUs';
 import AdminEvent from './pages/admin/AdminEventPage';
 import AdminUserMgmt from './pages/admin/AdminUserPage';
-import { isLoggedIn, getCurrentUser } from './api/auth';
-import { ToastProvider } from './hooks/ToastProvider'; 
-import AboutUs from './pages/AboutUs';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import VolunteerEvent from './pages/volunteer/VolunteerEventPage';
 import VolunteerDashboard from './pages/VolunteerDashboard';
+import { isLoggedIn, getCurrentUser } from './api/auth';
+import { ToastProvider } from './hooks/ToastProvider';
 
-
-
-
-
-// ProtectedRoute must be declared as a separate component that can use hooks
-const ProtectedRoute = ({ children }) => {
+// Enhanced ProtectedRoute component that accepts allowedRoles
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
   const currentUser = getCurrentUser();
 
   if (!isLoggedIn() || !currentUser) {
-    // Redirect to login, preserving attempted route
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (currentUser.role !== 'admin') {
-    // Redirect non-admins to home
+  if (allowedRoles.length > 0 && !allowedRoles.includes(currentUser.role)) {
     return <Navigate to="/home" replace />;
   }
 
@@ -39,7 +34,6 @@ const ProtectedRoute = ({ children }) => {
 export default function App() {
   return (
     <div className="font-poppins">
-      {/* Wrap the Router with ToastProvider so toasts are available throughout the app */}
       <ToastProvider>
         <Router>
           <Routes>
@@ -51,22 +45,49 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
 
+            {/* Dashboards */}
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/volunteer-dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <VolunteerDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Admin-only routes */}
             <Route
               path="/event-management"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['admin']}>
                   <AdminEvent />
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/user-management"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['admin']}>
                   <AdminUserMgmt />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Volunteer-only route */}
+            <Route
+              path="/volunteer-events"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <VolunteerEvent />
                 </ProtectedRoute>
               }
             />
