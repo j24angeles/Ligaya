@@ -7,6 +7,7 @@ import Devs from './pages/Devs';
 import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import AdminEvent from './pages/admin/AdminEventPage';
+import AdminUserMgmt from './pages/admin/AdminUserPage';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider'; 
 import AboutUs from './pages/AboutUs';
@@ -51,6 +52,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <AdminEvent />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/user-management"
+              element={
+                <ProtectedRoute>
+                  <AdminUserMgmt />
                 </ProtectedRoute>
               }
             />

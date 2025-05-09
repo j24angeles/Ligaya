@@ -57,7 +57,9 @@
       "name": "joaquin angeles",
       "id": 1746706656350,
       "role": "volunteer",
-      "createdAt": "2025-05-08T12:17:36.350Z"
+      "createdAt": "2025-05-08T12:17:36.350Z",
+      "status": "archived",
+      "updatedAt": "2025-05-09T12:01:20.982Z"
     },
     {
       "firstName": "joaquin",
