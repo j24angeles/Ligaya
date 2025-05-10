@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, AlertCircle } from 'lucide-react';
 import EventFormModal from './EventFormModal';
 import EventCard from './EventCard';
+import ConfirmationModal from './ConfirmationModal';
 import { getAllEvents, createEvent, updateEvent, deleteEvent } from '../api/eventService';
+import { useToast } from '../hooks/ToastProvider';
 
 const EventManagement = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +14,17 @@ const EventManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationData, setConfirmationData] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    type: 'info',
+    confirmText: 'Confirm'
+  });
+
+  // Use toast context
+  const { showSuccess, showError} = useToast();
 
   // Fetch all events
   const fetchEvents = async () => {
@@ -22,6 +35,7 @@ const EventManagement = () => {
       setError(null);
     } catch (err) {
       setError(err.message);
+      showError(`Failed to fetch events: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -32,27 +46,45 @@ const EventManagement = () => {
     fetchEvents();
   }, []);
 
-  // Handle creating and updating events
+  // Show confirmation modal
+  const confirmAction = (title, message, onConfirm, type = 'info', confirmText = 'Confirm') => {
+    setConfirmationData({ title, message, onConfirm, type, confirmText });
+    setShowConfirmation(true);
+  };
+
+  // Handle creating and updating events with confirmation
   const handleSubmitEvent = async (eventData) => {
-    setIsLoading(true);
+    const isUpdate = !!currentEvent;
     
-    try {
-      if (currentEvent) {
-        // Update existing event
-        await updateEvent(currentEvent.id, eventData);
-      } else {
-        // Create new event
-        await createEvent(eventData);
-      }
-      
-      await fetchEvents();
-      setShowModal(false);
-      setCurrentEvent(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    confirmAction(
+      isUpdate ? 'Update Event' : 'Create Event',
+      isUpdate ? 'Are you sure you want to update this event?' : 'Are you sure you want to create this event?',
+      async () => {
+        setIsLoading(true);
+        
+        try {
+          if (isUpdate) {
+            // Update existing event
+            await updateEvent(currentEvent.id, eventData);
+            showSuccess('Event updated successfully!');
+          } else {
+            // Create new event
+            await createEvent(eventData);
+            showSuccess('Event created successfully!');
+          }
+          
+          await fetchEvents();
+          setShowModal(false);
+          setCurrentEvent(null);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to ${isUpdate ? 'update' : 'create'} event: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      'info'
+    );
   };
 
   // Handle editing event
@@ -61,19 +93,26 @@ const EventManagement = () => {
     setShowModal(true);
   };
 
-  // Handle deleting event
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-    
-    setIsLoading(true);
-    try {
-      await deleteEvent(id);
-      await fetchEvents();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+  // Handle deleting event with confirmation
+  const handleDelete = (id) => {
+    confirmAction(
+      'Delete Event',
+      'Are you sure you want to delete this event? This action cannot be undone.',
+      async () => {
+        setIsLoading(true);
+        try {
+          await deleteEvent(id);
+          showSuccess('Event deleted successfully!');
+          await fetchEvents();
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to delete event: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      'delete'
+    );
   };
 
   // Filter events based on search term and status
@@ -94,15 +133,15 @@ const EventManagement = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">Event Management</h1>
         <button
-  onClick={() => {
-    setCurrentEvent(null);
-    setShowModal(true);
-  }}
-  className="flex items-center gap-2 bg-primary text-white p-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors"
->
-  <Plus size={18} />
-  <span className="hidden sm:inline">Add New Event</span>
-</button>
+          onClick={() => {
+            setCurrentEvent(null);
+            setShowModal(true);
+          }}
+          className="flex items-center gap-2 bg-primary text-white p-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          <Plus size={18} />
+          <span className="hidden sm:inline">Add New Event</span>
+        </button>
       </div>
 
       {/* Error alert */}
@@ -179,6 +218,17 @@ const EventManagement = () => {
         onClose={() => setShowModal(false)}
         onSubmit={handleSubmitEvent}
         currentEvent={currentEvent}
+      />
+
+      {/* Confirmation modal */}
+      <ConfirmationModal
+        show={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        title={confirmationData.title}
+        message={confirmationData.message}
+        onConfirm={confirmationData.onConfirm}
+        type={confirmationData.type}
+        confirmText={confirmationData.type === 'delete' ? 'Delete' : 'Confirm'}
       />
     </div>
   );

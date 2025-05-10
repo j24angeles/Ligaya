@@ -7,7 +7,7 @@ const AdminDashboard = () => {
     <div>
       <h1>Admin Dashboard</h1>
       {/* Admin specific content goes here */}
-      <Sidebar />
+      <Sidebar role="admin" />
     </div>
    
   );

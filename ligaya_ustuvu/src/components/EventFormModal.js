@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Image, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, Image, X, User } from 'lucide-react';
 
 const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,21 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
     isPublished: false
   });
 
+  // Track which fields have been touched by the user (on blur)
+  const [touched, setTouched] = useState({
+    title: false,
+    description: false,
+    location: false,
+    date: false,
+    time: false
+  });
+
+  // Track if form has been submitted to show all errors
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  // Store validation errors
+  const [errors, setErrors] = useState({});
+  
   // Initialize form with current event data if editing
   useEffect(() => {
     if (currentEvent) {
@@ -32,21 +47,106 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
         isPublished: false
       });
     }
+    // Reset touched states and errors when modal opens/closes or changes between edit/create
+    setTouched({
+      title: false,
+      description: false,
+      location: false,
+      date: false,
+      time: false
+    });
+    setErrors({});
+    setIsSubmitted(false);
   }, [currentEvent, isOpen]);
+
+  // Validate a single field
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'title':
+        return value.trim() === '' ? 'Event title is required' : '';
+      case 'description':
+        return value.trim() === '' ? 'Description is required' : '';
+      case 'location':
+        return value.trim() === '' ? 'Location is required' : '';
+      case 'date':
+        return value === '' ? 'Date is required' : '';
+      case 'time':
+        return value === '' ? 'Time is required' : '';
+      default:
+        return '';
+    }
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+    
+    // Validate all required fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (['title', 'description', 'location', 'date', 'time'].includes(key)) {
+        const error = validateField(key, value);
+        if (error) {
+          newErrors[key] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    const newValue = type === 'checkbox' ? checked : value;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue
+    }));
+    
+    // Only validate if the field has been touched (blurred) or form has been submitted
+    if (touched[name] || isSubmitted) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: validateField(name, newValue)
+      }));
+    }
+  };
+
+  // Handle field blur to mark as touched
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    
+    // Mark the field as touched
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
+    
+    // Validate the field
+    setErrors(prev => ({
+      ...prev,
+      [name]: validateField(name, value)
+    }));
   };
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    setIsSubmitted(true);
+    
+    // Validate all fields before submitting
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  // Helper to determine if error should be shown
+  const shouldShowError = (fieldName) => {
+    return (touched[fieldName] || isSubmitted) && errors[fieldName];
   };
 
   if (!isOpen) return null;
@@ -73,16 +173,24 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                   Event Title*
                 </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Enter event title"
-                />
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <User size={16} />
+                  </span>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    className={`w-full p-2 pl-10 border ${shouldShowError('title') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${shouldShowError('title') ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
+                    placeholder="Enter event title"
+                  />
+                </div>
+                {shouldShowError('title') && (
+                  <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                )}
               </div>
               
               <div>
@@ -99,11 +207,14 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
-                    required
-                    className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    onBlur={handleBlur}
+                    className={`w-full p-2 pl-10 border ${shouldShowError('location') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${shouldShowError('location') ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                     placeholder="Enter location"
                   />
                 </div>
+                {shouldShowError('location') && (
+                  <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                )}
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -121,10 +232,13 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                       name="date"
                       value={formData.date}
                       onChange={handleInputChange}
-                      required
-                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                      onBlur={handleBlur}
+                      className={`w-full p-2 pl-10 border ${shouldShowError('date') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${shouldShowError('date') ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                     />
                   </div>
+                  {shouldShowError('date') && (
+                    <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+                  )}
                 </div>
                 
                 <div>
@@ -141,10 +255,13 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                       name="time"
                       value={formData.time}
                       onChange={handleInputChange}
-                      required
-                      className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                      onBlur={handleBlur}
+                      className={`w-full p-2 pl-10 border ${shouldShowError('time') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${shouldShowError('time') ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                     />
                   </div>
+                  {shouldShowError('time') && (
+                    <p className="text-red-500 text-sm mt-1">{errors.time}</p>
+                  )}
                 </div>
               </div>
               
@@ -192,11 +309,14 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                required
+                onBlur={handleBlur}
                 rows="12"
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                className={`w-full p-2 border ${shouldShowError('description') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 ${shouldShowError('description') ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
                 placeholder="Enter event description"
               ></textarea>
+              {shouldShowError('description') && (
+                <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+              )}
             </div>
           </div>
           

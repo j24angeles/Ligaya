@@ -111,18 +111,13 @@
     },
     {
       "firstName": "joaquin",
-      "lastName": "angeles",
+      "lastName": "angeless",
       "email": "joaquinmiguel.angeles.cics@ust.edu.ph",
-      "password": "Happ1ness!",
       "birthdate": "2003-11-04",
-      "name": "joaquin angeles",
-      "id": 1746776568076,
+      "password": "",
       "role": "volunteer",
-      "createdAt": "2025-05-09T07:42:48.076Z",
-      "eventsJoined": [
-        1746799885524
-      ],
-      "updatedAt": "2025-05-09T14:12:19.476Z"
+      "updatedAt": "2025-05-10T11:21:43.618Z",
+      "id": 1746776568076
     }
   ],
   "events": [

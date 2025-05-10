@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, AlertCircle, Edit, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import UserFormModal from './UserFormModal';
+import ConfirmationModal from './ConfirmationModal';
+import { useToast } from '../hooks/ToastProvider';
 import { getAllUsers, createUser, updateUser, deleteUser } from '../api/userService';
 
 const AdminUserManagement = () => {
@@ -13,6 +15,20 @@ const AdminUserManagement = () => {
   const [statusFilter, setStatusFilter] = useState('active');
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
+  
+  // Toast notifications
+  const { showSuccess, showError, showInfo } = useToast();
+  
+  // Confirmation modals state
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationConfig, setConfirmationConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: () => {},
+    confirmText: 'Confirm',
+    cancelText: 'Cancel'
+  });
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,6 +43,7 @@ const AdminUserManagement = () => {
       setError(null);
     } catch (err) {
       setError(err.message);
+      showError(`Failed to load users: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -37,26 +54,61 @@ const AdminUserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Handle creating and updating users
+  // Open confirmation modal with specific configuration
+  const openConfirmationModal = (config) => {
+    setConfirmationConfig(config);
+    setShowConfirmationModal(true);
+  };
+
+  // Handle creating and updating users with confirmation
   const handleSubmitUser = async (userData) => {
-    setIsLoading(true);
-    
-    try {
-      if (currentUser) {
-        // Update existing user
-        await updateUser(currentUser.id, userData);
-      } else {
-        // Create new user
-        await createUser(userData);
-      }
-      
-      await fetchUsers();
-      setShowModal(false);
-      setCurrentUser(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+    if (currentUser) {
+      // Editing existing user - show confirmation
+      openConfirmationModal({
+        title: "Update Volunteer",
+        message: `Are you sure you want to update ${userData.firstName} ${userData.lastName}'s information?`,
+        type: "info",
+        onConfirm: async () => {
+          setIsLoading(true);
+          try {
+            await updateUser(currentUser.id, userData);
+            await fetchUsers();
+            setShowModal(false);
+            setCurrentUser(null);
+            showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was updated successfully`);
+          } catch (err) {
+            setError(err.message);
+            showError(`Failed to update volunteer: ${err.message}`);
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        confirmText: "Update",
+        cancelText: "Cancel"
+      });
+    } else {
+      // Creating new user - show confirmation
+      openConfirmationModal({
+        title: "Add New Volunteer",
+        message: `Are you sure you want to add ${userData.firstName} ${userData.lastName} as a volunteer?`,
+        type: "info",
+        onConfirm: async () => {
+          setIsLoading(true);
+          try {
+            await createUser(userData);
+            await fetchUsers();
+            setShowModal(false);
+            showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was added successfully`);
+          } catch (err) {
+            setError(err.message);
+            showError(`Failed to add volunteer: ${err.message}`);
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        confirmText: "Add Volunteer",
+        cancelText: "Cancel"
+      });
     }
   };
 
@@ -66,49 +118,76 @@ const AdminUserManagement = () => {
     setShowModal(true);
   };
 
-  // Handle archiving user
-  const handleArchive = async (user) => {
-    if (!window.confirm('Are you sure you want to archive this user?')) return;
-    
-    setIsLoading(true);
-    try {
-      await updateUser(user.id, { ...user, status: 'archived' });
-      await fetchUsers();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+  // Handle archiving user with confirmation
+  const handleArchive = (user) => {
+    openConfirmationModal({
+      title: "Archive Volunteer",
+      message: `Are you sure you want to archive ${user.firstName} ${user.lastName}? They will no longer appear in the active volunteers list.`,
+      type: "warning",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await updateUser(user.id, { ...user, status: 'archived' });
+          await fetchUsers();
+          showSuccess(`Volunteer ${user.firstName} ${user.lastName} was archived successfully`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to archive volunteer: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Archive",
+      cancelText: "Cancel"
+    });
   };
   
-  // Handle restoring archived user
-  const handleRestore = async (user) => {
-    if (!window.confirm('Are you sure you want to restore this user?')) return;
-    
-    setIsLoading(true);
-    try {
-      await updateUser(user.id, { ...user, status: 'active' });
-      await fetchUsers();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+  // Handle restoring archived user with confirmation
+  const handleRestore = (user) => {
+    openConfirmationModal({
+      title: "Restore Volunteer",
+      message: `Are you sure you want to restore ${user.firstName} ${user.lastName} to active status?`,
+      type: "success",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await updateUser(user.id, { ...user, status: 'active' });
+          await fetchUsers();
+          showSuccess(`Volunteer ${user.firstName} ${user.lastName} was restored to active status`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to restore volunteer: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Restore",
+      cancelText: "Cancel"
+    });
   };
   
-  // Handle permanently deleting user (only for archived users)
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) return;
-    
-    setIsLoading(true);
-    try {
-      await deleteUser(id);
-      await fetchUsers();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+  // Handle permanently deleting user with confirmation
+  const handleDelete = (user) => {
+    openConfirmationModal({
+      title: "Delete Volunteer Permanently",
+      message: `Are you sure you want to permanently delete ${user.firstName} ${user.lastName}? This action cannot be undone.`,
+      type: "delete",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await deleteUser(user.id);
+          await fetchUsers();
+          showSuccess(`Volunteer ${user.firstName} ${user.lastName} was permanently deleted`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to delete volunteer: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Delete Permanently",
+      cancelText: "Cancel"
+    });
   };
 
   // Format date for display
@@ -190,20 +269,43 @@ const AdminUserManagement = () => {
   const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
+  // Handle refresh button
+  const handleRefresh = () => {
+    fetchUsers();
+    showInfo('Refreshing volunteer list...');
+  };
+
+  // Handle modal close with confirmation if form has been edited
+  const handleModalClose = () => {
+    // In a real implementation, we might check if the form has unsaved changes
+    // For now, simply close the modal
+    setShowModal(false);
+    setCurrentUser(null);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-primary">Volunteer Management</h1>
-        <button
-          onClick={() => {
-            setCurrentUser(null);
-            setShowModal(true);
-          }}
-          className="flex items-center gap-2 bg-primary text-white p-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus size={18} />
-          <span className="hidden sm:inline">Add New Volunteer</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center bg-gray-100 text-gray-700 p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            title="Refresh volunteer list"
+          >
+            <RefreshCw size={18} />
+          </button>
+          <button
+            onClick={() => {
+              setCurrentUser(null);
+              setShowModal(true);
+            }}
+            className="flex items-center gap-2 bg-primary text-white p-2 sm:px-4 sm:py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <Plus size={18} />
+            <span className="hidden sm:inline">Add New Volunteer</span>
+          </button>
+        </div>
       </div>
 
       {/* Error alert */}
@@ -352,7 +454,7 @@ const AdminUserManagement = () => {
                             <span className="sr-only">Restore</span>
                           </button>
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user)}
                             className="text-red-600 hover:text-red-900"
                             title="Permanently delete volunteer"
                           >
@@ -444,9 +546,21 @@ const AdminUserManagement = () => {
       {/* User form modal */}
       <UserFormModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={handleModalClose}
         onSubmit={handleSubmitUser}
         currentUser={currentUser}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        show={showConfirmationModal}
+        onClose={() => setShowConfirmationModal(false)}
+        title={confirmationConfig.title}
+        message={confirmationConfig.message}
+        onConfirm={confirmationConfig.onConfirm}
+        type={confirmationConfig.type}
+        confirmText={confirmationConfig.confirmText}
+        cancelText={confirmationConfig.cancelText}
       />
     </div>
   );

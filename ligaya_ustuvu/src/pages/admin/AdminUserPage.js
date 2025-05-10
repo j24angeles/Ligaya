@@ -36,7 +36,7 @@ const AdminUserPage = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar component with responsive behavior built-in */}
-      <Sidebar role="admin" />
+      <Sidebar role={user.role} />
       
       {/* Main Content - with proper padding to avoid overlap */}
       <main className="flex-1 overflow-auto lg:ml-64 pt-16 lg:pt-4 px-4">

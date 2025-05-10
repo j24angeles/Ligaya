@@ -8,9 +8,21 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
     email: '',
     birthdate: '',
     password: '',
-    role: 'volunteer' // Always set to volunteer
+    role: 'volunteer'
   });
 
+  // Track which fields have been touched by the user
+  const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false
+  });
+
+  // Track if form has been submitted
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Store validation errors
   const [errors, setErrors] = useState({});
 
   // Initialize form with current user data if editing
@@ -22,7 +34,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
         email: currentUser.email || '',
         birthdate: currentUser.birthdate || '',
         password: '',
-        role: 'volunteer' // Always set to volunteer regardless of current value
+        role: 'volunteer'
       });
     } else {
       // Reset form when adding new user
@@ -35,54 +47,102 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
         role: 'volunteer'
       });
     }
+    // Reset touched states and errors when modal opens/closes or changes between edit/create
+    setTouched({
+      firstName: false,
+      lastName: false,
+      email: false,
+      password: false
+    });
     setErrors({});
+    setIsSubmitted(false);
   }, [currentUser, isOpen]);
+
+  // Validate a single field
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'firstName':
+        return value.trim() === '' ? 'First name is required' : '';
+      case 'lastName':
+        return value.trim() === '' ? 'Last name is required' : '';
+      case 'email':
+        if (value.trim() === '') return 'Email is required';
+        if (!/\S+@\S+\.\S+/.test(value)) return 'Email is invalid';
+        return '';
+      case 'password':
+        if (!currentUser && value === '') return 'Password is required for new volunteers';
+        if (value && value.length < 6) return 'Password must be at least 6 characters';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+    
+    // Validate all required fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (['firstName', 'lastName', 'email', 'password'].includes(key)) {
+        const error = validateField(key, value);
+        if (error) {
+          newErrors[key] = error;
+          isValid = false;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
     
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ''
-      });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Validate field if it's been touched or form has been submitted
+    if (touched[name] || isSubmitted) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: validateField(name, value)
+      }));
     }
   };
 
-  // Validate form
-  const validateForm = () => {
-    const newErrors = {};
+  // Handle field blur to mark as touched
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
     
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    if (!formData.password && !currentUser) {
-      newErrors.password = 'Password is required for new volunteers';
-    } else if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
+    // Mark the field as touched
+    setTouched(prev => ({
+      ...prev,
+      [name]: true
+    }));
     
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // Validate the field
+    setErrors(prev => ({
+      ...prev,
+      [name]: validateField(name, value)
+    }));
+  };
+
+  // Helper to determine if error should be shown
+  const shouldShowError = (fieldName) => {
+    return (touched[fieldName] || isSubmitted) && errors[fieldName];
   };
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsSubmitted(true);
+    
     if (validateForm()) {
       // Ensure role is volunteer before submitting
       onSubmit({...formData, role: 'volunteer'});
@@ -122,11 +182,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full p-2 pl-10 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('firstName') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter first name"
                 />
               </div>
-              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
+              {shouldShowError('firstName') && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
             </div>
             
             <div className="space-y-1">
@@ -143,11 +204,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full p-2 pl-10 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('lastName') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter last name"
                 />
               </div>
-              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+              {shouldShowError('lastName') && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
             </div>
             
             <div className="space-y-1">
@@ -164,11 +226,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full p-2 pl-10 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('email') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter email address"
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {shouldShowError('email') && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
             
             <div className="space-y-1">
@@ -204,11 +267,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full p-2 pl-10 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('password') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder={currentUser ? 'Enter new password' : 'Enter password'}
                 />
               </div>
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              {shouldShowError('password') && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
             
             <div className="space-y-1">
