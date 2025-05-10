@@ -47,10 +47,15 @@ export const getUserById = async (id) => {
  */
 export const updateUser = async (id, userData) => {
   try {
+    // First get the existing user to preserve createdAt
+    const existingUser = await api.get(`/users/${id}`);
+    
     const response = await api.put(`/users/${id}`, {
-      ...userData,
-      updatedAt: new Date().toISOString()
+      ...existingUser.data, // Preserve all existing data
+      ...userData,          // Apply updates
+      updatedAt: new Date().toISOString() // Add updatedAt
     });
+    
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);
