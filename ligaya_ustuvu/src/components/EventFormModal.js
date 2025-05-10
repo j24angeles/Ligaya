@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Image, X, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, Clock, MapPin, Image, X, User, Upload } from 'lucide-react';
 
 const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -11,6 +12,9 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
     bannerImage: '',
     isPublished: false
   });
+  
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Track which fields have been touched by the user (on blur)
   const [touched, setTouched] = useState({
@@ -35,6 +39,13 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
         date: currentEvent.date ? currentEvent.date : '',
         time: currentEvent.time ? currentEvent.time : ''
       });
+      
+      // Set preview if there's a banner image
+      if (currentEvent.bannerImage) {
+        setPreviewImage(currentEvent.bannerImage);
+      } else {
+        setPreviewImage(null);
+      }
     } else {
       // Reset form when adding new event
       setFormData({
@@ -46,6 +57,7 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
         bannerImage: '',
         isPublished: false
       });
+      setPreviewImage(null);
     }
     // Reset touched states and errors when modal opens/closes or changes between edit/create
     setTouched({
@@ -147,6 +159,79 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
   // Helper to determine if error should be shown
   const shouldShowError = (fieldName) => {
     return (touched[fieldName] || isSubmitted) && errors[fieldName];
+  };
+
+  // Image upload handlers
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleImageFile(file);
+    }
+  };
+
+  const handleImageFile = (file) => {
+    // Check if the file is an image
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageDataUrl = e.target.result;
+        setPreviewImage(imageDataUrl);
+        setFormData(prev => ({
+          ...prev,
+          bannerImage: imageDataUrl
+        }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert('Please select an image file (JPEG, PNG, etc.)');
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setPreviewImage(null);
+    setFormData(prev => ({
+      ...prev,
+      bannerImage: ''
+    }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      handleImageFile(file);
+    }
   };
 
   if (!isOpen) return null;
@@ -264,25 +349,58 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
                   )}
                 </div>
               </div>
-              
+
+              {/* Image Upload Area */}
               <div>
-                <label htmlFor="bannerImage" className="block text-sm font-medium text-gray-700 mb-1">
-                  Banner Image URL
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Banner Image
                 </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-                    <Image size={16} />
-                  </span>
-                  <input
-                    type="text"
-                    id="bannerImage"
-                    name="bannerImage"
-                    value={formData.bannerImage}
-                    onChange={handleInputChange}
-                    className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    placeholder="Enter image URL"
-                  />
-                </div>
+                
+                {previewImage ? (
+                  <div className="relative mt-1 mb-4">
+                    <img 
+                      src={previewImage} 
+                      alt="Event banner preview" 
+                      className="w-full h-48 object-cover rounded-md border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
+                    >
+                      <X size={16} className="text-gray-700" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={handleImageClick}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    className={`mt-1 flex flex-col items-center justify-center h-48 border-2 border-dashed rounded-md cursor-pointer transition-all ${
+                      isDragging 
+                        ? 'border-primary bg-primary/5' 
+                        : 'border-gray-300 hover:border-primary hover:bg-gray-50'
+                    }`}
+                  >
+                    <Upload size={36} className="text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-500">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
+                  </div>
+                )}
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
               
               <div className="flex items-center">

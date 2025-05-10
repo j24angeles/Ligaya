@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
 import { getAllEvents, registerForEvent, cancelEventRegistration } from '../api/eventService';
 import PublicEventCard from './PublicEventCard';
+import { useToast } from '../hooks/ToastProvider';
+import Toast from '../hooks/Toast';
+import ConfirmationModal from './ConfirmationModal';
 
 const PublicEventList = ({ currentUser }) => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [registrationStatus, setRegistrationStatus] = useState(null);
+  const { showSuccess, showError } = useToast();
 
   // Fetch all published events
   const fetchEvents = async () => {
@@ -21,6 +24,7 @@ const PublicEventList = ({ currentUser }) => {
       setError(null);
     } catch (err) {
       setError(err.message);
+      showError(`Failed to load events: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -38,33 +42,23 @@ const PublicEventList = ({ currentUser }) => {
     try {
       await registerForEvent(eventId, currentUser);
       await fetchEvents();
-      setRegistrationStatus({ type: 'success', message: 'Successfully registered for the event!' });
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setRegistrationStatus(null), 3000);
-      
+      showSuccess('Successfully registered for the event!');
     } catch (err) {
-      setRegistrationStatus({ type: 'error', message: err.message });
+      showError(err.message || 'Failed to register for the event');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle canceling registration
+  // Handle canceling registration - with our custom confirmation handled by the card component
   const handleCancelRegistration = async (eventId) => {
-    if (!window.confirm('Are you sure you want to cancel your registration?')) return;
-    
     setIsLoading(true);
     try {
       await cancelEventRegistration(eventId, currentUser.id);
       await fetchEvents();
-      setRegistrationStatus({ type: 'success', message: 'Registration cancelled successfully' });
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setRegistrationStatus(null), 3000);
-      
+      showSuccess('Registration cancelled successfully');
     } catch (err) {
-      setRegistrationStatus({ type: 'error', message: err.message });
+      showError(err.message || 'Failed to cancel registration');
     } finally {
       setIsLoading(false);
     }
@@ -89,19 +83,6 @@ const PublicEventList = ({ currentUser }) => {
         <p className="text-gray-600 mt-2">Browse and register for upcoming volunteer opportunities</p>
       </div>
 
-      {/* Status message */}
-      {registrationStatus && (
-        <div 
-          className={`${
-            registrationStatus.type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700'
-          } border-l-4 p-4 mb-6 flex items-start`} 
-          role="alert"
-        >
-          <AlertCircle size={20} className="mr-2 mt-0.5" />
-          <p>{registrationStatus.message}</p>
-        </div>
-      )}
-
       {/* Search */}
       <div className="mb-6">
         <div className="relative">
@@ -125,8 +106,18 @@ const PublicEventList = ({ currentUser }) => {
         </div>
       )}
 
+      {/* Error state */}
+      {error && !isLoading && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+          <div className="flex">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <p className="text-red-700">Error loading events: {error}</p>
+          </div>
+        </div>
+      )}
+
       {/* No events message */}
-      {!isLoading && filteredEvents.length === 0 && (
+      {!isLoading && !error && filteredEvents.length === 0 && (
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
           <h3 className="text-lg font-medium text-gray-600 mb-2">No events found</h3>
           <p className="text-gray-500">
