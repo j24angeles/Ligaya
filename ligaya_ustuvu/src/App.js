@@ -7,6 +7,7 @@ import Devs from './pages/Devs';
 import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import AboutUs from './pages/AboutUs';
+import VolunteerSettings from './pages/volunteer/VolunteerSettings';
 import AdminEvent from './pages/admin/AdminEventPage';
 import AdminUserMgmt from './pages/admin/AdminUserPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -19,15 +20,15 @@ import { ToastProvider } from './hooks/ToastProvider';
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const location = useLocation();
   const currentUser = getCurrentUser();
-
+  
   if (!isLoggedIn() || !currentUser) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
-
+  
   if (allowedRoles.length > 0 && !allowedRoles.includes(currentUser.role)) {
     return <Navigate to="/home" replace />;
   }
-
+  
   return children;
 };
 
@@ -45,7 +46,17 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/about-us" element={<AboutUs />} />
-
+            
+            {/* Settings page - accessible by any logged-in user */}
+            <Route
+              path="/volunteersettings"
+              element={
+                <ProtectedRoute>
+                  <VolunteerSettings />
+                </ProtectedRoute>
+              }
+            />
+            
             {/* Dashboards */}
             <Route
               path="/admin-dashboard"
@@ -63,7 +74,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             {/* Admin-only routes */}
             <Route
               path="/event-management"
@@ -81,7 +92,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             {/* Volunteer-only route */}
             <Route
               path="/volunteer-events"

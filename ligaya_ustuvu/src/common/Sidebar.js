@@ -31,16 +31,16 @@ const Sidebar = ({ role = 'volunteer' }) => {
   const navItems = {
     admin: [
       { path: '/admin-dashboard', label: 'Home', icon: 'home' },
-      { path: '/user-management', label: 'Volunteer Management', icon: 'users' },
-      { path: '/event-management', label: 'Event Management', icon: 'calendar' },
-      { path: '/admin/donations', label: 'Donation Management', icon: 'heart' },
-      { path: '/admin/settings', label: 'Settings', icon: 'settings' }
+      { path: '/user-management', label: 'Volunteers', icon: 'users' },
+      { path: '/event-management', label: 'Events', icon: 'calendar' },
+      { path: '/admin/donations', label: 'Donations', icon: 'heart' },
+      { path: '/settings', label: 'Settings', icon: 'settings' }
     ],
     volunteer: [
       { path: '/volunteer-dashboard', label: 'Home', icon: 'home' },
       { path: '/volunteer-events', label: 'Events', icon: 'calendar' },
       { path: '/donate', label: 'Donate', icon: 'heart' },
-      { path: '/settings', label: 'Settings', icon: 'settings' }
+      { path: '/volunteersettings', label: 'Settings', icon: 'settings' }
     ]
   };
 

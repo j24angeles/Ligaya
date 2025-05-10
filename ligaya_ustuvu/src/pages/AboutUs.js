@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../common/Footer';
 import Navbar from '../common/Navbar';
 
+
 const AboutUs = () => {
   return (
     <div className="font-poppins">
