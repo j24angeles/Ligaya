@@ -131,7 +131,7 @@ const EventManagement = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary">Event Management</h1>
+        <h1 className="text-3xl font-bold text-primary">Manage Events</h1>
         <button
           onClick={() => {
             setCurrentEvent(null);
