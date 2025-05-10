@@ -114,7 +114,7 @@
       "lastName": "angeless",
       "email": "joaquinmiguel.angeles.cics@ust.edu.ph",
       "birthdate": "2003-11-04",
-      "password": "",
+      "password": "Happ1ness!",
       "role": "volunteer",
       "updatedAt": "2025-05-10T11:21:43.618Z",
       "id": 1746776568076
@@ -146,6 +146,18 @@
         }
       ],
       "updatedAt": "2025-05-09T14:21:39.590Z"
+    },
+    {
+      "title": "dasdas",
+      "description": "asdasdasdasd",
+      "location": "dasdasd",
+      "date": "2025-12-31",
+      "time": "12:12",
+      "bannerImage": "",
+      "isPublished": true,
+      "id": 1746878447389,
+      "createdAt": "2025-05-10T12:00:47.389Z",
+      "volunteers": []
     }
   ]
 }

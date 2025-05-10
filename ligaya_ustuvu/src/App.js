@@ -11,7 +11,7 @@ import AdminEvent from './pages/admin/AdminEventPage';
 import AdminUserMgmt from './pages/admin/AdminUserPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import VolunteerEvent from './pages/volunteer/VolunteerEventPage';
-import VolunteerDashboard from './pages/VolunteerDashboard';
+import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider';
 

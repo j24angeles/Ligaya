@@ -1,6 +1,6 @@
 // src/pages/VolunteerDashboard.js
 import React from 'react';
-import Sidebar from '../common/Sidebar';
+import Sidebar from '../../common/Sidebar';
 
 
 const VolunteerDashboard = () => {
