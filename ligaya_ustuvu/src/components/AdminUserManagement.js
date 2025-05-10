@@ -53,29 +53,38 @@ const AdminUserManagement = () => {
   };
 
   const handleSubmitUser = async (userData) => {
-    if (currentUser) {
-      openConfirmationModal({
-        title: "Update Volunteer",
-        message: `Are you sure you want to update ${userData.firstName} ${userData.lastName}'s information?`,
-        type: "info",
-        onConfirm: async () => {
-          setIsLoading(true);
-          try {
-            await updateUser(currentUser.id, userData);
-            await fetchUsers();
-            setShowModal(false);
-            setCurrentUser(null);
-            showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was updated successfully`);
-          } catch (err) {
-            setError(err.message);
-            showError(`Failed to update volunteer: ${err.message}`);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        confirmText: "Update",
-        cancelText: "Cancel"
-      });
+  if (currentUser) {
+    openConfirmationModal({
+      title: "Update Volunteer",
+      message: `Are you sure you want to update ${userData.firstName} ${userData.lastName}'s information?`,
+      type: "info",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          // Only send the fields that are being updated
+          const updatedFields = {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            birthdate: userData.birthdate,
+            ...(userData.password && { password: userData.password }) // Only include password if it was changed
+          };
+          
+          await updateUser(currentUser.id, updatedFields);
+          await fetchUsers();
+          setShowModal(false);
+          setCurrentUser(null);
+          showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was updated successfully`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to update volunteer: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Update",
+      cancelText: "Cancel"
+    });
     } else {
       openConfirmationModal({
         title: "Add New Volunteer",
