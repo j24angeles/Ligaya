@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Users, ArrowRight, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { useToast } from '../hooks/ToastProvider';
 import ConfirmationModal from './ConfirmationModal';
 
-const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration }) => {
+const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCancelRegistration }) => {
   const { showSuccess, showError } = useToast();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -59,12 +59,14 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
   
   // Handle registration with confirmation
   const handleRegisterClick = () => {
+    if (isPastEvent) return; // Prevent registration for past events
     setConfirmAction('register');
     setShowConfirmModal(true);
   };
   
   // Handle cancellation with confirmation
   const handleCancelClick = () => {
+    if (isPastEvent) return; // Prevent cancellation for past events
     setConfirmAction('cancel');
     setShowConfirmModal(true);
   };
@@ -86,7 +88,14 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
 
   // Determine status label and color
   let statusBadge = null;
-  if (isRegistered) {
+  
+  if (isPastEvent) {
+    statusBadge = {
+      text: "Past Event",
+      bgColor: "bg-gray-100", 
+      textColor: "text-gray-800"
+    };
+  } else if (isRegistered) {
     statusBadge = {
       text: "You're registered",
       bgColor: "bg-green-100", 
@@ -96,7 +105,7 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
 
   return (
     <>
-      <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full border border-gray-100">
+      <div className={`bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full border border-gray-100 ${isPastEvent ? 'opacity-85' : ''}`}>
         {/* Card clickable area */}
         <div 
           className="cursor-pointer flex-grow flex flex-col"
@@ -109,9 +118,9 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
                 <img 
                   src={event.bannerImage} 
                   alt={event.title} 
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${isPastEvent ? 'filter grayscale opacity-80' : ''}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent ${isPastEvent ? 'from-black/80' : ''}`}></div>
               </>
             ) : (
               <div className="w-full h-full bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center">
@@ -168,7 +177,12 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
         
         {/* Action buttons - separate from the clickable area */}
         <div className="p-5 pt-0">
-          {isRegistered ? (
+          {isPastEvent ? (
+            <div className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg w-full font-medium text-sm flex items-center justify-center">
+              <AlertCircle size={16} className="mr-2" />
+              Event has ended
+            </div>
+          ) : isRegistered ? (
             <button 
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering the card click
@@ -206,6 +220,14 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
                 <X size={24} />
               </button>
             </div>
+
+            {/* Past Event Banner - only shown for past events */}
+            {isPastEvent && (
+              <div className="bg-gray-100 p-3 flex items-center justify-center text-gray-700">
+                <AlertCircle size={18} className="mr-2" />
+                <span>This event has already occurred and is no longer available for registration</span>
+              </div>
+            )}
             
             {/* Event Banner Image */}
             <div className="w-full h-64 relative">
@@ -213,7 +235,7 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
                 <img 
                   src={event.bannerImage} 
                   alt={event.title} 
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${isPastEvent ? 'filter grayscale opacity-80' : ''}`}
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-r from-gray-200 to-gray-300 flex items-center justify-center">
@@ -284,7 +306,10 @@ const PublicEventCard = ({ event, isRegistered, onRegister, onCancelRegistration
                   Close
                 </button>
                 
-                {isRegistered ? (
+                {isPastEvent ? (
+                  // No action button for past events
+                  null
+                ) : isRegistered ? (
                   <button 
                     onClick={handleCancelClick}
                     className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors font-medium"

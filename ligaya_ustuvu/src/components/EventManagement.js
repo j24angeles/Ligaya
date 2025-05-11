@@ -14,6 +14,7 @@ const EventManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'upcoming', or 'past'
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
     title: '',
@@ -45,6 +46,15 @@ const EventManagement = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Check if event is in the past
+  const isEventInPast = (eventDate) => {
+    if (!eventDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+    const eventDay = new Date(eventDate);
+    return eventDay < today;
+  };
 
   // Show confirmation modal
   const confirmAction = (title, message, onConfirm, type = 'info', confirmText = 'Confirm') => {
@@ -115,17 +125,24 @@ const EventManagement = () => {
     );
   };
 
-  // Filter events based on search term and status
+  // Filter events based on search term, status and time filter
   const filteredEvents = events.filter(event => {
+    // First apply search filter
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (statusFilter === 'all') return matchesSearch;
-    if (statusFilter === 'published') return matchesSearch && event.isPublished;
-    if (statusFilter === 'draft') return matchesSearch && !event.isPublished;
+    // Apply status filter
+    let statusMatch = true;
+    if (statusFilter === 'published') statusMatch = event.isPublished;
+    if (statusFilter === 'draft') statusMatch = !event.isPublished;
     
-    return matchesSearch;
+    // Apply time filter
+    let timeMatch = true;
+    if (timeFilter === 'upcoming') timeMatch = !isEventInPast(event.date);
+    if (timeFilter === 'past') timeMatch = isEventInPast(event.date);
+    
+    return matchesSearch && statusMatch && timeMatch;
   });
 
   return (
@@ -153,7 +170,8 @@ const EventManagement = () => {
       )}
 
       {/* Search and filter */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="mb-6 flex flex-col space-y-4">
+        {/* Search */}
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search size={18} className="text-gray-400" />
@@ -167,17 +185,58 @@ const EventManagement = () => {
           />
         </div>
         
-        <div className="flex items-center">
-          <span className="mr-2 text-sm text-gray-600">Status:</span>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">All</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
-          </select>
+        {/* Filter controls */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Time Filter Tabs */}
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            <button
+              type="button"
+              onClick={() => setTimeFilter('all')}
+              className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
+                timeFilter === 'all'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              All Events
+            </button>
+            <button
+              type="button"
+              onClick={() => setTimeFilter('upcoming')}
+              className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+                timeFilter === 'upcoming'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              Upcoming
+            </button>
+            <button
+              type="button"
+              onClick={() => setTimeFilter('past')}
+              className={`px-4 py-2 text-sm font-medium border-t border-b border-r rounded-r-lg ${
+                timeFilter === 'past'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              Past Events
+            </button>
+          </div>
+          
+          {/* Status Filter */}
+          <div className="flex items-center">
+            <span className="mr-2 text-sm text-gray-600">Status:</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -193,8 +252,8 @@ const EventManagement = () => {
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
           <h3 className="text-lg font-medium text-gray-600 mb-2">No events found</h3>
           <p className="text-gray-500">
-            {searchTerm || statusFilter !== 'all' 
-              ? "Try adjusting your search or filter" 
+            {searchTerm || statusFilter !== 'all' || timeFilter !== 'all'
+              ? "Try adjusting your search or filters" 
               : "Click the 'Add New Event' button to create your first event"}
           </p>
         </div>
@@ -208,6 +267,7 @@ const EventManagement = () => {
             event={event}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            isPastEvent={isEventInPast(event.date)}
           />
         ))}
       </div>

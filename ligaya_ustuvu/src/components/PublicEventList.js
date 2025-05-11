@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle, Clock } from 'lucide-react';
 import { getAllEvents, registerForEvent, cancelEventRegistration } from '../api/eventService';
 import PublicEventCard from './PublicEventCard';
 import { useToast } from '../hooks/ToastProvider';
-import Toast from '../hooks/Toast';
-import ConfirmationModal from './ConfirmationModal';
 
 const PublicEventList = ({ currentUser }) => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all'); // 'all', 'upcoming', or 'past'
   const { showSuccess, showError } = useToast();
 
   // Fetch all published events
@@ -35,6 +34,15 @@ const PublicEventList = ({ currentUser }) => {
     fetchEvents();
   }, []);
 
+  // Check if event is in the past
+  const isEventInPast = (eventDate) => {
+    if (!eventDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+    const eventDay = new Date(eventDate);
+    return eventDay < today;
+  };
+
   // Handle registering for an event
   const handleRegister = async (eventId) => {
     setIsLoading(true);
@@ -50,7 +58,7 @@ const PublicEventList = ({ currentUser }) => {
     }
   };
 
-  // Handle canceling registration - with our custom confirmation handled by the card component
+  // Handle canceling registration
   const handleCancelRegistration = async (eventId) => {
     setIsLoading(true);
     try {
@@ -69,33 +77,84 @@ const PublicEventList = ({ currentUser }) => {
     return event.volunteers && event.volunteers.some(volunteer => volunteer.id === currentUser.id);
   };
 
-  // Filter events based on search term
+  // Filter events based on search term and filter type
   const filteredEvents = events.filter(event => {
-    return event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           event.location.toLowerCase().includes(searchTerm.toLowerCase());
+    // First apply search filter
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         event.location.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Then apply time filter
+    if (filter === 'upcoming') {
+      return matchesSearch && !isEventInPast(event.date);
+    } else if (filter === 'past') {
+      return matchesSearch && isEventInPast(event.date);
+    }
+    
+    // All events
+    return matchesSearch;
   });
 
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-primary">Upcoming Events</h1>
-        <p className="text-gray-600 mt-2">Browse and register for upcoming volunteer opportunities</p>
+        <h1 className="text-3xl font-bold text-primary">Volunteer Events</h1>
+        <p className="text-gray-600 mt-2">Browse and register for volunteer opportunities</p>
       </div>
 
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search size={18} className="text-gray-400" />
+      {/* Search and Filter */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        {/* Search */}
+        <div className="flex-grow">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search size={18} className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search events..."
+              className="block w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
           </div>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search events..."
-            className="block w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+        </div>
+        
+        {/* Filter Tabs */}
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
+              filter === 'all'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            All Events
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('upcoming')}
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+              filter === 'upcoming'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Upcoming
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('past')}
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r rounded-r-lg ${
+              filter === 'past'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            Past Events
+          </button>
         </div>
       </div>
 
@@ -121,7 +180,13 @@ const PublicEventList = ({ currentUser }) => {
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
           <h3 className="text-lg font-medium text-gray-600 mb-2">No events found</h3>
           <p className="text-gray-500">
-            {searchTerm ? "Try adjusting your search" : "There are no upcoming events at this time"}
+            {searchTerm 
+              ? "Try adjusting your search" 
+              : filter === 'upcoming' 
+                ? "There are no upcoming events at this time" 
+                : filter === 'past' 
+                  ? "There are no past events to display" 
+                  : "There are no events to display"}
           </p>
         </div>
       )}
@@ -133,6 +198,7 @@ const PublicEventList = ({ currentUser }) => {
             key={event.id}
             event={event}
             isRegistered={isUserRegistered(event)}
+            isPastEvent={isEventInPast(event.date)}
             onRegister={() => handleRegister(event.id)}
             onCancelRegistration={() => handleCancelRegistration(event.id)}
           />
