@@ -39,7 +39,7 @@ const Sidebar = ({ role = 'volunteer' }) => {
     volunteer: [
       { path: '/volunteer-dashboard', label: 'Home', icon: 'home' },
       { path: '/volunteer-events', label: 'Events', icon: 'calendar' },
-      { path: '/donate', label: 'Donate', icon: 'heart' },
+      { path: '/volunteer-donate', label: 'Donate', icon: 'heart' },
       { path: '/volunteersettings', label: 'Settings', icon: 'settings' }
     ]
   };

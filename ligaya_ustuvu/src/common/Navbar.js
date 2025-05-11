@@ -87,14 +87,14 @@ const Navbar = () => {
       {/* Mobile menu */}
       <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {['home', 'about-us', 'events', 'history', 'devs'].map((item, i) => (
+                {['home', 'about-us', 'devs'].map((item, i) => (
             <a
               key={i}
               href={`/${item}`}
               className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:bg-gray-100 transition"
               style={textShadowStyle}
             >
-              {item === 'devs' ? 'Team' : item === 'events' ? 'Our Events' : item === 'history' ? 'The History' : item.charAt(0).toUpperCase() + item.slice(1).replace('-', ' ')}
+              {item === 'devs' ? 'Team' : item === 'about-us' ? 'About Us' : item.charAt(0).toUpperCase() + item.slice(1).replace('-', ' ')}
             </a>
           ))}
         </div>
