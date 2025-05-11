@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Calendar, Key, Shield, X } from 'lucide-react';
 
-const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
+const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -316,4 +316,4 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) => {
   );
 };
 
-export default UserFormModal;
+export default AdminUserFormModal;

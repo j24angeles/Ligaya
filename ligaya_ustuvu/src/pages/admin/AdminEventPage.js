@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../common/Sidebar';
-import EventManagement from '../../components/EventManagement';
+import EventManagement from '../../components/admin-events/EventManagement';
 
 const AdminEventPage = () => {
   const [user, setUser] = useState(null);

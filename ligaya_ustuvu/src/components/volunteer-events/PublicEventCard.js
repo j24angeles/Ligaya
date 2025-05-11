@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Users, ArrowRight, X, AlertCircle } from 'lucide-react';
-import { useToast } from '../hooks/ToastProvider';
-import ConfirmationModal from './ConfirmationModal';
+import { useToast } from '../../hooks/ToastProvider';
+import ConfirmationModal from '../ConfirmationModal';
 
 const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCancelRegistration }) => {
   const { showSuccess, showError } = useToast();

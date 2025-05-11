@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, AlertCircle, Edit, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
-import UserFormModal from './UserFormModal';
-import ConfirmationModal from './ConfirmationModal';
-import { useToast } from '../hooks/ToastProvider';
-import { getAllUsers, createUser, updateUser, deleteUser } from '../api/userService';
+import UserFormModal from './AdminUserFormModal';
+import ConfirmationModal from '../ConfirmationModal';
+import { useToast } from '../../hooks/ToastProvider';
+import { getAllUsers, createUser, updateUser, deleteUser } from '../../api/userService';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);

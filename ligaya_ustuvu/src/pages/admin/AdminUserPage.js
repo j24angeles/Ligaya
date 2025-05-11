@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../common/Sidebar';
-import AdminUserManagement from '../../components/AdminUserManagement';
+import AdminUserManagement from '../../components/admin-users/AdminUserManagement';
 
 const AdminUserPage = () => {
   const [user, setUser] = useState(null);

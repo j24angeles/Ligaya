@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getEventById } from '../api/eventService';
+import { getEventById } from '../../api/eventService';
 import { AlertCircle } from 'lucide-react';
 import VisitorEventDetailContent from '../components/VisitorEventDetailContent';
 

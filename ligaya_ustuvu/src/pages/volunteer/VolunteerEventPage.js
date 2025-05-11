@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../common/Sidebar';
-import PublicEventList from '../../components/PublicEventList';
+import PublicEventList from '../../components/volunteer-events/PublicEventList';
 
 const VolunteerEventPage = () => {
   const [user, setUser] = useState(null);

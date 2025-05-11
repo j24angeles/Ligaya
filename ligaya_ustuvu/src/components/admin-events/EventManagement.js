@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, AlertCircle } from 'lucide-react';
 import EventFormModal from './EventFormModal';
 import EventCard from './EventCard';
-import ConfirmationModal from './ConfirmationModal';
-import { getAllEvents, createEvent, updateEvent, deleteEvent } from '../api/eventService';
-import { useToast } from '../hooks/ToastProvider';
+import ConfirmationModal from '../ConfirmationModal';
+import { getAllEvents, createEvent, updateEvent, deleteEvent } from '../../api/eventService';
+import { useToast } from '../../hooks/ToastProvider';
 
 const EventManagement = () => {
   const [events, setEvents] = useState([]);

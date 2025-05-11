@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Mail, Calendar } from 'lucide-react';
 
-const VolunteersModal = ({ isOpen, onClose, event }) => {
+const EventVolunteersModal = ({ isOpen, onClose, event }) => {
   if (!isOpen) return null;
   
   const volunteers = event?.volunteers || [];
@@ -70,4 +70,4 @@ const VolunteersModal = ({ isOpen, onClose, event }) => {
   );
 };
 
-export default VolunteersModal;
+export default EventVolunteersModal;

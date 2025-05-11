@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Clock, MapPin, Users, Edit, Trash2 } from 'lucide-react';
-import VolunteersModal from './VolunteersModal';
+import VolunteersModal from './EventVolunteersModal';
 
 const EventCard = ({ event, onEdit, onDelete }) => {
   const [showVolunteers, setShowVolunteers] = useState(false);
