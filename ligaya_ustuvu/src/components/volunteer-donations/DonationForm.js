@@ -1,140 +1,136 @@
+// src/components/user-donation/DonationForm.js
 import React, { useState } from 'react';
-import AmountInput from './form-components/AmountInput';
-import DateInput from './form-components/DateInput';
-import PaymentMethodSelector from './form-components/PaymentMethodSelector';
-import ReferenceNumberInput from './form-components/ReferenceNumberInput';
 import { createDonation } from '../../api/donationService';
-import { useAuth } from '../../context/AuthContext';
+import AmountInput from '../../components/volunteer-donations/form-components/AmountInput';
+import DateInput from '../../components/volunteer-donations/form-components/DateInput';
+import PaymentMethodSelect from '../../components/volunteer-donations/form-components/PaymentMethodSelector';
+import ReferenceNumberInput from '../../components/volunteer-donations/form-components/ReferenceNumberInput';
 
-const DonationForm = ({ onSuccess }) => {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
-  
+const DonationForm = ({ userId, onSuccess }) => {
   const [formData, setFormData] = useState({
     amount: '',
-    date: new Date().toISOString().split('T')[0], // Today's date as default
-    paymentMethod: 'cash',
+    date: new Date().toISOString().split('T')[0],
+    paymentMethod: '',
     referenceNumber: '',
   });
 
-  const handleChange = (name, value) => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error when field changes
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      newErrors.amount = 'Please enter a valid amount';
+    }
+    
+    if (!formData.date) {
+      newErrors.date = 'Please select a date';
+    }
+    
+    if (!formData.paymentMethod) {
+      newErrors.paymentMethod = 'Please select a payment method';
+    }
+    
+    if (formData.paymentMethod !== 'cash' && !formData.referenceNumber) {
+      newErrors.referenceNumber = 'Reference number is required for this payment method';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.amount || !formData.date || !formData.paymentMethod) {
-      setError('Please fill in all required fields.');
+    if (!validateForm()) {
       return;
     }
-
-    if (formData.paymentMethod !== 'cash' && !formData.referenceNumber) {
-      setError('Reference number is required for the selected payment method.');
-      return;
-    }
-
+    
+    setIsSubmitting(true);
+    setSubmitError('');
+    
     try {
-      setLoading(true);
-      setError('');
+      const donationData = {
+        userId,
+        amount: formData.amount,
+        date: formData.date,
+        paymentMethod: formData.paymentMethod,
+        referenceNumber: formData.paymentMethod === 'cash' ? '' : formData.referenceNumber,
+      };
       
-      await createDonation({
-        userId: user.id.toString(),
-        ...formData,
-      });
+      const createdDonation = await createDonation(donationData);
+      onSuccess(createdDonation);
       
-      setSuccess(true);
+      // Reset form
       setFormData({
         amount: '',
         date: new Date().toISOString().split('T')[0],
-        paymentMethod: 'cash',
+        paymentMethod: '',
         referenceNumber: '',
       });
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
-      
-    } catch (err) {
-      setError(err.message || 'An error occurred while processing your donation.');
+    } catch (error) {
+      setSubmitError(error.message || 'Failed to submit donation. Please try again.');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto">
-      <h2 className="text-xl font-semibold text-primary mb-6 text-center">Make a Donation</h2>
+    <form onSubmit={handleSubmit}>
+      <AmountInput
+        value={formData.amount}
+        onChange={(value) => handleChange('amount', value)}
+        error={errors.amount}
+      />
       
-      {success && (
-        <div className="alert alert-success mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Thank you! Your donation has been submitted successfully.</span>
-        </div>
+      <DateInput
+        value={formData.date}
+        onChange={(value) => handleChange('date', value)}
+        error={errors.date}
+      />
+      
+      <PaymentMethodSelect
+        value={formData.paymentMethod}
+        onChange={(value) => handleChange('paymentMethod', value)}
+        error={errors.paymentMethod}
+      />
+      
+      <ReferenceNumberInput
+        value={formData.referenceNumber}
+        onChange={(value) => handleChange('referenceNumber', value)}
+        error={errors.referenceNumber}
+        show={formData.paymentMethod && formData.paymentMethod !== 'cash'}
+      />
+      
+      {submitError && (
+        <div className="mb-4 text-red-500 text-sm">{submitError}</div>
       )}
       
-      {error && (
-        <div className="alert alert-error mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <AmountInput 
-          value={formData.amount} 
-          onChange={(value) => handleChange('amount', value)} 
-        />
-        
-        <DateInput 
-          value={formData.date} 
-          onChange={(value) => handleChange('date', value)} 
-        />
-        
-        <PaymentMethodSelector 
-          value={formData.paymentMethod} 
-          onChange={(value) => handleChange('paymentMethod', value)} 
-        />
-        
-        {formData.paymentMethod !== 'cash' && (
-          <ReferenceNumberInput 
-            value={formData.referenceNumber} 
-            onChange={(value) => handleChange('referenceNumber', value)} 
-          />
-        )}
-        
-        <div className="flex justify-center mt-6">
-          <button 
-            type="submit" 
-            className="btn btn-primary w-full max-w-xs"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="loading loading-spinner"></span>
-                Processing...
-              </>
-            ) : (
-              'Submit Donation'
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+      >
+        {isSubmitting ? 'Submitting...' : 'Submit Donation'}
+      </button>
+    </form>
   );
 };
 

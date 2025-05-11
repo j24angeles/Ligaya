@@ -39,6 +39,24 @@ export const getDonationById = async (id) => {
   }
 };
 
+// src/api/donationService.js
+// Add this function to your existing donationService.js
+export const getDonationsByUserId = async (userId) => {
+  try {
+    const response = await api.get('/donations', {
+      params: {
+        userId: userId.toString(),
+        _sort: 'date',
+        _order: 'desc'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user donations:', error);
+    throw error.response?.data?.message || error.message || 'Failed to fetch user donations';
+  }
+};
+
 /**
  * Create new donation
  * @param {Object} donationData - Donation data

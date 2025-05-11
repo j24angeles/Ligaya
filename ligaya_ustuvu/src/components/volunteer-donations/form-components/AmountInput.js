@@ -1,29 +1,24 @@
+// src/components/user-donation/AmountInput.js
 import React from 'react';
 
-const AmountInput = ({ value, onChange }) => {
-  const handleChange = (e) => {
-    // Allow only numbers
-    const amount = e.target.value.replace(/[^0-9]/g, '');
-    onChange(amount);
-  };
-
+const AmountInput = ({ value, onChange, error }) => {
   return (
-    <div className="form-control w-full">
-      <label className="label">
-        <span className="label-text font-medium">Amount (PHP)</span>
-        <span className="label-text-alt text-red-500">*</span>
+    <div className="mb-4">
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
+        Amount (₱)
       </label>
-      <div className="relative">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
-        <input
-          type="text"
-          placeholder="Enter donation amount"
-          className="input input-bordered w-full pl-8"
-          value={value}
-          onChange={handleChange}
-          required
-        />
-      </div>
+      <input
+        type="number"
+        id="amount"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${error ? 'border-red-500' : ''}`}
+        placeholder="0.00"
+        min="1"
+        step="0.01"
+        required
+      />
+      {error && <p className="text-red-500 text-xs italic">{error}</p>}
     </div>
   );
 };

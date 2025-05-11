@@ -1,29 +1,24 @@
+// src/components/user-donation/ReferenceNumberInput.js
 import React from 'react';
 
-const ReferenceNumberInput = ({ value, onChange }) => {
-  const handleChange = (e) => {
-    onChange(e.target.value);
-  };
+const ReferenceNumberInput = ({ value, onChange, error, show }) => {
+  if (!show) return null;
 
   return (
-    <div className="form-control w-full">
-      <label className="label">
-        <span className="label-text font-medium">Reference Number</span>
-        <span className="label-text-alt text-red-500">*</span>
+    <div className="mb-4">
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="referenceNumber">
+        Reference Number
       </label>
       <input
         type="text"
-        placeholder="Enter transaction reference number"
-        className="input input-bordered w-full"
+        id="referenceNumber"
         value={value}
-        onChange={handleChange}
+        onChange={(e) => onChange(e.target.value)}
+        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${error ? 'border-red-500' : ''}`}
+        placeholder="Enter reference number"
         required
       />
-      <label className="label">
-        <span className="label-text-alt text-gray-500">
-          Please enter the reference/transaction number from your payment receipt
-        </span>
-      </label>
+      {error && <p className="text-red-500 text-xs italic">{error}</p>}
     </div>
   );
 };
