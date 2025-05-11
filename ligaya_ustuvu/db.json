@@ -12,6 +12,39 @@
       "createdAt": "2025-05-09T06:58:48.972Z"
     },
     {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "password": "hashed_password_here",
+      "birthdate": "2004-01-01",
+      "name": "John Doe",
+      "id": 2,
+      "role": "volunteer",
+      "createdAt": "2025-01-15T08:00:00Z"
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane.smith@example.com",
+      "password": "hashed_password_here",
+      "birthdate": "2004-01-01",
+      "name": "Jane Smith",
+      "id": 3,
+      "role": "volunteer",
+      "createdAt": "2025-02-20T10:30:00Z"
+    },
+    {
+      "firstName": "Maria",
+      "lastName": "Santos",
+      "email": "maria.santos@example.com",
+      "password": "hashed_password_here",
+      "birthdate": "2004-01-01",
+      "name": "Maria Santos",
+      "id": 4,
+      "role": "volunteer",
+      "createdAt": "2025-03-10T09:15:00Z"
+    },
+    {
       "firstName": "lyannam",
       "lastName": "cristobalaaaa",
       "email": "lyannacristobal@gmail.comaaaa",
@@ -30,9 +63,10 @@
       "password": "Happ1ness!",
       "role": "volunteer",
       "createdAt": "2025-05-09T06:58:48.972Z",
-      "updatedAt": "2025-05-11T06:37:07.567Z",
+      "updatedAt": "2025-05-11T12:46:45.341Z",
       "id": 1746776568076,
-      "eventsJoined": []
+      "eventsJoined": [],
+      "status": "archived"
     },
     {
       "firstName": "julia",
@@ -46,6 +80,66 @@
       "createdAt": "2025-05-10T16:55:18.927Z"
     }
   ],
+  "donations": [
+    {
+      "id": 1,
+      "volunteerId": 1746773928972,
+      "amount": 500,
+      "date": "2025-05-01",
+      "paymentMethod": "GCash",
+      "receiptImage": "",
+      "status": "Verified",
+      "createdAt": "2025-05-01T08:30:00Z",
+      "updatedAt": "2025-05-01T09:15:00Z"
+    },
+    {
+      "id": 2,
+      "volunteerId": 1746773928972,
+      "amount": 1000,
+      "date": "2025-05-03",
+      "paymentMethod": "Bank Transfer",
+      "receiptImage": "",
+      "status": "Pending",
+      "createdAt": "2025-05-03T10:45:00Z",
+      "updatedAt": null
+    },
+    {
+      "id": 3,
+      "volunteerId": 1746773928972,
+      "amount": 750,
+      "date": "2025-05-05",
+      "paymentMethod": "Maya",
+      "receiptImage": "",
+      "status": "Verified",
+      "createdAt": "2025-05-05T14:20:00Z",
+      "updatedAt": "2025-05-05T16:30:00Z"
+    },
+    {
+      "id": 4,
+      "volunteerId": 1746773928972,
+      "amount": 1250,
+      "date": "2025-05-08",
+      "paymentMethod": "GCash",
+      "receiptImage": "",
+      "status": "Pending",
+      "createdAt": "2025-05-08T09:10:00Z",
+      "updatedAt": null
+    },
+    {
+      "id": 5,
+      "volunteerId": 1746773928972,
+      "amount": 2000,
+      "date": "2025-05-10",
+      "paymentMethod": "Bank Transfer",
+      "receiptImage": "",
+      "status": "Verified",
+      "createdAt": "2025-05-10T11:45:00Z",
+      "updatedAt": "2025-05-10T13:20:00Z"
+    }
+  ],
+ 
+
+  
   "events": [
     {
       "title": "Test Run",
