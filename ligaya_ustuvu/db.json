@@ -33,10 +33,11 @@
       "password": "Happ1ness!",
       "role": "volunteer",
       "donations": [
-        1
+        1,
+        1746977032248
       ],
       "createdAt": "2025-05-09T06:58:48.972Z",
-      "updatedAt": "2025-05-11T06:37:07.567Z",
+      "updatedAt": "2025-05-11T15:23:52.322Z",
       "id": 1746776568076,
       "eventsJoined": []
     },
@@ -49,7 +50,12 @@
       "role": "volunteer",
       "name": "julia angeles",
       "id": 1746896118927,
-      "createdAt": "2025-05-10T16:55:18.927Z"
+      "createdAt": "2025-05-10T16:55:18.927Z",
+      "donations": [
+        1746979207493,
+        1746979309031
+      ],
+      "updatedAt": "2025-05-11T16:01:49.104Z"
     }
   ],
   "events": [
@@ -92,6 +98,41 @@
       "isValidated": true,
       "validatedAt": "2025-05-11T15:13:29.127Z",
       "updatedAt": "2025-05-11T15:13:29.127Z"
+    },
+    {
+      "userId": "1746776568076",
+      "amount": "22",
+      "date": "2025-05-11",
+      "paymentMethod": "bank_transfer",
+      "referenceNumber": "neqwr312",
+      "id": 1746977032248,
+      "createdAt": "2025-05-11T15:23:52.248Z",
+      "status": "active",
+      "isValidated": false
+    },
+    {
+      "userId": "1746896118927",
+      "amount": "2",
+      "date": "2025-05-11",
+      "paymentMethod": "maya",
+      "referenceNumber": "3123",
+      "id": 1746979207493,
+      "createdAt": "2025-05-11T16:00:07.493Z",
+      "status": "active",
+      "isValidated": false
+    },
+    {
+      "userId": "1746896118927",
+      "amount": "1212212121212",
+      "date": "2025-05-11",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1746979309031,
+      "createdAt": "2025-05-11T16:01:49.031Z",
+      "status": "active",
+      "isValidated": true,
+      "validatedAt": "2025-05-11T16:02:55.937Z",
+      "updatedAt": "2025-05-11T16:02:55.937Z"
     }
   ]
 }

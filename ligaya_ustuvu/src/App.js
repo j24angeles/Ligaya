@@ -16,6 +16,8 @@ import VolunteerEvent from './pages/volunteer/VolunteerEventPage';
 import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider';
+import UserDonationPage from './pages/volunteer/UserDonationPage';
+
 
 // Enhanced ProtectedRoute component that accepts allowedRoles
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -99,6 +101,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['volunteer']}>
                   <VolunteerEvent />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/volunteer-donate"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <UserDonationPage />
                 </ProtectedRoute>
               }
             />

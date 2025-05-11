@@ -33,14 +33,14 @@ const Sidebar = ({ role = 'volunteer' }) => {
       { path: '/admin-dashboard', label: 'Home', icon: 'home' },
       { path: '/user-management', label: 'Volunteers', icon: 'users' },
       { path: '/event-management', label: 'Events', icon: 'calendar' },
-      { path: '/admin/donations', label: 'Donations', icon: 'heart' },
+      { path: '/donation-management', label: 'Donations', icon: 'heart' },
       { path: '/settings', label: 'Settings', icon: 'settings' }
     ],
     volunteer: [
       { path: '/volunteer-dashboard', label: 'Home', icon: 'home' },
       { path: '/volunteer-events', label: 'Events', icon: 'calendar' },
       { path: '/volunteer-donate', label: 'Donate', icon: 'heart' },
-      { path: '/volunteersettings', label: 'Settings', icon: 'settings' }
+      { path: '/volunteer-settings', label: 'Settings', icon: 'settings' }
     ]
   };
 
