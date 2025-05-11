@@ -90,7 +90,7 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Support our Advocacy</h3>
             <p className="text-gray-600 mb-6 flex-grow [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Together, we will make a difference in children's lives. Support our advocacies and programs!</p>
             <div className="mt-auto">
-              <Link to="/collaborate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
+              <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
                 Start Now
               </Link>
             </div>
