@@ -10,6 +10,7 @@ import AboutUs from './pages/AboutUs';
 import Events from './pages/Events';
 import AdminEvent from './pages/admin/AdminEventPage';
 import AdminUserMgmt from './pages/admin/AdminUserPage';
+import AdminDonationPage from './pages/admin/AdminDonationPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import VolunteerEvent from './pages/volunteer/VolunteerEventPage';
 import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
@@ -48,8 +49,6 @@ export default function App() {
             <Route path="/about-us" element={<AboutUs />} />
             <Route path="/events" element={<Events />} />
             
-        
-            
             {/* Dashboards */}
             <Route
               path="/admin-dashboard"
@@ -82,6 +81,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminUserMgmt />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/donation-management"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDonationPage />
                 </ProtectedRoute>
               }
             />
