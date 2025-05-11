@@ -6,7 +6,7 @@ import {
   isLoggedIn,
   logoutUser as authLogout,
   storeUserSession
-} from '../api/auth'; // Assuming auth.js is in the same directory
+} from '../api/auth'; 
 
 // Create context
 const AuthContext = createContext();
