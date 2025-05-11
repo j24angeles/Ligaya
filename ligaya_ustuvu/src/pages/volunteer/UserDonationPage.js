@@ -40,31 +40,72 @@ const UserDonationPage = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center p-4">Error: {error}</div>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full text-center">
+          <div className="text-red-500 text-lg font-medium mb-4">Error</div>
+          <p className="text-gray-700">{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-              <Sidebar role={user.role} />
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar role={user.role} />
+      
+      {/* Main Content */}
+      <main className="flex-1 ml-64 p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Donation Dashboard</h1>
+            <p className="mt-2 text-gray-600">Support our cause by making a donation</p>
+          </div>
 
-      <h1 className="text-3xl font-bold text-center mb-8">Make a Donation</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Card - Donation Form */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Donation Form</h2>
-          <DonationForm userId={user.id} onSuccess={handleDonationSuccess} />
-        </div>
+          {/* Cards Container */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Donation Form Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center mb-6">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg mr-4 text-white">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">New Donation</h2>
+                </div>
+                <DonationForm userId={user.id} onSuccess={handleDonationSuccess} />
+              </div>
+            </div>
 
-        {/* Right Card - Donation History */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4">Your Donation History</h2>
-          <DonationTable donations={donations} />
+            {/* Donation History Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center mb-6">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 p-2 rounded-lg mr-4 text-white">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">Your Donation History</h2>
+                </div>
+                <DonationTable donations={donations} />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
