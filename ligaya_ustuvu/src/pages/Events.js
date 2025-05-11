@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { getAllEvents } from '../api/eventService';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
-import { Calendar, Clock, MapPin } from 'lucide-react';
 import VisitorEventCard from '../components/visitor-events/VisitorEventCard';
 
 const Events = () => {
