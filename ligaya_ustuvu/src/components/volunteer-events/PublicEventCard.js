@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Users, ArrowRight, X, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, MapPin, Users, ArrowRight, X, AlertCircle, Loader2 } from 'lucide-react';
 import { useToast } from '../../hooks/ToastProvider';
 import ConfirmationModal from '../ConfirmationModal';
 
-const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCancelRegistration }) => {
+const PublicEventCard = ({ 
+  event: propEvent, 
+  isRegistered: propIsRegistered, 
+  isPastEvent, 
+  onRegister, 
+  onCancelRegistration,
+  currentUserId 
+}) => {
   const { showSuccess, showError } = useToast();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [localIsRegistered, setLocalIsRegistered] = useState(propIsRegistered);
+  const [localEvent, setLocalEvent] = useState(propEvent);
+  const [isProcessing, setIsProcessing] = useState(false);
+  // Adding a specific state for volunteer count to ensure UI consistency
+  const [volunteerCount, setVolunteerCount] = useState(propEvent.volunteers?.length || 0);
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    setLocalIsRegistered(propIsRegistered);
+    setLocalEvent(propEvent);
+    setVolunteerCount(propEvent.volunteers?.length || 0);
+  }, [propIsRegistered, propEvent]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -24,14 +43,11 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
   const formatTime = (timeString) => {
     if (!timeString) return '';
     
-    // If time is already in proper format, just return it
     if (timeString.includes('AM') || timeString.includes('PM')) {
       return timeString;
     }
     
-    // Handle 24h format or other formats by creating a date object
     try {
-      // Create a date object with the current date and the specified time
       const [hours, minutes] = timeString.split(':').map(num => parseInt(num, 10));
       const date = new Date();
       date.setHours(hours);
@@ -43,7 +59,6 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
         hour12: true 
       });
     } catch (e) {
-      // Fallback if parsing fails
       return timeString;
     }
   };
@@ -53,49 +68,70 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
     if (!text || text.length <= maxLength) return text || '';
     return text.substring(0, maxLength) + '...';
   };
-
-  // Get volunteer count
-  const volunteerCount = event.volunteers?.length || 0;
   
-  // Handle registration with confirmation
   const handleRegisterClick = () => {
-    if (isPastEvent) return; // Prevent registration for past events
+    if (isPastEvent || isProcessing) return;
     setConfirmAction('register');
     setShowConfirmModal(true);
   };
   
-  // Handle cancellation with confirmation
   const handleCancelClick = () => {
-    if (isPastEvent) return; // Prevent cancellation for past events
+    if (isPastEvent || isProcessing) return;
     setConfirmAction('cancel');
     setShowConfirmModal(true);
   };
   
-  // Execute the confirmed action
   const handleConfirmAction = async () => {
+    setIsProcessing(true);
+    setShowConfirmModal(false);
+    
     try {
       if (confirmAction === 'register') {
+        // Optimistic UI updates
+        setLocalIsRegistered(true);
+        // Update volunteer count immediately for better UI feedback
+        setVolunteerCount(prevCount => prevCount + 1);
+        setLocalEvent(prev => ({
+          ...prev,
+          volunteers: [...(prev.volunteers || []), { id: currentUserId }]
+        }));
+        
         await onRegister();
         showSuccess('Successfully registered for the event!');
       } else if (confirmAction === 'cancel') {
+        // Optimistic UI updates
+        setLocalIsRegistered(false);
+        // Update volunteer count immediately for better UI feedback
+        setVolunteerCount(prevCount => Math.max(0, prevCount - 1));
+        setLocalEvent(prev => ({
+          ...prev,
+          volunteers: (prev.volunteers || []).filter(v => v.id !== currentUserId)
+        }));
+        
         await onCancelRegistration();
         showSuccess('Registration cancelled successfully');
       }
     } catch (error) {
+      // Revert on error
+      setLocalIsRegistered(confirmAction === 'register' ? false : true);
+      // Also revert the volunteer count on error
+      setVolunteerCount(propEvent.volunteers?.length || 0);
+      setLocalEvent(propEvent);
       showError(error.message || 'An error occurred');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  // Determine status label and color
+  // Determine status using LOCAL state
   let statusBadge = null;
-  
   if (isPastEvent) {
     statusBadge = {
       text: "Past Event",
       bgColor: "bg-gray-100", 
       textColor: "text-gray-800"
     };
-  } else if (isRegistered) {
+  } else if (localIsRegistered) {
     statusBadge = {
       text: "You're registered",
       bgColor: "bg-green-100", 
@@ -106,18 +142,16 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
   return (
     <>
       <div className={`bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col h-full border border-gray-100 ${isPastEvent ? 'opacity-85' : ''}`}>
-        {/* Card clickable area */}
         <div 
           className="cursor-pointer flex-grow flex flex-col"
-          onClick={() => setShowDetailsModal(true)}
+          onClick={() => !isProcessing && setShowDetailsModal(true)}
         >
-          {/* Banner image with gradient overlay */}
           <div className="relative w-full h-48">
-            {event.bannerImage ? (
+            {localEvent.bannerImage ? (
               <>
                 <img 
-                  src={event.bannerImage} 
-                  alt={event.title} 
+                  src={localEvent.bannerImage} 
+                  alt={localEvent.title} 
                   className={`w-full h-full object-cover ${isPastEvent ? 'filter grayscale opacity-80' : ''}`}
                 />
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent ${isPastEvent ? 'from-black/80' : ''}`}></div>
@@ -128,7 +162,6 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
               </div>
             )}
             
-            {/* Status badge - displayed if present */}
             {statusBadge && (
               <div className={`absolute top-4 right-4 ${statusBadge.bgColor} ${statusBadge.textColor} py-1 px-3 rounded-full text-xs font-medium`}>
                 {statusBadge.text}
@@ -136,26 +169,25 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
             )}
           </div>
 
-          {/* Content */}
           <div className="p-5 flex-grow flex flex-col">
             <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2">
-              {event.title}
+              {localEvent.title}
             </h3>
             
             <div className="space-y-3 mb-4 text-sm">
               <div className="flex items-center text-gray-700">
                 <Calendar size={16} className="text-primary mr-2 flex-shrink-0" />
-                <span>{formatDate(event.date)}</span>
+                <span>{formatDate(localEvent.date)}</span>
               </div>
               
               <div className="flex items-center text-gray-700">
                 <Clock size={16} className="text-primary mr-2 flex-shrink-0" />
-                <span>{formatTime(event.time)}</span>
+                <span>{formatTime(localEvent.time)}</span>
               </div>
               
               <div className="flex items-center text-gray-700">
                 <MapPin size={16} className="text-primary mr-2 flex-shrink-0" />
-                <span className="line-clamp-1">{event.location}</span>
+                <span className="line-clamp-1">{localEvent.location}</span>
               </div>
               
               <div className="flex items-center text-gray-700">
@@ -165,7 +197,7 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
             </div>
             
             <p className="text-gray-600 mb-4 text-sm flex-grow">
-              {truncateDescription(event.description)}
+              {truncateDescription(localEvent.description)}
             </p>
             
             <div className="flex items-center text-primary font-medium text-sm mt-2">
@@ -175,66 +207,82 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
           </div>
         </div>
         
-        {/* Action buttons - separate from the clickable area */}
         <div className="p-5 pt-0">
           {isPastEvent ? (
             <div className="px-4 py-2.5 bg-gray-100 text-gray-500 rounded-lg w-full font-medium text-sm flex items-center justify-center">
               <AlertCircle size={16} className="mr-2" />
               Event has ended
             </div>
-          ) : isRegistered ? (
+          ) : localIsRegistered ? (
             <button 
               onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering the card click
+                e.stopPropagation();
                 handleCancelClick();
               }} 
-              className="px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors w-full font-medium text-sm"
+              disabled={isProcessing}
+              className={`px-4 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors w-full font-medium text-sm flex items-center justify-center ${
+                isProcessing ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
-              Cancel Registration
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Cancel Registration'
+              )}
             </button>
           ) : (
             <button 
               onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering the card click
+                e.stopPropagation();
                 handleRegisterClick();
-              }} 
-              className="px-4 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors w-full font-medium text-sm"
+              }}
+              disabled={isProcessing}
+              className={`px-4 py-2.5 bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors w-full font-medium text-sm flex items-center justify-center ${
+                isProcessing ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
             >
-              Register as Volunteer
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Register as Volunteer'
+              )}
             </button>
           )}
         </div>
       </div>
 
-      {/* Event Details Modal */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-            {/* Modal Header with close button */}
             <div className="sticky top-0 bg-white p-4 border-b border-gray-200 flex justify-between items-center z-10">
               <h2 className="text-2xl font-bold text-gray-800">Event Details</h2>
               <button 
                 onClick={() => setShowDetailsModal(false)}
                 className="p-1 rounded-full hover:bg-gray-100"
+                disabled={isProcessing}
               >
                 <X size={24} />
               </button>
             </div>
 
-            {/* Past Event Banner - only shown for past events */}
             {isPastEvent && (
               <div className="bg-gray-100 p-3 flex items-center justify-center text-gray-700">
                 <AlertCircle size={18} className="mr-2" />
-                <span>This event has already occurred and is no longer available for registration</span>
+                <span>This event has already occurred</span>
               </div>
             )}
             
-            {/* Event Banner Image */}
             <div className="w-full h-64 relative">
-              {event.bannerImage ? (
+              {localEvent.bannerImage ? (
                 <img 
-                  src={event.bannerImage} 
-                  alt={event.title} 
+                  src={localEvent.bannerImage} 
+                  alt={localEvent.title} 
                   className={`w-full h-full object-cover ${isPastEvent ? 'filter grayscale opacity-80' : ''}`}
                 />
               ) : (
@@ -244,9 +292,8 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
               )}
             </div>
             
-            {/* Event Content */}
             <div className="p-6">
-              <h1 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-800 mb-4">{localEvent.title}</h1>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="space-y-4">
@@ -254,7 +301,7 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
                     <Calendar size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-medium text-gray-800">Date & Time</h3>
-                      <p className="text-gray-600">{formatDate(event.date)} at {formatTime(event.time)}</p>
+                      <p className="text-gray-600">{formatDate(localEvent.date)} at {formatTime(localEvent.time)}</p>
                     </div>
                   </div>
                   
@@ -262,7 +309,7 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
                     <MapPin size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
                     <div>
                       <h3 className="font-medium text-gray-800">Location</h3>
-                      <p className="text-gray-600">{event.location}</p>
+                      <p className="text-gray-600">{localEvent.location}</p>
                     </div>
                   </div>
                 </div>
@@ -276,14 +323,14 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
                     </div>
                   </div>
                   
-                  {event.organizer && (
+                  {localEvent.organizer && (
                     <div className="flex items-start">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-3 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                       </svg>
                       <div>
                         <h3 className="font-medium text-gray-800">Organizer</h3>
-                        <p className="text-gray-600">{event.organizer}</p>
+                        <p className="text-gray-600">{localEvent.organizer}</p>
                       </div>
                     </div>
                   )}
@@ -293,35 +340,40 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
               <div className="mb-6">
                 <h3 className="font-medium text-gray-800 mb-2">Description</h3>
                 <div className="text-gray-600 whitespace-pre-line">
-                  {event.description}
+                  {localEvent.description}
                 </div>
               </div>
               
-              {/* Modal action buttons */}
               <div className="mt-8 flex justify-end gap-4">
                 <button
                   onClick={() => setShowDetailsModal(false)}
+                  disabled={isProcessing}
                   className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                 >
                   Close
                 </button>
                 
-                {isPastEvent ? (
-                  // No action button for past events
-                  null
-                ) : isRegistered ? (
+                {isPastEvent ? null : localIsRegistered ? (
                   <button 
                     onClick={handleCancelClick}
-                    className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors font-medium"
+                    disabled={isProcessing}
+                    className={`px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors font-medium flex items-center ${
+                      isProcessing ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
                   >
-                    Cancel Registration
+                    {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isProcessing ? 'Processing...' : 'Cancel Registration'}
                   </button>
                 ) : (
                   <button 
                     onClick={handleRegisterClick}
-                    className="px-4 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors font-medium"
+                    disabled={isProcessing}
+                    className={`px-4 py-2 bg-primary text-white hover:bg-primary/90 rounded-lg transition-colors font-medium flex items-center ${
+                      isProcessing ? 'opacity-70 cursor-not-allowed' : ''
+                    }`}
                   >
-                    Register as Volunteer
+                    {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isProcessing ? 'Processing...' : 'Register as Volunteer'}
                   </button>
                 )}
               </div>
@@ -330,19 +382,19 @@ const PublicEventCard = ({ event, isRegistered, isPastEvent, onRegister, onCance
         </div>
       )}
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         show={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
+        onClose={() => !isProcessing && setShowConfirmModal(false)}
         title={confirmAction === 'register' ? 'Confirm Registration' : 'Confirm Cancellation'}
         message={
           confirmAction === 'register' 
-            ? `Are you sure you want to register as a volunteer for "${event.title}"?`
-            : `Are you sure you want to cancel your registration for "${event.title}"?`
+            ? `Are you sure you want to register as a volunteer for "${localEvent.title}"?`
+            : `Are you sure you want to cancel your registration for "${localEvent.title}"?`
         }
         onConfirm={handleConfirmAction}
         type={confirmAction === 'register' ? 'info' : 'delete'}
         confirmText={confirmAction === 'register' ? 'Register' : 'Cancel Registration'}
+        isProcessing={isProcessing}
       />
     </>
   );

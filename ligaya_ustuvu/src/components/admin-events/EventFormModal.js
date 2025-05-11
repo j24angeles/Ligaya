@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, MapPin, Image, X, User, Upload } from 'lucide-react';
+import { Calendar, Clock, MapPin, X, User, Upload } from 'lucide-react';
 
 const EventFormModal = ({ isOpen, onClose, onSubmit, currentEvent = null }) => {
   const fileInputRef = useRef(null);

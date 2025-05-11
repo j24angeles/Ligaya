@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Users, X, Clock } from 'lucide-react';
+import { Calendar, MapPin, Users, X } from 'lucide-react';
 
 const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
   // Function to format date
@@ -25,6 +25,7 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
   };
 
   const isPastEvent = isEventInPast(event.date);
+  const volunteerCount = event.volunteers?.length || 0;
 
   // If modal is not open, don't render anything
   if (!isOpen) return null;
@@ -99,17 +100,16 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
             </div>
             
             <div className="space-y-4">
-              {event.attendees && (
-                <div className="flex items-start">
-                  <Users size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-medium text-gray-800">Attendees</h3>
-                    <p className="text-gray-600">
-                      {event.attendees.length} {event.attendees.length === 1 ? 'person' : 'people'} attending
-                    </p>
-                  </div>
+              {/* Updated Volunteers section */}
+              <div className="flex items-start">
+                <Users size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-medium text-gray-800">Volunteers</h3>
+                  <p className="text-gray-600">
+                    {volunteerCount} volunteer{volunteerCount !== 1 ? 's' : ''} registered
+                  </p>
                 </div>
-              )}
+              </div>
               
               {event.organizer && (
                 <div className="flex items-start">
@@ -177,6 +177,7 @@ const VisitorEventCard = ({ event }) => {
   };
 
   const isPastEvent = isEventInPast(event.date);
+  const volunteerCount = event.volunteers?.length || 0;
 
   return (
     <>
@@ -231,6 +232,12 @@ const VisitorEventCard = ({ event }) => {
             <span>{event.location || 'Location TBA'}</span>
           </div>
           
+          {/* Volunteer count in card */}
+          <div className="flex items-center text-gray-600 mb-4">
+            <Users size={16} className="mr-2" />
+            <span>{volunteerCount} volunteer{volunteerCount !== 1 ? 's' : ''} registered</span>
+          </div>
+          
           <p className="text-gray-700 mb-6 line-clamp-3">
             {event.description || 'Join us for this exciting event!'}
           </p>
@@ -256,8 +263,5 @@ const VisitorEventCard = ({ event }) => {
   );
 };
 
-// Export both components - you can decide which to use based on your needs
 export { VisitorEventCard, VisitorEventDetailsModal };
-
-// Default export for backward compatibility
 export default VisitorEventCard;
