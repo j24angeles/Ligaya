@@ -24,14 +24,14 @@ const Navbar = () => {
             {/* Desktop Navigation Items */}
             <div className="hidden md:block ml-8">
               <div className="flex items-baseline space-x-8">
-                {['home', 'about-us', 'devs'].map((item, i) => (
+                {['home', 'about-us', 'events', 'devs'].map((item, i) => (
                   <a
                     key={i}
                     href={`/${item}`}
                     className="px-3 py-2 text-sm font-medium hover:text-accent transition"
                     style={textShadowStyle}
                   >
-                    {item === 'devs' ? 'Team' : item === 'about-us' ? 'About Us' : item.charAt(0).toUpperCase() + item.slice(1).replace('-', ' ')}
+                    {item === 'devs' ? 'Team' : item === 'about-us' ? 'About Us' : item === 'events' ? 'Our Events' : item.charAt(0).toUpperCase() + item.slice(1).replace('-', ' ')}
                   </a>
                 ))}
               </div>

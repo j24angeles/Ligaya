@@ -7,6 +7,7 @@ import Devs from './pages/Devs';
 import Privacy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import AboutUs from './pages/AboutUs';
+import Events from './pages/Events';
 import VolunteerSettings from './pages/volunteer/VolunteerSettings';
 import AdminEvent from './pages/admin/AdminEventPage';
 import AdminUserMgmt from './pages/admin/AdminUserPage';
@@ -46,12 +47,13 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/events" element={<Events />} />
             
             {/* Settings page - accessible by any logged-in user */}
             <Route
               path="/volunteersettings"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['volunteer']}>
                   <VolunteerSettings />
                 </ProtectedRoute>
               }
