@@ -17,10 +17,10 @@ const Devs = () => {
       image: "/assets/dev-pics/joaq.png",
       bio: "Student developer passionate about building scalable web applications and exploring new technologies.",
       skills: ["React", "Kotlin", "ASP .NET", "MySQL", "PHP", "HTML/CSS"],
-      github: "https://github.com/joaquindev",
-      linkedin: "https://linkedin.com/in/joaquindev",
-      facebook: "https://facebook.com/joaquindev",
-      instagram: "https://instagram.com/joaquindev"
+      github: "https://github.com/j24angeles",
+      linkedin: "https://www.linkedin.com/in/joaquin-miguel-angeles-050606328/",
+      facebook: "https://facebook.com/j24angeles",
+      instagram: "https://instagram.com/j24a_"
     },
     {
       id: 2,
@@ -29,10 +29,10 @@ const Devs = () => {
       image: "/assets/dev-pics/ly.png",
       bio: "Student developer focused on creating intuitive user interfaces and robust backend solutions.",
       skills: ["React", "Kotlin", "ASP .NET", "MySQL", "PHP", "HTML/CSS"],
-      github: "https://github.com/lyannac",
-      linkedin: "https://linkedin.com/in/lyannac",
-      facebook: "https://facebook.com/lyannac",
-      instagram: "https://instagram.com/lyannac"
+      github: "https://github.com/lycristobal",
+      linkedin: "https://www.linkedin.com/in/lyanna-ysabel-cristobal-61707a328/",
+      facebook: "https://facebook.com/lyannaysabeel",
+      instagram: "https://instagram.com/lycristobal"
     }
   ];
 
