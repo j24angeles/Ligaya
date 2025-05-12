@@ -60,6 +60,21 @@
       "eventsJoined": [
         1746884804523
       ]
+    },
+    {
+      "firstName": "joaquin",
+      "lastName": "angeles",
+      "email": "joaquinmiguelangeless@gmail.com",
+      "password": "Happ1ness!",
+      "birthdate": "2003-11-04",
+      "name": "joaquin angeles",
+      "id": 1747022673176,
+      "role": "volunteer",
+      "createdAt": "2025-05-12T04:04:33.176Z",
+      "donations": [
+        1747022697098
+      ],
+      "updatedAt": "2025-05-12T04:04:57.144Z"
     }
   ],
   "events": [
@@ -153,6 +168,17 @@
       "referenceNumber": "312312",
       "id": 1746990108678,
       "createdAt": "2025-05-11T19:01:48.678Z",
+      "status": "active",
+      "isValidated": false
+    },
+    {
+      "userId": 1747022673176,
+      "amount": "1000",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747022697098,
+      "createdAt": "2025-05-12T04:04:57.098Z",
       "status": "active",
       "isValidated": false
     }

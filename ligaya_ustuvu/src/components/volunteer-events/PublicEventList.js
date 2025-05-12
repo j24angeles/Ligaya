@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, AlertCircle, Clock } from 'lucide-react';
+import { Search, AlertCircle } from 'lucide-react';
 import { getAllEvents, registerForEvent, cancelEventRegistration } from '../../api/eventService';
 import PublicEventCard from './PublicEventCard';
 import { useToast } from '../../hooks/ToastProvider';
