@@ -54,12 +54,15 @@
       "donations": [
         1746979207493,
         1746979309031,
-        1746990108678
+        1746990108678,
+        1747041628286,
+        1747048623563,
+        1747048633128,
+        1747048736468,
+        1747048986513
       ],
-      "updatedAt": "2025-05-11T19:05:44.785Z",
-      "eventsJoined": [
-        1746884804523
-      ]
+      "updatedAt": "2025-05-12T11:23:06.562Z",
+      "eventsJoined": []
     },
     {
       "firstName": "joaquin",
@@ -88,15 +91,8 @@
       "isPublished": true,
       "id": 1746884804523,
       "createdAt": "2025-05-10T13:46:44.523Z",
-      "volunteers": [
-        {
-          "id": 1746896118927,
-          "name": "julia angeles",
-          "email": "julia@gmail.com",
-          "registeredAt": "2025-05-11T19:05:44.435Z"
-        }
-      ],
-      "updatedAt": "2025-05-11T19:05:44.435Z"
+      "volunteers": [],
+      "updatedAt": "2025-05-12T10:08:34.343Z"
     }
   ],
   "donations": [
@@ -179,6 +175,76 @@
       "referenceNumber": "",
       "id": 1747022697098,
       "createdAt": "2025-05-12T04:04:57.098Z",
+      "status": "active",
+      "isValidated": true,
+      "validationStatus": "validated",
+      "validatedAt": "2025-05-12T14:13:03.716Z",
+      "rejectionReason": null,
+      "rejectedAt": null,
+      "updatedAt": "2025-05-12T14:13:03.716Z"
+    },
+    {
+      "userId": 1746896118927,
+      "amount": "2",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747041628286,
+      "createdAt": "2025-05-12T09:20:28.286Z",
+      "status": "active",
+      "isValidated": false,
+      "validationStatus": "rejected",
+      "rejectionReason": "Invalid transaction",
+      "rejectedAt": "2025-05-12T14:13:23.657Z",
+      "validatedAt": null,
+      "updatedAt": "2025-05-12T14:13:23.657Z"
+    },
+    {
+      "userId": 1746896118927,
+      "amount": "2312",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747048623563,
+      "createdAt": "2025-05-12T11:17:03.563Z",
+      "status": "active",
+      "isValidated": false
+    },
+    {
+      "userId": 1746896118927,
+      "amount": "312",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747048633128,
+      "createdAt": "2025-05-12T11:17:13.128Z",
+      "status": "active",
+      "isValidated": true,
+      "validationStatus": "validated",
+      "validatedAt": "2025-05-12T15:44:27.697Z",
+      "rejectionReason": null,
+      "rejectedAt": null,
+      "updatedAt": "2025-05-12T15:44:27.697Z"
+    },
+    {
+      "userId": 1746896118927,
+      "amount": "312",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747048736468,
+      "createdAt": "2025-05-12T11:18:56.468Z",
+      "status": "active",
+      "isValidated": false
+    },
+    {
+      "userId": 1746896118927,
+      "amount": "312",
+      "date": "2025-05-12",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747048986513,
+      "createdAt": "2025-05-12T11:23:06.513Z",
       "status": "active",
       "isValidated": false
     }

@@ -13,33 +13,31 @@ const PaymentMethodSelector = ({ value, onChange }) => {
   };
 
   return (
-    <div className="form-control w-full">
-      <label className="label">
-        <span className="label-text font-medium">Payment Method</span>
-        <span className="label-text-alt text-red-500">*</span>
+    <div className="mb-4">
+      <label className="block text-gray-700 text-xs font-medium mb-1">
+        Payment Method <span className="text-red-500">*</span>
       </label>
-      
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {paymentMethods.map((method) => (
-          <label 
+          <label
             key={method.id}
-            className={`flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-              value === method.id ? 'border-primary bg-primary bg-opacity-10' : 'border-gray-300'
+            className={`flex items-center justify-between px-3 py-2 border rounded-md text-sm cursor-pointer transition-colors ${
+              value === method.id
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-300 hover:bg-gray-50'
             }`}
           >
+            <span>{method.label}</span>
             <input
               type="radio"
               name="paymentMethod"
               value={method.id}
               checked={value === method.id}
               onChange={handleChange}
-              className="radio radio-primary hidden"
+              className="hidden"
             />
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{method.label}</span>
-            </div>
             {value === method.id && (
-              <svg className="ml-auto h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             )}

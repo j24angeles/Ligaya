@@ -1,6 +1,6 @@
-// src/components/volunteer-donations/DonationTable.js
 import React, { useState } from 'react';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
+import DonationDetailsModal from './DonationDetailsModal';
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -18,9 +18,9 @@ const formatPaymentMethod = (method) => {
 };
 
 const statusStyles = {
-  active: 'bg-green-100 text-green-800',
+  verified: 'bg-green-100 text-green-800',
   pending: 'bg-yellow-100 text-yellow-800',
-  archived: 'bg-gray-100 text-gray-800'
+  rejected: 'bg-red-100 text-red-800'
 };
 
 const DonationTable = ({ donations }) => {
@@ -30,28 +30,53 @@ const DonationTable = ({ donations }) => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDonation, setSelectedDonation] = useState(null);
 
-  // Filter donations
-  const filteredDonations = donations.filter(donation => {
-    const matchesSearch = 
-      donation.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      donation.amount.toString().includes(searchTerm);
-    
-    return (
-      matchesSearch &&
-      (filterMethod === 'all' || donation.paymentMethod === filterMethod) &&
-      (filterStatus === 'all' || 
-       (filterStatus === 'verified' && donation.isValidated) ||
-       (filterStatus === 'pending' && !donation.isValidated))
-    );
-  });
+  // Filter donations - Fixed status matching
+const filteredDonations = donations.filter(donation => {
+  const matchesSearch = 
+    donation.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    donation.amount.toString().includes(searchTerm);
+
+  // Fallback if the validationStatus is undefined
+  const donationStatus = donation.validationStatus || 'pending'; 
+
+  const statusMatch = filterStatus === 'all' || donationStatus.toLowerCase() === filterStatus.toLowerCase();
+  const methodMatch = filterMethod === 'all' || donation.paymentMethod === filterMethod;
+
+  return matchesSearch && statusMatch && methodMatch;
+});
+
+
+
 
   // Sort donations
   const sortedDonations = [...filteredDonations].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+
+    if (sortConfig.key === 'validationStatus') {
+      const statusOrder = { 'validated': 1, 'pending': 2, 'rejected': 3 };
+      aValue = statusOrder[a.validationStatus] || 0;
+      bValue = statusOrder[b.validationStatus] || 0;
+    }
+    else if (sortConfig.key === 'date') {
+      aValue = new Date(a.date).getTime();
+      bValue = new Date(b.date).getTime();
+    }
+    else if (sortConfig.key === 'amount') {
+      aValue = parseFloat(a.amount);
+      bValue = parseFloat(b.amount);
+    }
+
+    if (aValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
+    if (bValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue == null && bValue == null) return 0;
+
+    if (aValue < bValue) {
       return sortConfig.direction === 'asc' ? -1 : 1;
     }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
+    if (aValue > bValue) {
       return sortConfig.direction === 'asc' ? 1 : -1;
     }
     return 0;
@@ -129,8 +154,9 @@ const DonationTable = ({ donations }) => {
               className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All Statuses</option>
-              <option value="verified">Verified</option>
+              <option value="validated">Verified</option>
               <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
         </div>
@@ -171,17 +197,21 @@ const DonationTable = ({ donations }) => {
               <th 
                 scope="col" 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => requestSort('isValidated')}
+                onClick={() => requestSort('validationStatus')}
               >
                 <div className="flex items-center">
-                  Status {getSortIcon('isValidated')}
+                  Status {getSortIcon('validationStatus')}
                 </div>
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentItems.map((donation) => (
-              <tr key={donation.id} className="hover:bg-gray-50">
+              <tr 
+                key={donation.id} 
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => setSelectedDonation(donation)}
+              >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   ₱{parseFloat(donation.amount).toFixed(2)}
                 </td>
@@ -192,8 +222,14 @@ const DonationTable = ({ donations }) => {
                   {formatPaymentMethod(donation.paymentMethod)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.isValidated ? statusStyles.active : statusStyles.pending}`}>
-                    {donation.isValidated ? 'Verified' : 'Pending'}
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    donation.validationStatus === 'validated' 
+                      ? statusStyles.verified 
+                      : donation.validationStatus === 'rejected' 
+                        ? statusStyles.rejected 
+                        : statusStyles.pending
+                  }`}>
+                    {donation.validationStatus === 'validated' ? 'Verified' : donation.validationStatus === 'rejected' ? 'Rejected' : 'Pending'}
                   </span>
                 </td>
               </tr>
@@ -271,6 +307,14 @@ const DonationTable = ({ donations }) => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Donation Details Modal */}
+      {selectedDonation && (
+        <DonationDetailsModal 
+          donation={selectedDonation} 
+          onClose={() => setSelectedDonation(null)} 
+        />
       )}
     </div>
   );

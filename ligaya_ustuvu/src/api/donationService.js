@@ -39,8 +39,6 @@ export const getDonationById = async (id) => {
   }
 };
 
-// src/api/donationService.js
-// Add this function to your existing donationService.js
 export const getDonationsByUserId = async (userId) => {
   try {
     const response = await api.get('/donations', {
@@ -69,7 +67,11 @@ export const createDonation = async (donationData) => {
       id: Date.now(),
       createdAt: new Date().toISOString(),
       status: 'active',
-      isValidated: false
+      validationStatus: 'pending',
+      isValidated: false,
+      rejectionReason: null,
+      validatedAt: null,
+      rejectedAt: null
     };
     
     // Create the donation
@@ -170,8 +172,11 @@ export const validateDonation = async (id) => {
     // Update the donation validation status
     const response = await api.put(`/donations/${id}`, {
       ...existingDonation.data,
+      validationStatus: 'validated',
       isValidated: true,
       validatedAt: new Date().toISOString(),
+      rejectionReason: null,
+      rejectedAt: null,
       updatedAt: new Date().toISOString()
     });
     
@@ -179,6 +184,35 @@ export const validateDonation = async (id) => {
   } catch (error) {
     console.error('Error validating donation:', error);
     throw error.response?.data?.message || error.message || 'Failed to validate donation';
+  }
+};
+
+/**
+ * Reject donation
+ * @param {string|number} id - Donation ID
+ * @param {string} reason - Reason for rejection
+ * @returns {Promise<Object>} - Updated donation data
+ */
+export const rejectDonation = async (id, reason = '') => {
+  try {
+    // First get the existing donation
+    const existingDonation = await api.get(`/donations/${id}`);
+    
+    // Update the donation validation status
+    const response = await api.put(`/donations/${id}`, {
+      ...existingDonation.data,
+      validationStatus: 'rejected',
+      isValidated: false,
+      rejectionReason: reason,
+      rejectedAt: new Date().toISOString(),
+      validatedAt: null,
+      updatedAt: new Date().toISOString()
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting donation:', error);
+    throw error.response?.data?.message || error.message || 'Failed to reject donation';
   }
 };
 

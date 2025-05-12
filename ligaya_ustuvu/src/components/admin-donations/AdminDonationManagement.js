@@ -1,9 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, AlertCircle, Edit, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
+import { 
+  Plus, 
+  Search, 
+  AlertCircle, 
+  Edit, 
+  Archive, 
+  Trash2, 
+  ChevronDown, 
+  ChevronUp, 
+  RefreshCw, 
+  ChevronLeft, 
+  ChevronRight, 
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
 import DonationFormModal from './AdminDonationFormModal';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../../hooks/ToastProvider';
-import { getAllDonations, createDonation, updateDonation, deleteDonation, archiveDonation, restoreDonation, validateDonation } from '../../api/donationService';
+import { 
+  getAllDonations, 
+  createDonation, 
+  updateDonation, 
+  deleteDonation, 
+  archiveDonation, 
+  restoreDonation, 
+  validateDonation,
+  rejectDonation
+} from '../../api/donationService';
 import { getAllUsers } from '../../api/userService';
 
 const AdminDonationManagement = () => {
@@ -28,7 +51,7 @@ const AdminDonationManagement = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const donationsPerPage = 10;
-  const [isValidatedFilter, setIsValidatedFilter] = useState('all');
+  const [validationFilter, setValidationFilter] = useState('all');
 
   const { showSuccess, showError, showInfo } = useToast();
 
@@ -49,7 +72,6 @@ const AdminDonationManagement = () => {
   const fetchUsers = async () => {
     try {
       const data = await getAllUsers();
-      // Filter to only include volunteers
       const filteredUsers = data.filter(user => user.role === 'volunteer');
       setUsers(filteredUsers);
     } catch (err) {
@@ -213,6 +235,30 @@ const AdminDonationManagement = () => {
     });
   };
 
+  const handleReject = (donation) => {
+    openConfirmationModal({
+      title: "Reject Donation",
+      message: `Are you sure you want to mark this donation as failed/not approved?`,
+      type: "warning",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          const reason = prompt("Please enter the reason for rejection (optional):");
+          await rejectDonation(donation.id, reason);
+          await fetchDonations();
+          showSuccess(`Donation has been marked as rejected`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to reject donation: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Reject",
+      cancelText: "Cancel"
+    });
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Not provided';
     const date = new Date(dateString);
@@ -252,24 +298,19 @@ const AdminDonationManagement = () => {
   };
 
   const filteredDonations = donations.filter(donation => {
-    // Get donor name for search
     const donorName = getDonorName(donation.userId).toLowerCase();
     
-    // Check if donation matches search term
     const matchesSearch = 
       donorName.includes(searchTerm.toLowerCase()) || 
       (donation.referenceNumber && donation.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Check if donation matches status filter
     const donationStatus = donation.status || 'active';
     const matchesStatus = statusFilter === 'all' || donationStatus === statusFilter;
     
-    // Check if donation matches validation filter
-    const isValidated = donation.isValidated || false;
+    const validationStatus = donation.validationStatus || 'pending';
     const matchesValidation = 
-      isValidatedFilter === 'all' || 
-      (isValidatedFilter === 'validated' && isValidated) || 
-      (isValidatedFilter === 'unvalidated' && !isValidated);
+      validationFilter === 'all' || 
+      validationStatus === validationFilter;
     
     return matchesSearch && matchesStatus && matchesValidation;
   });
@@ -380,13 +421,14 @@ const AdminDonationManagement = () => {
           <div className="flex items-center">
             <span className="mr-2 text-sm text-gray-600">Validation:</span>
             <select
-              value={isValidatedFilter}
-              onChange={(e) => setIsValidatedFilter(e.target.value)}
+              value={validationFilter}
+              onChange={(e) => setValidationFilter(e.target.value)}
               className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All</option>
               <option value="validated">Validated</option>
-              <option value="unvalidated">Unvalidated</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
         </div>
@@ -402,7 +444,7 @@ const AdminDonationManagement = () => {
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
           <h3 className="text-lg font-medium text-gray-600 mb-2">No donations found</h3>
           <p className="text-gray-500">
-            {searchTerm || statusFilter !== 'active' || isValidatedFilter !== 'all'
+            {searchTerm || statusFilter !== 'active' || validationFilter !== 'all'
               ? "Try adjusting your search or filters" 
               : "Click the '+' button to record your first donation"}
           </p>
@@ -502,9 +544,13 @@ const AdminDonationManagement = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap hidden lg:table-cell">
                       <div className="flex items-center">
-                        {donation.isValidated ? (
+                        {donation.validationStatus === 'validated' ? (
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                             Validated
+                          </span>
+                        ) : donation.validationStatus === 'rejected' ? (
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                            Rejected
                           </span>
                         ) : (
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
@@ -517,14 +563,23 @@ const AdminDonationManagement = () => {
                       <div className="flex justify-end space-x-2">
                         {donation.status !== 'archived' ? (
                           <>
-                            {!donation.isValidated && (
-                              <button
-                                onClick={() => handleValidate(donation)}
-                                className="text-green-600 hover:text-green-900"
-                                title="Validate donation"
-                              >
-                                <CheckCircle size={18} />
-                              </button>
+                            {donation.validationStatus !== 'validated' && donation.validationStatus !== 'rejected' && (
+                              <>
+                                <button
+                                  onClick={() => handleValidate(donation)}
+                                  className="text-green-600 hover:text-green-900"
+                                  title="Validate donation"
+                                >
+                                  <CheckCircle size={18} />
+                                </button>
+                                <button
+                                  onClick={() => handleReject(donation)}
+                                  className="text-red-600 hover:text-red-900"
+                                  title="Reject donation"
+                                >
+                                  <XCircle size={18} />
+                                </button>
+                              </>
                             )}
                             <button
                               onClick={() => handleEdit(donation)}
