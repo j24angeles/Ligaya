@@ -1,97 +1,100 @@
 // src/pages/UserDonationPage.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Navigate } from 'react-router-dom';
+import Sidebar from '../../common/Sidebar';
 import DonationForm from '../../components/volunteer-donations/DonationForm';
 import DonationTable from '../../components/volunteer-donations/DonationTable';
 import { getDonationsByUserId } from '../../api/donationService';
-import Sidebar from '../../common/Sidebar';
 import DonationAccountCards from '../../components/volunteer-donations/DonationAccountCards';
 
 const UserDonationPage = () => {
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchDonations = async () => {
+    // Get user from localStorage to match the pattern used in VolunteerEventPage
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
       try {
-        const userId = user.id;
-        const userDonations = await getDonationsByUserId(userId);
-        setDonations(userDonations);
-      } catch (err) {
-        setError(err.message || 'Failed to fetch donations');
-      } finally {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        
+        // Fetch donations after we have the user
+        const fetchDonations = async () => {
+          try {
+            const userDonations = await getDonationsByUserId(parsedUser.id);
+            setDonations(userDonations);
+          } catch (err) {
+            setError(err.message || 'Failed to fetch donations');
+          } finally {
+            setLoading(false);
+          }
+        };
+        
+        fetchDonations();
+      } catch (error) {
+        console.error('Error parsing current user:', error);
+        localStorage.removeItem('currentUser');
         setLoading(false);
       }
-    };
-
-    fetchDonations();
-  }, [isAuthenticated, navigate, user]);
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full text-center">
-          <div className="text-red-500 text-lg font-medium mb-4">Error</div>
-          <p className="text-gray-700">{error}</p>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 overflow-x-hidden">
-      {/* Sidebar */}
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar component with responsive behavior built-in */}
       <Sidebar role={user.role} />
-
-      {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 mt-3 mx-auto max-w-full lg:ml-64 sm:ml-0">
-        <div className="mb-8 sm:mb-6">
-          {/* Page Header */}
-          <div className="mb-4 sm:mb-3">
-            {/* Added more top margin on small screens */}
-            <h1 className="text-3xl font-bold text-primary mt-12 sm:mt-5">Make a Donation</h1>
-            <p className="text-gray-600 mt-2 text-xs sm:text-sm">
-              Kindly transfer your donations directly to our official accounts,
-              then complete the donation form so we can verify your contribution.
-            </p>
-          </div>
-          <DonationAccountCards />
-
-          {/* Donation Section */}
-          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-            {/* Donation Form Card */}
-            <div className="bg-white rounded-md shadow-sm border border-gray-200 px-4 sm:px-6 py-4 w-full lg:w-[47%] max-h-[650px] overflow-auto">
-              <DonationForm
-                userId={user.id}
-                onSuccess={(newDonation) => {
-                  setDonations(prev => [newDonation, ...prev]);
-                }}
-              />
+      
+      {/* Main Content - with proper padding to avoid overlap */}
+      <main className="flex-1 overflow-auto lg:ml-64 pt-16 lg:pt-4 px-4">
+        <div className="container mx-auto">
+          <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-primary">Make a Donation</h1>
+              <p className="text-gray-600 mt-2">
+                Kindly transfer your donations directly to our official accounts,
+                then complete the donation form so we can verify your contribution.
+              </p>
             </div>
 
-            {/* Donation History Card */}
-            <div className="bg-white rounded-md shadow-sm border border-gray-200 px-4 sm:px-6 py-4 w-full lg:w-[53%] max-h-[650px] overflow-auto">
-              <div className="flex items-center mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Donation History</h2>
+            {/* Donation Account Cards */}
+            <DonationAccountCards />
+
+            {/* Donation Section */}
+            <div className="flex flex-col lg:flex-row gap-6 mt-6">
+              {/* Donation Form Card */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full lg:w-[45%]">
+                <DonationForm
+                  userId={user.id}
+                  onSuccess={(newDonation) => {
+                    setDonations(prev => [newDonation, ...prev]);
+                  }}
+                />
               </div>
-              <DonationTable donations={donations} />
+
+              {/* Donation History Card */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full lg:w-[55%]">
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold text-gray-800">Donation History</h2>
+                </div>
+                <DonationTable donations={donations} />
+              </div>
             </div>
           </div>
         </div>

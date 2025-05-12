@@ -164,7 +164,7 @@ const formatPaymentMethod = (method) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-secondary text-white font-bold text-sm py-2 px-4 rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 hover:bg-accent-dark disabled:opacity-60 mt-1"
+            className="w-full bg-primary text-white font-medium text-sm py-2 px-4 rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 hover:bg-accent-dark disabled:opacity-60 mt-1"
           >
             {isSubmitting ? 'Processing...' : 'Submit'}
           </button>
