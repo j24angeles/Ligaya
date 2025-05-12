@@ -22,7 +22,7 @@ const DonationAccountCards = () => {
         {
           title: 'BDO Bank Transfer',
           img: '/assets/bank/bdo.png',
-          name: 'Ligaya Community Foundation Inc.',
+          name: 'Ligaya Community Foundation',
           contactLabel: 'Account Number',
           contact: '1234 5678 9012',
         },
