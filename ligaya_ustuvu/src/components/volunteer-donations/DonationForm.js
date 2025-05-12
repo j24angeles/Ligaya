@@ -123,6 +123,10 @@ const formatPaymentMethod = (method) => {
 
       {/* Form Content */}
       <div className="px-6 pb-6">
+        <p className="text-gray-500 text-[11px] mt-2 max-w-s">
+  Transfer directly to our official accounts, then complete the donation form so we can verify your contribution.
+</p>
+<br/>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1">

@@ -67,9 +67,8 @@ const UserDonationPage = () => {
           <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
             <div className="mb-6">
               <h1 className="text-3xl font-bold text-primary">Make a Donation</h1>
-              <p className="text-gray-600 mt-2">
-                Kindly transfer your donations directly to our official accounts,
-                then complete the donation form so we can verify your contribution.
+<p className="text-gray-600 mt-2 max-w-prose">
+                100% of your donations will go to our cause. 
               </p>
             </div>
 
