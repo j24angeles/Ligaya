@@ -1,4 +1,3 @@
-// src/pages/UserDonationPage.js
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../common/Sidebar';
@@ -14,7 +13,6 @@ const UserDonationPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Get user from localStorage to match the pattern used in VolunteerEventPage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
@@ -58,7 +56,6 @@ const UserDonationPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar component with responsive behavior built-in */}
       <Sidebar role={user.role} />
       
       {/* Main Content - with proper padding to avoid overlap */}

@@ -5,7 +5,6 @@ import Navbar from '../common/Navbar';
 
 
 const PrivacyPolicy = () => {
-  // Scroll to top when component mounts
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

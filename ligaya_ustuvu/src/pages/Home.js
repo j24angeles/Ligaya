@@ -115,7 +115,7 @@ const Home = () => {
       </div>
     </section>
 
-      {/* Mission Statement with Improved Layout */}
+      {/* Mission Statement */}
       <section className="py-16 bg-blue-50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -134,28 +134,28 @@ const Home = () => {
               <div className="md:w-1/2 grid grid-cols-2 gap-4">
                 {/* Stat Box 1 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">20+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">10+</div>
                   <div className="text-secondary font-semibold">Programs</div>
                   <p className="text-gray-600 text-sm">Active initiatives</p>
                 </div>
                 
                 {/* Stat Box 2 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">700+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">100+</div>
                   <div className="text-secondary font-semibold">Volunteers</div>
                   <p className="text-gray-600 text-sm">And growing every day</p>
                 </div>
                 
                 {/* Stat Box 3 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">50+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">20+</div>
                   <div className="text-secondary font-semibold">Events</div>
                   <p className="text-gray-600 text-sm">Annual activities</p>
                 </div>
                 
                 {/* Stat Box 4 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">200+</div>
                   <div className="text-secondary font-semibold">Children</div>
                   <p className="text-gray-600 text-sm">Helped so far</p>
                 </div>
