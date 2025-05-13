@@ -1,15 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/**
- * Ultra-minimal single-line Toast component
- * @param {Object} props - Component props
- * @param {string} props.message - The message to display
- * @param {string} props.type - The type of toast (error, success, warning, info)
- * @param {boolean} props.show - Whether to show the toast
- * @param {function} props.onClose - Function to call when toast is closed
- * @param {number} props.duration - Duration in ms before auto-close (default: 3000)
- * @returns {JSX.Element}
- */
 export default function Toast({ message, type = 'error', show, onClose, duration = 3000 }) {
   const [isVisible, setIsVisible] = useState(false);
   
