@@ -1,16 +1,22 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import the auth context
+import { useAuth } from '../context/AuthContext'; 
 
 const Sidebar = ({ role = 'volunteer' }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth(); // Get logout function from context
+  const { logout } = useAuth(); 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [currentUser, setCurrentUser] = useState(null);
   
   useEffect(() => {
+    // Get current user from localStorage
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      setCurrentUser(JSON.parse(userJson));
+    }
+    
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       if (window.innerWidth >= 1024) {
@@ -23,8 +29,7 @@ const Sidebar = ({ role = 'volunteer' }) => {
   }, []);
   
   const handleLogout = () => {
-    logout(); // Use the context logout function
-    // Replace current history entry with login page
+    logout(); 
     navigate('/login', { replace: true });
   };
 
@@ -122,18 +127,21 @@ const Sidebar = ({ role = 'volunteer' }) => {
         {/* Top space on mobile to avoid overlap with header */}
         <div className="h-16 lg:hidden"></div>
 
-        {/* Role indicator */}
-        <div className="py-3 px-4 bg-primary/90 border-b border-accent/30">
+        {/* User info section - Name and Role */}
+        <div className="py-4 px-4 bg-primary/90 border-b border-accent/30">
           <div className="flex items-center">
-            <div className="bg-secondary/20 text-secondary uppercase font-bold rounded-full w-8 h-8 flex items-center justify-center">
-              {role.charAt(0)}
+            <div className="bg-secondary/20 text-secondary uppercase font-bold rounded-full w-10 h-10 flex items-center justify-center">
+              {currentUser?.firstName?.charAt(0) || role.charAt(0)}
             </div>
-            <span className="ml-2 font-semibold capitalize">{role}</span>
+            <div className="ml-3 flex flex-col">
+              <span className="font-semibold text-lg">{currentUser?.firstName || 'User'}</span>
+              <span className="text-xs text-secondary/80 capitalize">{role}</span>
+            </div>
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="mt-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <nav className="mt-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
           <ul className="space-y-1 px-2">
             {items.map((item, index) => {
               const isActive = location.pathname === item.path;
