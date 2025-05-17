@@ -33,7 +33,7 @@ const Events = () => {
   // Filter events based on active tab
   const filteredEvents = React.useMemo(() => {
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+    currentDate.setHours(0, 0, 0, 0);
     
     // Filter by tab (all/upcoming/past)
     if (activeTab === 'all') {

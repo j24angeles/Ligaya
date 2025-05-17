@@ -35,10 +35,9 @@ const VolunteerEventPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar component with responsive behavior built-in */}
       <Sidebar role={user.role} />
       
-      {/* Main Content - with proper padding to avoid overlap */}
+      {/* Main Content */}
       <main className="flex-1 overflow-auto lg:ml-64 pt-16 lg:pt-4 px-4">
         <div className="container mx-auto">
           <PublicEventList currentUser={user} />

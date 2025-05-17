@@ -95,10 +95,8 @@ const Devs = () => {
     );
   };
 
-  // Fade-in animation class based on loading state
   const fadeIn = isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10';
   
-  // Background grid pattern style
   const gridPatternStyle = {
     backgroundImage: `radial-gradient(#00254C 1px, transparent 1px)`,
     backgroundSize: '20px 20px',
@@ -156,7 +154,7 @@ const Devs = () => {
                   <h3 className="text-xl font-bold text-neutral mb-1">{dev.name}</h3>
                   <p className="text-neutral/80 text-sm mb-3">{dev.bio}</p>
                   
-                  {/* Skills - Tighter layout */}
+                  {/* Skills */}
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-1">
                       {dev.skills.map((skill, idx) => (

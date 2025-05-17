@@ -1,4 +1,4 @@
-import SignupForm from '../components/SignupForm'; // Ensure this path matches your project structure
+import SignupForm from '../components/SignupForm'; 
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 

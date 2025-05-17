@@ -35,12 +35,15 @@
       "donations": [
         1,
         1746977032248,
-        1747068070472
+        1747068070472,
+        1747108236681
       ],
       "createdAt": "2025-05-09T06:58:48.972Z",
-      "updatedAt": "2025-05-12T16:41:10.521Z",
+      "updatedAt": "2025-05-13T03:50:36.738Z",
       "id": 1746776568076,
-      "eventsJoined": []
+      "eventsJoined": [
+        1746884804523
+      ]
     },
     {
       "firstName": "julia",
@@ -92,8 +95,14 @@
       "isPublished": true,
       "id": 1746884804523,
       "createdAt": "2025-05-10T13:46:44.523Z",
-      "volunteers": [],
-      "updatedAt": "2025-05-12T16:35:06.227Z"
+      "volunteers": [
+        {
+          "id": 1746776568076,
+          "email": "joaquinmiguel.angeles.cics@ust.edu.ph",
+          "registeredAt": "2025-05-13T03:44:59.197Z"
+        }
+      ],
+      "updatedAt": "2025-05-13T03:44:59.197Z"
     }
   ],
   "donations": [
@@ -257,6 +266,21 @@
       "referenceNumber": "767868",
       "id": 1747068070472,
       "createdAt": "2025-05-12T16:41:10.472Z",
+      "status": "active",
+      "validationStatus": "pending",
+      "isValidated": false,
+      "rejectionReason": null,
+      "validatedAt": null,
+      "rejectedAt": null
+    },
+    {
+      "userId": 1746776568076,
+      "amount": "120",
+      "date": "2025-05-13",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "id": 1747108236681,
+      "createdAt": "2025-05-13T03:50:36.681Z",
       "status": "active",
       "validationStatus": "pending",
       "isValidated": false,

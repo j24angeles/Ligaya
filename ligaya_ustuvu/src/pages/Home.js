@@ -43,7 +43,7 @@ const Home = () => {
         {/* Quote Section */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">"Nothing You Do For Children Is Ever Wasted"</h2>
-          <p className="text-2xl text-primary mb-8 italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">- Garrison Keillor</p>
+          <p className="text-2xl text-primary mb-8 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">- Garrison Keillor</p>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
           <p className="text-xl text-gray-700 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be part of our advocacy and help us make a difference.</p>
         </div>    
@@ -115,13 +115,13 @@ const Home = () => {
       </div>
     </section>
 
-      {/* Mission Statement with Improved Layout */}
+      {/* Mission Statement */}
       <section className="py-16 bg-blue-50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                <h2 className="text-3xl font-bold text-primary mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Our Mission</h2>
+                <h2 className="text-3xl font-bold text-primary mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Who are we?</h2>
                 <p className="text-lg text-gray-700 mb-6">
                   Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
                   We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
@@ -134,28 +134,28 @@ const Home = () => {
               <div className="md:w-1/2 grid grid-cols-2 gap-4">
                 {/* Stat Box 1 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">20+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">10+</div>
                   <div className="text-secondary font-semibold">Programs</div>
                   <p className="text-gray-600 text-sm">Active initiatives</p>
                 </div>
                 
                 {/* Stat Box 2 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">700+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">100+</div>
                   <div className="text-secondary font-semibold">Volunteers</div>
                   <p className="text-gray-600 text-sm">And growing every day</p>
                 </div>
                 
                 {/* Stat Box 3 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">50+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">20+</div>
                   <div className="text-secondary font-semibold">Events</div>
                   <p className="text-gray-600 text-sm">Annual activities</p>
                 </div>
                 
                 {/* Stat Box 4 */}
                 <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-4xl font-bold text-primary mb-2">200+</div>
                   <div className="text-secondary font-semibold">Children</div>
                   <p className="text-gray-600 text-sm">Helped so far</p>
                 </div>
