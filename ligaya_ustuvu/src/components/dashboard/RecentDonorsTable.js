@@ -1,80 +1,95 @@
-// src/components/dashboard/RecentDonorsTable.js
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const RecentDonorsTable = ({ donations }) => {
-  const recentDonors = useMemo(() => {
-    // Sort donations by date (newest first)
-    const sortedDonations = [...donations].sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
+const RecentDonorsTable = () => {
+  const [recentDonations, setRecentDonations] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDonationsAndUsers = async () => {
+      try {
+        const [donationsRes, usersRes] = await Promise.all([
+          axios.get('http://localhost:3001/donations'),
+          axios.get('http://localhost:3001/users')
+        ]);
+
+        const sortedDonations = donationsRes.data
+          .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
+          .slice(0, 3);
+
+        setRecentDonations(sortedDonations);
+        setUsers(usersRes.data);
+      } catch (error) {
+        console.error('Failed to load donations or users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDonationsAndUsers();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-    
-    // Get the top 5 most recent donations
-    return sortedDonations.slice(0, 5);
-  }, [donations]);
-
-  const getStatusBadgeClass = (isValidated) => {
-    if (isValidated === true) return 'bg-green-100 text-green-800';
-    if (isValidated === false) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-gray-100 text-gray-800';
   };
 
-  const getStatusText = (isValidated) => {
-    if (isValidated === true) return 'Verified';
-    if (isValidated === false) return 'Pending';
-    return 'Unknown';
+  const getUserName = (userId) => {
+    const user = users.find((u) => u.id === userId);
+    if (!user) return 'Full Name';
+    return user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim();
   };
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="p-6 pb-0">
-        <h3 className="text-lg font-medium text-gray-700">Recent Donors</h3>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
-              </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Donation Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {recentDonors.length > 0 ? (
-              recentDonors.map((donation) => (
-                <tr key={donation.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {donation.donorName || `User ID: ${donation.userId}`}
-                    </div>
+    <div className="bg-white rounded-xl shadow-sm p-4">
+      <h3 className="font-semibold mb-4">Recent Donors</h3>
+      {loading ? (
+        <div className="text-center text-gray-500 my-8">Loading recent donations...</div>
+      ) : recentDonations.length === 0 ? (
+        <div className="text-center text-gray-500 my-8">No donations available.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left text-xs uppercase text-gray-500">
+                <th className="px-4 py-2">Donor Name</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentDonations.map((donation) => (
+                <tr key={donation.id} className="border-t border-gray-100">
+                  <td className="px-4 py-3 font-medium">
+                    {getUserName(donation.userId)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="text-sm font-medium text-gray-900">
-                      ₱{parseFloat(donation.amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(donation.isValidated)}`}>
-                      {getStatusText(donation.isValidated)}
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      donation.isValidated
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {donation.isValidated ? 'Verified' : 'Pending'}
                     </span>
                   </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {formatDate(donation.date || donation.createdAt)}
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium">
+                    PHP {parseFloat(donation.amount).toLocaleString()}
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="px-6 py-4 text-center text-sm text-gray-500">
-                  No recent donations found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
