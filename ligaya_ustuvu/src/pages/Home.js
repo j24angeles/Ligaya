@@ -43,7 +43,7 @@ const Home = () => {
         {/* Quote Section */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-3 leading-tight italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">"Nothing You Do For Children Is Ever Wasted"</h2>
-          <p className="text-2xl text-primary mb-8 italic [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">- Garrison Keillor</p>
+          <p className="text-2xl text-primary mb-8 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">- Garrison Keillor</p>
           <div className="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
           <p className="text-xl text-gray-700 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be part of our advocacy and help us make a difference.</p>
         </div>    

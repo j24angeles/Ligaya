@@ -144,48 +144,57 @@ const AboutUs = () => {
       </section>
       
       {/* Vision & Mission Section */}
-      <section id="mission" className="py-20 bg-blue-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-12">Vision & Mission</h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Vision Card */}
-            <div className="bg-white rounded-xl shadow-lg p-8 transform transition hover:-translate-y-2 hover:shadow-xl animate-on-scroll" id="vision-card">
-              <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Our Vision</h3>
-              
-              <p className="text-lg text-gray-600 leading-relaxed">
-                The UST Volunteers for UNICEF envisions to be the primary partner of the University of Santo Tomas in promoting 
-                and upholding children's rights.
-              </p>
+<section id="mission" className="py-16 bg-white relative">
+  <div className="container mx-auto px-4 relative z-10">
+    <div className="text-center max-w-3xl mx-auto mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+        <span className="relative inline-block pb-2">
+          Vision & Mission
+          <span className="absolute bottom-0 left-0 w-full h-1 bg-primary/30"></span>
+        </span>
+      </h2>
+    </div>
+    
+    <div className="grid md:grid-cols-2 gap-8">
+      {/* Vision Card */}
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border-l-4 border-primary">
+        <div className="p-8">
+          <div className="flex items-center mb-6">
+            <div className="bg-primary/10 p-3 rounded-lg mr-4 text-primary">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
             </div>
-            
-            {/* Mission Card */}
-            <div className="bg-white rounded-xl shadow-lg p-8 transform transition hover:-translate-y-2 hover:shadow-xl animate-on-scroll" id="mission-card">
-              <div className="bg-secondary/10 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
-              
-              <p className="text-lg text-gray-600 leading-relaxed">
-                The UST Volunteers for UNICEF commits itself in providing programs that develop the whole Thomasian 
-                community in uplifting the conditions of the children in the Philippines under the principles of UNICEF.
-              </p>
-            </div>
+            <h3 className="text-2xl font-bold text-gray-800">Our Vision</h3>
           </div>
+          <p className="text-gray-600 pl-16">
+            The UST Volunteers for UNICEF envisions to be the primary partner of the University of Santo Tomas in promoting 
+            and upholding children's rights.
+          </p>
         </div>
-      </section>
+      </div>
+      
+      {/* Mission Card */}
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all border-l-4 border-secondary">
+        <div className="p-8">
+          <div className="flex items-center mb-6">
+            <div className="bg-secondary/10 p-3 rounded-lg mr-4 text-secondary">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800">Our Mission</h3>
+          </div>
+          <p className="text-gray-600 pl-16">
+            The UST Volunteers for UNICEF commits itself in providing programs that develop the whole Thomasian 
+            community in uplifting the conditions of the children in the Philippines under the principles of UNICEF.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+      
       
       {/* Impact Numbers - Animated Counters */}
       <section className="py-16 bg-primary text-white">
