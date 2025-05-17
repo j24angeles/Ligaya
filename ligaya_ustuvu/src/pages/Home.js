@@ -121,7 +121,7 @@ const Home = () => {
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                <h2 className="text-3xl font-bold text-primary mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Our Mission</h2>
+                <h2 className="text-3xl font-bold text-primary mb-4 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Who are we?</h2>
                 <p className="text-lg text-gray-700 mb-6">
                   Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
                   We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
