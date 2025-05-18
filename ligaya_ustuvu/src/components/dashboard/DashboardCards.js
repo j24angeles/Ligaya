@@ -36,36 +36,41 @@ const DashboardCards = ({ events, donations, users }) => {
   const heroBackground = '/assets/dashboard_hero.png';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3"> {/* reduced vertical spacing */}
       {/* Hero Section */}
       <div
-        className="rounded-2xl p-6 md:p-8 text-white relative overflow-hidden bg-cover bg-center"
+        className="rounded-2xl p-4 md:p-6 text-white relative overflow-hidden bg-cover bg-center"
         style={{
-          backgroundImage: `url(${heroBackground})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundImage: `url(${heroBackground})`
         }}
       >
-        <div className="absolute inset-0 bg-primary/70 rounded-2xl z-0" />
-        <div className="flex flex-col z-10 relative">
-          <span className="text-lg text-secondary font-medium mb-2">LIGAYA</span>
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">Powering Child Advocacy</h2>
-          <h3 className="text-xl md:text-2xl font-medium">Behind the Scenes</h3>
-        </div>
-      </div>
+<div className="absolute inset-0 bg-primary/70 rounded-2xl z-0" />
+<div className="flex flex-col z-10 relative">
+<span className="text-xs text-secondary font-normal mb-1">
+    {new Date().toLocaleDateString('en-US', {
+      timeZone: 'Asia/Manila',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })}
+  </span>
+  <h3 className="text-lg md:text-xl font-medium mb-1">Empowering Child Advocacy</h3>
+  <h3 className="text-lg md:text-xl font-medium">Behind the Scenes</h3>
+</div>
+</div>
 
       {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3"> {/* less gap */}
         {/* Card 1: Upcoming Events */}
-        <div className="bg-white rounded-xl shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm p-3 relative overflow-hidden"> {/* less padding */}
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                <MdEvent className="text-secondary" size={24} />
+            <div className="flex items-center gap-2"> {/* smaller gap */}
+              <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center"> {/* smaller circle */}
+                <MdEvent className="text-secondary" size={20} /> {/* smaller icon */}
               </div>
               <div>
-                <p className="text-sm text-gray-500">Upcoming Events</p>
-                <h3 className="text-lg font-semibold">{stats.upcomingEvents} Upcoming Events</h3>
+                <p className="text-xs text-gray-500">Upcoming Events</p> {/* smaller text */}
+                <h3 className="text-base font-semibold">{stats.upcomingEvents} Upcoming Events</h3> {/* smaller text */}
               </div>
             </div>
             <button
@@ -73,21 +78,21 @@ const DashboardCards = ({ events, donations, users }) => {
               onClick={() => navigate('/event-management')}
               aria-label="Go to event management"
             >
-              <MdMoreVert size={24} />
+              <MdMoreVert size={20} /> {/* smaller icon */}
             </button>
           </div>
         </div>
 
         {/* Card 2: Volunteer Count */}
-        <div className="bg-white rounded-xl shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm p-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                <MdPeople className="text-secondary" size={24} />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
+                <MdPeople className="text-secondary" size={20} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Volunteer Count</p>
-                <h3 className="text-lg font-semibold">{stats.totalVolunteers} Volunteers</h3>
+                <p className="text-xs text-gray-500">Volunteer Count</p>
+                <h3 className="text-base font-semibold">{stats.totalVolunteers} Volunteers</h3>
               </div>
             </div>
             <button
@@ -95,21 +100,21 @@ const DashboardCards = ({ events, donations, users }) => {
               onClick={() => navigate('/user-management')}
               aria-label="Go to user management"
             >
-              <MdMoreVert size={24} />
+              <MdMoreVert size={20} />
             </button>
           </div>
         </div>
 
         {/* Card 3: Total Donations */}
-        <div className="bg-white rounded-xl shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm p-3 relative overflow-hidden">
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                <MdPayments className="text-secondary" size={24} />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
+                <MdPayments className="text-secondary" size={20} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Donations this Month</p>
-                <h3 className="text-lg font-semibold">PHP {stats.totalDonations.toLocaleString()}</h3>
+                <p className="text-xs text-gray-500">Total Donations this Month</p>
+                <h3 className="text-base font-semibold">PHP {stats.totalDonations.toLocaleString()}</h3>
               </div>
             </div>
             <button
@@ -117,7 +122,7 @@ const DashboardCards = ({ events, donations, users }) => {
               onClick={() => navigate('/donation-management')}
               aria-label="Go to donation management"
             >
-              <MdMoreVert size={24} />
+              <MdMoreVert size={20} />
             </button>
           </div>
         </div>

@@ -53,13 +53,23 @@
       "createdAt": "2025-05-10T16:55:18.927Z",
       "donations": [
         1746979207493,
-        1746979309031,
         1746990108678
       ],
-      "updatedAt": "2025-05-11T19:05:44.785Z",
+      "updatedAt": "2025-05-18T10:58:37.392Z",
       "eventsJoined": [
         1746884804523
       ]
+    },
+    {
+      "firstName": "Ryo",
+      "lastName": "Cristobal",
+      "email": "ryo@gmail.com",
+      "birthdate": "9090-03-22",
+      "password": "!04Hybr1D22!",
+      "role": "volunteer",
+      "name": "Ryo Cristobal",
+      "id": 1747565046120,
+      "createdAt": "2025-05-18T10:44:06.120Z"
     }
   ],
   "events": [
@@ -81,6 +91,18 @@
         }
       ],
       "updatedAt": "2025-05-11T19:05:44.435Z"
+    },
+    {
+      "title": "Fun-Run",
+      "description": "Fun run",
+      "location": "Welcome Rotunda",
+      "date": "2025-05-25",
+      "time": "18:45",
+      "bannerImage": "",
+      "isPublished": true,
+      "id": 1747565121338,
+      "createdAt": "2025-05-18T10:45:21.338Z",
+      "volunteers": []
     }
   ],
   "donations": [
@@ -118,7 +140,12 @@
       "id": 1746977032248,
       "createdAt": "2025-05-11T15:23:52.248Z",
       "status": "active",
-      "isValidated": false
+      "isValidated": true,
+      "validationStatus": "validated",
+      "validatedAt": "2025-05-18T08:28:24.341Z",
+      "rejectionReason": null,
+      "rejectedAt": null,
+      "updatedAt": "2025-05-18T08:28:24.342Z"
     },
     {
       "userId": 1746896118927,
@@ -129,20 +156,12 @@
       "id": 1746979207493,
       "createdAt": "2025-05-11T16:00:07.493Z",
       "status": "active",
-      "isValidated": false
-    },
-    {
-      "userId": 1746896118927,
-      "amount": 1212212121212,
-      "date": "2025-05-11",
-      "paymentMethod": "cash",
-      "referenceNumber": "",
-      "id": 1746979309031,
-      "createdAt": "2025-05-11T16:01:49.031Z",
-      "status": "active",
-      "isValidated": true,
-      "validatedAt": "2025-05-11T16:02:55.937Z",
-      "updatedAt": "2025-05-11T16:02:55.937Z"
+      "isValidated": false,
+      "validationStatus": "rejected",
+      "rejectionReason": "",
+      "rejectedAt": "2025-05-18T08:28:27.559Z",
+      "validatedAt": null,
+      "updatedAt": "2025-05-18T08:28:27.559Z"
     },
     {
       "userId": 1746896118927,
@@ -153,7 +172,12 @@
       "id": 1746990108678,
       "createdAt": "2025-05-11T19:01:48.678Z",
       "status": "active",
-      "isValidated": false
+      "isValidated": true,
+      "validationStatus": "validated",
+      "validatedAt": "2025-05-18T10:59:11.194Z",
+      "rejectionReason": null,
+      "rejectedAt": null,
+      "updatedAt": "2025-05-18T10:59:11.194Z"
     }
   ]
 }
