@@ -114,7 +114,7 @@ const DashboardCards = ({ events, donations, users }) => {
               </div>
               <div>
                 <p className="text-xs text-gray-500">Total Donations this Month</p>
-                <h3 className="text-base font-semibold">PHP {stats.totalDonations.toLocaleString()}</h3>
+                <h3 className="text-base font-semibold">₱{stats.totalDonations.toLocaleString()}</h3>
               </div>
             </div>
             <button

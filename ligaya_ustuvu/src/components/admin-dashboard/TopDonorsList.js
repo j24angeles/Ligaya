@@ -65,7 +65,7 @@ const TopDonorsList = ({ donations = [], users = [], max = 3 }) => {
               <tr key={userId} className="border-t border-gray-100">
                 <td className="px-2 py-1">{name}</td>
                 <td className="px-2 py-1 text-right font-medium">
-                  PHP {total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  ₱{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </td>
               </tr>
             ))}

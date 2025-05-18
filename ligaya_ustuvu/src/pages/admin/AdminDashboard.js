@@ -1,6 +1,6 @@
 import React from 'react';
 import Sidebar from '../../common/Sidebar';
-import AdminDashboardComponent from '../../components/dashboard/AdminDashboardComponent';
+import AdminDashboardComponent from '../../components/admin-dashboard/AdminDashboardComponent';
 
 const AdminDashboard = () => {
   return (

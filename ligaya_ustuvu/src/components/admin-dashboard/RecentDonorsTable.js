@@ -70,7 +70,7 @@ const RecentDonorsTable = () => {
                 </td>
                 <td className="px-2 py-1 text-gray-600">{formatDate(date || createdAt)}</td>
                 <td className="px-2 py-1 text-right font-medium">
-                  PHP {parseFloat(amount).toLocaleString()}
+                  ₱{parseFloat(amount).toLocaleString()}
                 </td>
               </tr>
             ))}
