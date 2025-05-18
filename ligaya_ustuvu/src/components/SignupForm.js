@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../api/auth'; // Ensure this path matches your project structure
-import TermsCondi from './TermsCondi'; // Import the Terms and Conditions component
-import { useToast } from '../hooks/ToastProvider'; // Adjust the import path based on your file structure
+import { registerUser } from '../api/auth';
+import TermsCondi from './TermsCondi';
+import { useToast } from '../hooks/ToastProvider';
 
 export default function SignupForm() {
   const navigate = useNavigate();
-  const { showError, showSuccess } = useToast(); // Use our toast hook
+  const { showError, showSuccess } = useToast();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -54,18 +54,43 @@ export default function SignupForm() {
       color: colors[strength]
     };
   };
+
+  // Calculate age from birthdate
+  const calculateAge = (birthdate) => {
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
   
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Enforce max lengths
+    let processedValue = value;
+    if (name === 'firstName' || name === 'lastName') {
+      processedValue = value.slice(0, 50);
+    } else if (name === 'email') {
+      processedValue = value.slice(0, 100);
+    } else if (name === 'password') {
+      processedValue = value.slice(0, 50);
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
     
     // Update password strength when password changes
     if (name === 'password') {
-      setPasswordStrength(calculatePasswordStrength(value));
+      setPasswordStrength(calculatePasswordStrength(processedValue));
     }
     
     // Clear errors when user types
@@ -80,59 +105,91 @@ export default function SignupForm() {
   // Validate form inputs
   const validateForm = () => {
     const newErrors = {};
+    let isValid = true;
     
-    // Check for empty required fields
-    const requiredFields = ['firstName', 'lastName', 'email', 'birthdate', 'password', 'confirmPassword'];
-    const hasEmptyFields = requiredFields.some(field => !formData[field] || formData[field].trim() === '');
-    
-    if (hasEmptyFields) {
-      // Single error message for all required fields
-      showError('All fields are required.');
-      newErrors.requiredFields = 'All fields are required.';
+    // First name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      isValid = false;
+    } else if (formData.firstName.length > 50) {
+      newErrors.firstName = 'First name must be 50 characters or less';
+      isValid = false;
     }
     
-    // Email format (only if email is not empty)
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    // Last name validation
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      isValid = false;
+    } else if (formData.lastName.length > 50) {
+      newErrors.lastName = 'Last name must be 50 characters or less';
+      isValid = false;
+    }
+    
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (formData.email.length > 100) {
+      newErrors.email = 'Email must be 100 characters or less';
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
-      showError('Please enter a valid email address');
+      isValid = false;
     }
     
-    // Password requirements (only if password is not empty)
-    if (formData.password && !/^(?=.*[A-Z])(?=.*\d).{6,}$/.test(formData.password)) {
-      newErrors.password = 'Password must have at least 6 characters, 1 number, and 1 capital letter';
-      showError('Password must have at least 6 characters, 1 number, and 1 capital letter');
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must have at least 6 characters';
+      isValid = false;
+    } else if (formData.password.length > 50) {
+      newErrors.password = 'Password must be 50 characters or less';
+      isValid = false;
+    } else if (!/(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least 1 number and 1 capital letter';
+      isValid = false;
     }
     
-    // Password match
-    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
+    // Confirm password validation
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
-      showError('Passwords do not match');
+      isValid = false;
     }
     
-    // Age validation (only if birthdate is not empty)
-    if (formData.birthdate) {
+    // Birthdate validation
+    if (!formData.birthdate) {
+      newErrors.birthdate = 'Birthdate is required';
+      isValid = false;
+    } else {
       const birthDate = new Date(formData.birthdate);
       const today = new Date();
-      const minAge = new Date();
-      minAge.setFullYear(today.getFullYear() - 13);
       
       if (birthDate > today) {
         newErrors.birthdate = 'Birthdate cannot be in the future';
-        showError('Birthdate cannot be in the future');
-      } else if (birthDate > minAge) {
-        newErrors.birthdate = 'You must be at least 13 years old to register.';
-        showError('You must be at least 13 years old to register.');
+        isValid = false;
+      } else if (calculateAge(formData.birthdate) < 13) {
+        newErrors.birthdate = 'You must be at least 13 years old to register';
+        isValid = false;
       }
     }
     
     // Terms and conditions validation
     if (!termsAccepted) {
-      newErrors.terms = 'You must accept the Terms and Conditions.';
-      showError('You must accept the Terms and Conditions.');
+      newErrors.terms = 'You must accept the Terms and Conditions';
+      isValid = false;
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    // Show first error if any
+    const firstError = Object.values(newErrors)[0];
+    if (firstError) {
+      showError(firstError);
+    }
+    
+    return isValid;
   };
   
   // Handle form submission
@@ -146,7 +203,6 @@ export default function SignupForm() {
     setLoading(true);
     
     try {
-      // Register user with your API
       await registerUser({
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -155,15 +211,11 @@ export default function SignupForm() {
         birthdate: formData.birthdate
       });
       
-      // Show success toast
       showSuccess('Account created successfully!');
-      
-      // Redirect to login page after successful registration
       navigate('/login', { 
         state: { message: 'Account created successfully! Please log in.' } 
       });
     } catch (error) {
-      // Show error toast
       showError(error.message || 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
@@ -191,9 +243,6 @@ export default function SignupForm() {
   // Required field marker
   const RequiredMark = () => <span className="text-error ml-1">*</span>;
   
-  // Check if there's a required fields error to highlight all inputs
-  const hasRequiredFieldsError = errors.requiredFields && attemptedSubmit;
-  
   return (
     <div className="w-full max-w-md bg-base-100 shadow-xl rounded-lg p-4 mt-4">
       <div className="px-6 pt-6">
@@ -211,10 +260,15 @@ export default function SignupForm() {
               type="text"
               name="firstName"
               placeholder="First Name"
-              className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError ? 'input-error' : ''}`}
+              className={`input input-bordered input-sm text-xs w-full ${
+                (attemptedSubmit && errors.firstName) ? 'input-error' : ''
+              }`}
               value={formData.firstName}
               onChange={handleChange}
             />
+            {attemptedSubmit && errors.firstName && (
+              <span className="text-xs text-error mt-1">{errors.firstName}</span>
+            )}
           </div>
           
           {/* Last Name */}
@@ -226,10 +280,15 @@ export default function SignupForm() {
               type="text"
               name="lastName"
               placeholder="Last Name"
-              className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError ? 'input-error' : ''}`}
+              className={`input input-bordered input-sm text-xs w-full ${
+                (attemptedSubmit && errors.lastName) ? 'input-error' : ''
+              }`}
               value={formData.lastName}
               onChange={handleChange}
             />
+            {attemptedSubmit && errors.lastName && (
+              <span className="text-xs text-error mt-1">{errors.lastName}</span>
+            )}
           </div>
         </div>
         
@@ -242,10 +301,15 @@ export default function SignupForm() {
             type="email"
             name="email"
             placeholder="email@example.com"
-            className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError || (errors.email && attemptedSubmit) ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm text-xs w-full ${
+              (attemptedSubmit && errors.email) ? 'input-error' : ''
+            }`}
             value={formData.email}
             onChange={handleChange}
           />
+          {attemptedSubmit && errors.email && (
+            <span className="text-xs text-error mt-1">{errors.email}</span>
+          )}
         </div>
         
         {/* Birthdate */}
@@ -256,50 +320,54 @@ export default function SignupForm() {
           <input 
             type="date"
             name="birthdate"
-            className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError || (errors.birthdate && attemptedSubmit) ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm text-xs w-full ${
+              (attemptedSubmit && errors.birthdate) ? 'input-error' : ''
+            }`}
             value={formData.birthdate}
             onChange={handleChange}
             max={today}
           />
+          {attemptedSubmit && errors.birthdate && (
+            <span className="text-xs text-error mt-1">{errors.birthdate}</span>
+          )}
         </div>
         
-      {/* Password */}
-<div className="form-control">
-  <label className="label py-0.5">
-    <span className="label-text text-xs text-shadow">Password<RequiredMark /></span>
-  </label>
-  <input 
-    type="password"
-    name="password"
-    placeholder="Enter password"
-    className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError || (errors.password && attemptedSubmit) ? 'input-error' : ''}`}
-    value={formData.password}
-    onChange={handleChange}
-  />
-  {/* Compact line-style password strength meter */}
-  <div className="flex items-center gap-2 mt-1">
-    <div className="flex-1 h-1 bg-gray-200 rounded-full">
-      <div 
-        className="h-1 rounded-full transition-all duration-300"
-        style={{ 
-          width: `${(passwordStrength / 5) * 100}%`,
-          backgroundColor: getStrengthInfo(passwordStrength).color
-        }}
-      />
-    </div>
-    <span 
-      className="text-[0.60rem] leading-none whitespace-nowrap"
-      style={{ color: getStrengthInfo(passwordStrength).color }}
-    >
-      {passwordStrength === 0 && 'Very weak'}
-      {passwordStrength === 1 && 'Weak'}
-      {passwordStrength === 2 && 'So-so'}
-      {passwordStrength === 3 && 'Good'}
-      {passwordStrength === 4 && 'Great!'}
-      {passwordStrength === 5 && 'Excellent!'}
-    </span>
-  </div>
-</div>
+        {/* Password */}
+        <div className="form-control">
+          <label className="label py-0.5">
+            <span className="label-text text-xs text-shadow">Password<RequiredMark /></span>
+          </label>
+          <input 
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            className={`input input-bordered input-sm text-xs w-full ${
+              (attemptedSubmit && errors.password) ? 'input-error' : ''
+            }`}
+            value={formData.password}
+            onChange={handleChange}
+          />
+          {attemptedSubmit && errors.password && (
+            <span className="text-xs text-error mt-1">{errors.password}</span>
+          )}
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex-1 h-1 bg-gray-200 rounded-full">
+              <div 
+                className="h-1 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${(passwordStrength / 5) * 100}%`,
+                  backgroundColor: getStrengthInfo(passwordStrength).color
+                }}
+              />
+            </div>
+            <span 
+              className="text-[0.60rem] leading-none whitespace-nowrap"
+              style={{ color: getStrengthInfo(passwordStrength).color }}
+            >
+              {getStrengthInfo(passwordStrength).label}
+            </span>
+          </div>
+        </div>
         
         {/* Confirm Password */}
         <div className="form-control">
@@ -310,10 +378,15 @@ export default function SignupForm() {
             type="password"
             name="confirmPassword"
             placeholder="Confirm password"
-            className={`input input-bordered input-sm text-xs w-full ${hasRequiredFieldsError || (errors.confirmPassword && attemptedSubmit) ? 'input-error' : ''}`}
+            className={`input input-bordered input-sm text-xs w-full ${
+              (attemptedSubmit && errors.confirmPassword) ? 'input-error' : ''
+            }`}
             value={formData.confirmPassword}
             onChange={handleChange}
           />
+          {attemptedSubmit && errors.confirmPassword && (
+            <span className="text-xs text-error mt-1">{errors.confirmPassword}</span>
+          )}
         </div>
         
         {/* Terms and Conditions Checkbox */}
@@ -337,6 +410,9 @@ export default function SignupForm() {
               <RequiredMark />
             </span>
           </label>
+          {attemptedSubmit && errors.terms && (
+            <span className="text-xs text-error mt-1">{errors.terms}</span>
+          )}
         </div>
         
         {/* Submit Button */}
@@ -366,11 +442,6 @@ export default function SignupForm() {
             </a>
           </p>
         </div>
-        <style jsx>{`
-          .text-shadow {
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-          }
-        `}</style>
       </form>
       
       {/* Terms and Conditions Modal */}

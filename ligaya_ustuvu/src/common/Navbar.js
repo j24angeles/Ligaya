@@ -50,7 +50,7 @@ const Navbar = () => {
               </a>
               <a
                 href="/signup"
-                className="bg-secondary text-primary px-8 py-2 rounded-full text-sm font-medium transition duration-200 hover:brightness-90"
+                className="bg-secondary text-primary px-8 py-2 rounded-full text-sm font-medium hover:bg-secondary/80 transition-all duration-300"
                 style={textShadowStyle}
               >
                 Sign Up

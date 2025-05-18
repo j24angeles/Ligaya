@@ -16,6 +16,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
     firstName: false,
     lastName: false,
     email: false,
+    birthdate: false,
     password: false
   });
 
@@ -52,26 +53,60 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
       firstName: false,
       lastName: false,
       email: false,
+      birthdate: false,
       password: false
     });
     setErrors({});
     setIsSubmitted(false);
   }, [currentUser, isOpen]);
 
+  // Calculate age from birthdate
+  const calculateAge = (birthdate) => {
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
   // Validate a single field
   const validateField = (name, value) => {
     switch (name) {
       case 'firstName':
-        return value.trim() === '' ? 'First name is required' : '';
+        if (value.trim() === '') return 'First name is required';
+        if (value.length > 50) return 'First name must be 50 characters or less';
+        return '';
       case 'lastName':
-        return value.trim() === '' ? 'Last name is required' : '';
+        if (value.trim() === '') return 'Last name is required';
+        if (value.length > 50) return 'Last name must be 50 characters or less';
+        return '';
       case 'email':
         if (value.trim() === '') return 'Email is required';
+        if (value.length > 100) return 'Email must be 100 characters or less';
         if (!/\S+@\S+\.\S+/.test(value)) return 'Email is invalid';
         return '';
       case 'password':
         if (!currentUser && value === '') return 'Password is required for new volunteers';
         if (value && value.length < 6) return 'Password must be at least 6 characters';
+        if (value && value.length > 50) return 'Password must be 50 characters or less';
+        return '';
+      case 'birthdate':
+        if (value) {
+          // Check if date is in the future
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+          const selectedDate = new Date(value);
+          if (selectedDate > today) return 'Birthdate cannot be in the future';
+          
+          // Check age is at least 13
+          const age = calculateAge(value);
+          if (age < 13) return 'Must be at least 13 years old';
+        }
         return '';
       default:
         return '';
@@ -85,7 +120,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
     
     // Validate all required fields
     Object.entries(formData).forEach(([key, value]) => {
-      if (['firstName', 'lastName', 'email', 'password'].includes(key)) {
+      if (['firstName', 'lastName', 'email', 'password', 'birthdate'].includes(key)) {
         const error = validateField(key, value);
         if (error) {
           newErrors[key] = error;
@@ -183,6 +218,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                   value={formData.firstName}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  maxLength={50}
                   className={`w-full p-2 pl-10 border ${shouldShowError('firstName') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter first name"
                 />
@@ -205,6 +241,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                   value={formData.lastName}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  maxLength={50}
                   className={`w-full p-2 pl-10 border ${shouldShowError('lastName') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter last name"
                 />
@@ -227,6 +264,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                   value={formData.email}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  maxLength={100}
                   className={`w-full p-2 pl-10 border ${shouldShowError('email') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder="Enter email address"
                 />
@@ -248,9 +286,11 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                   name="birthdate"
                   value={formData.birthdate}
                   onChange={handleInputChange}
-                  className="w-full p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('birthdate') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                 />
               </div>
+              {shouldShowError('birthdate') && <p className="text-red-500 text-xs mt-1">{errors.birthdate}</p>}
             </div>
             
             <div className="space-y-1">
@@ -268,6 +308,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                   value={formData.password}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  maxLength={50}
                   className={`w-full p-2 pl-10 border ${shouldShowError('password') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
                   placeholder={currentUser ? 'Enter new password' : 'Enter password'}
                 />
