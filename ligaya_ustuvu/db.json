@@ -97,8 +97,8 @@
       "updatedAt": "2023-05-15T10:00:00Z"
     },
     {
-      "userId": "1746773928972",
-      "amount": "12312321",
+      "userId": 1746773928972,
+      "amount": 12312321,
       "date": "2024-05-11",
       "paymentMethod": "cash",
       "referenceNumber": "",
@@ -110,8 +110,8 @@
       "updatedAt": "2025-05-11T15:13:29.127Z"
     },
     {
-      "userId": "1746776568076",
-      "amount": "22",
+      "userId": 1746776568076,
+      "amount": 22,
       "date": "2025-05-11",
       "paymentMethod": "bank_transfer",
       "referenceNumber": "neqwr312",
@@ -121,8 +121,8 @@
       "isValidated": false
     },
     {
-      "userId": "1746896118927",
-      "amount": "2",
+      "userId": 1746896118927,
+      "amount": 2,
       "date": "2025-05-11",
       "paymentMethod": "maya",
       "referenceNumber": "3123",
@@ -132,8 +132,8 @@
       "isValidated": false
     },
     {
-      "userId": "1746896118927",
-      "amount": "1212212121212",
+      "userId": 1746896118927,
+      "amount": 1212212121212,
       "date": "2025-05-11",
       "paymentMethod": "cash",
       "referenceNumber": "",
@@ -143,4 +143,17 @@
       "isValidated": true,
       "validatedAt": "2025-05-11T16:02:55.937Z",
       "updatedAt": "2025-05-11T16:02:55.937Z"
+    },
+    {
+      "userId": 1746896118927,
+      "amount": 5000,
+      "date": "2025-05-11",
+      "paymentMethod": "gcash",
+      "referenceNumber": "GC987654",
+      "id": 1746990108678,
+      "createdAt": "2025-05-11T19:01:48.678Z",
+      "status": "active",
+      "isValidated": false
     }
+  ]
+}
