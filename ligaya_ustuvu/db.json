@@ -55,10 +55,11 @@
         1746979207493,
         1746990108678
       ],
-      "updatedAt": "2025-05-18T14:17:49.212Z",
+      "updatedAt": "2025-05-19T16:16:03.980Z",
       "eventsJoined": [
         1746884804523,
-        1747570125415
+        1747570125415,
+        1747578431715
       ]
     },
     {
@@ -173,7 +174,15 @@
       "isPublished": true,
       "id": 1747578431715,
       "createdAt": "2025-05-18T14:27:11.715Z",
-      "volunteers": []
+      "volunteers": [
+        {
+          "id": 1746896118927,
+          "name": "julia angeles",
+          "email": "julia@gmail.com",
+          "registeredAt": "2025-05-19T16:16:03.870Z"
+        }
+      ],
+      "updatedAt": "2025-05-19T16:16:03.870Z"
     },
     {
       "title": "DOG WALK",

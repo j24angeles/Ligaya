@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getDonationsByUserId } from '../../api/donationService';
+import { FaHandHoldingHeart } from 'react-icons/fa';
+
 
 const RecentDonationsTable = () => {
   const { user } = useAuth();
@@ -11,7 +13,7 @@ const RecentDonationsTable = () => {
   useEffect(() => {
     const fetchUserDonations = async () => {
       if (!user || !user.id) return;
-      
+
       try {
         setLoading(true);
         const userDonations = await getDonationsByUserId(user.id);
@@ -29,30 +31,66 @@ const RecentDonationsTable = () => {
   }, [user]);
 
   const formatDate = (d) =>
-    new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    new Date(d).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
 
-  // Get up to 3 most recent donations
   const recentDonations = donations.slice(0, 3);
 
+  const TableWrapper = ({ children }) => (
+    <div className="bg-white rounded-xl shadow-s p-2 h-full">
+
+<h3 className="font-semibold mb-3 text-sm flex items-center gap-2">
+  <FaHandHoldingHeart className="text-inherit" />
+  Your Recent Donations
+</h3>
+
+      {children}
+    </div>
+  );
+
   if (!user) {
-    return <div className="text-center text-gray-500 my-4 text-xs">Please log in to view your donations.</div>;
+    return (
+      <TableWrapper>
+        <div className="text-center text-gray-500 my-4 text-xs">
+          Please log in to view your donations.
+        </div>
+      </TableWrapper>
+    );
   }
 
   if (loading) {
-    return <div className="text-center text-gray-500 my-4 text-xs">Loading your donations...</div>;
+    return (
+      <TableWrapper>
+        <div className="text-center text-gray-500 my-4 text-xs">
+          Loading your donations...
+        </div>
+      </TableWrapper>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 my-4 text-xs">{error}</div>;
+    return (
+      <TableWrapper>
+        <div className="text-center text-red-500 my-4 text-xs">{error}</div>
+      </TableWrapper>
+    );
   }
 
   if (donations.length === 0) {
-    return <div className="text-center text-gray-500 my-4 text-xs">You haven't made any donations yet.</div>;
+    return (
+      <TableWrapper>
+        <div className="text-center text-gray-500 my-4 text-xs">
+          You haven't made any donations yet.
+        </div>
+      </TableWrapper>
+    );
   }
 
   return (
-    <div className="bg-white rounded-md shadow p-3">
-      <h3 className="font-semibold mb-3 text-sm">Your Recent Donations</h3>
+    <TableWrapper>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
@@ -69,18 +107,18 @@ const RecentDonationsTable = () => {
                 <td className="px-2 py-1">
                   <span
                     className={`px-2 py-0.5 text-[11px] rounded-full ${
-                      validationStatus === 'validated' 
-                        ? 'bg-green-100 text-green-700' 
+                      validationStatus === 'validated'
+                        ? 'bg-green-100 text-green-700'
                         : validationStatus === 'rejected'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700'
                     }`}
                   >
-                    {validationStatus === 'validated' 
-                      ? 'Verified' 
+                    {validationStatus === 'validated'
+                      ? 'Verified'
                       : validationStatus === 'rejected'
-                        ? 'Rejected'
-                        : 'Pending'}
+                      ? 'Rejected'
+                      : 'Pending'}
                   </span>
                 </td>
                 <td className="px-2 py-1 text-gray-600">{formatDate(date || createdAt)}</td>
@@ -93,7 +131,7 @@ const RecentDonationsTable = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </TableWrapper>
   );
 };
 

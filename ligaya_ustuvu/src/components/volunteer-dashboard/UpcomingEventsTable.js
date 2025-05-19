@@ -69,7 +69,7 @@ const UpcomingEventsTable = () => {
 
 
   const TableWrapper = ({ children }) => (
-    <div className="bg-white rounded-md shadow p-3">
+    <div className="bg-white rounded-md h-full">
       <h3 className="font-semibold mb-3 text-sm flex items-center">
         <MdEvent className="mr-2" size={14} />
         Your Upcoming Events

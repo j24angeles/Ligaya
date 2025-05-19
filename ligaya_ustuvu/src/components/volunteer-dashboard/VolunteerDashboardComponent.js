@@ -76,10 +76,15 @@ const VolunteerDashboardComponent = () => {
 
       {/* Updated section with two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <UpcomingEventsTable />
-          <RecentDonationsTable />
-      </div>
-    </div>
+  <div className="bg-white rounded-xl shadow-sm p-4 h-[200px] overflow-y-auto">
+    <UpcomingEventsTable />
+  </div>
+  <div className="bg-white rounded-xl shadow-sm p-4 h-[200px] overflow-y-auto">
+    <RecentDonationsTable />
+  </div>
+</div>
+
+</div>
   );
 };
 
