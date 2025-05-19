@@ -17,6 +17,7 @@ import VolunteerDashboard from './pages/volunteer/VolunteerDashboard';
 import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider';
 import UserDonationPage from './pages/volunteer/UserDonationPage';
+import VolunteerSettings from './pages/volunteer/VolunteerSettings';
 
 
 // Enhanced ProtectedRoute component that accepts allowedRoles
@@ -112,7 +113,17 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
+              <Route
+              path="/volunteer-settings"
+              element={
+                <ProtectedRoute allowedRoles={['volunteer']}>
+                  <VolunteerSettings />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
+          
         </Router>
       </ToastProvider>
     </div>
