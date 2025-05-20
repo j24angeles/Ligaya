@@ -1,4 +1,3 @@
-// src/components/settings/HelpTab.js
 import React from 'react';
 
 const HelpTab = () => {
