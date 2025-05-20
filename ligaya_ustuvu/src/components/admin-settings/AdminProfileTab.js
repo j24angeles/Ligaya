@@ -8,35 +8,115 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
     confirmPassword: ''
   });
   const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState(0);
+
+  // Calculate password strength
+  const calculatePasswordStrength = (password) => {
+    if (!password) return 0;
+    
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 6) strength += 1;
+    if (password.length >= 10) strength += 1;
+    
+    // Character variety checks
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    
+    return Math.min(strength, 5); // Max score of 5
+  };
+
+  // Get strength label and color
+  const getStrengthInfo = (strength) => {
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const colors = ['#ff4d4d', '#ff9933', '#ffcc00', '#99cc33', '#70cc33', '#33cc33'];
+    
+    return {
+      label: labels[strength],
+      color: colors[strength]
+    };
+  };
 
   const handlePasswordChange = (field, value) => {
     setPasswordData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Update password strength when new password changes
+    if (field === 'newPassword') {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
+    
+    // Clear errors when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
+    }
   };
 
-  const handlePasswordUpdate = () => {
+  const validatePasswordForm = () => {
+    const newErrors = {};
+    
+    // Validate current password is not empty
+    if (!passwordData.currentPassword.trim()) {
+      newErrors.currentPassword = 'Current password is required';
+    }
+    
+    // Validate new password
+    if (!passwordData.newPassword.trim()) {
+      newErrors.newPassword = 'New password is required';
+    } else {
+      if (passwordData.newPassword.length < 6) {
+        newErrors.newPassword = 'Password must be at least 6 characters';
+      } else if (passwordData.newPassword.length > 50) {
+        newErrors.newPassword = 'Password must be 50 characters or less';
+      } else if (!/(?=.*[A-Z])(?=.*\d)/.test(passwordData.newPassword)) {
+        newErrors.newPassword = 'Password must contain at least 1 number and 1 capital letter';
+      }
+    }
+    
+    // Validate password confirmation
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
-      return;
+      newErrors.confirmPassword = 'Passwords do not match';
     }
-    if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters');
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!validatePasswordForm()) {
       return;
     }
     
-    onUpdate({ 
-      password: passwordData.newPassword,
-      lastPasswordChange: new Date().toISOString()
-    });
-    
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-    setIsEditingPassword(false);
+    try {
+      await onUpdate({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      
+      // Reset form on success
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setIsEditingPassword(false);
+      setPasswordStrength(0);
+    } catch (error) {
+      // Handle errors from the API call
+      if (error.message && error.message.includes('Current password is incorrect')) {
+        setErrors({ currentPassword: 'Current password is incorrect' });
+      } else {
+        setErrors({ general: 'Failed to update password. Please try again.' });
+      }
+    }
   };
 
   const formatDisplayDate = (dateString) => {
@@ -108,8 +188,6 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                 </div>
               </div>
             </div>
-
-         
           </div>
 
           {/* Password Change Section */}
@@ -135,14 +213,22 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                 </div>
               ) : (
                 <div className="space-y-3 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  {errors.general && (
+                    <div className="p-2 bg-red-50 text-red-700 text-xs rounded border border-red-200">
+                      {errors.general}
+                    </div>
+                  )}
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Current Password"
                       value={passwordData.currentPassword}
                       onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border ${errors.currentPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.currentPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.currentPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -158,8 +244,11 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                       placeholder="New Password"
                       value={passwordData.newPassword}
                       onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.newPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.newPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -168,6 +257,26 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
+                    {/* Password strength indicator */}
+                    {passwordData.newPassword && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 h-1 bg-gray-200 rounded-full">
+                          <div 
+                            className="h-1 rounded-full transition-all duration-300"
+                            style={{ 
+                              width: `${(passwordStrength / 5) * 100}%`,
+                              backgroundColor: getStrengthInfo(passwordStrength).color
+                            }}
+                          />
+                        </div>
+                        <span 
+                          className="text-xs leading-none whitespace-nowrap"
+                          style={{ color: getStrengthInfo(passwordStrength).color }}
+                        >
+                          {getStrengthInfo(passwordStrength).label}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="relative">
                     <input
@@ -175,8 +284,11 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                       placeholder="Confirm New Password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.confirmPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.confirmPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -203,6 +315,8 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                           newPassword: '',
                           confirmPassword: ''
                         });
+                        setErrors({});
+                        setPasswordStrength(0);
                       }}
                       className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                       title="Cancel"
@@ -223,6 +337,12 @@ const AdminProfileTab = ({ user, onUpdate, loading }) => {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   Use at least 12 characters with a mix of letters, numbers, and symbols
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-4 h-4 mr-2 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Include at least one uppercase letter and one number
                 </li>
                 <li className="flex items-start">
                   <svg className="w-4 h-4 mr-2 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
