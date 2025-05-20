@@ -57,7 +57,7 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be one of us</h3>
             <p className="text-gray-600 mb-6 flex-grow [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Help us to promote and uphold children's rights. Be part of our growing family!</p>
             <div className="mt-auto">
-              <Link to="/register" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
+              <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm">
                 Register Now
               </Link>
             </div>
@@ -105,7 +105,7 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-primary mb-3 [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">Be a Blessing</h3>
             <p className="text-gray-600 mb-6 flex-grow">As a volunteer, your gift brings hope—support our programs and brighten a child's future.</p>
             <div className="mt-auto">
-              <Link to="/donate" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
+              <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-semibold uppercase tracking-wider rounded-full hover:bg-secondary/80 transition-all duration-300 text-sm [text-shadow:_0.5px_0.5px_1px_rgba(0,0,0,0.1)]">
                 Lend a Hand
               </Link>
             </div>
@@ -125,7 +125,7 @@ const Home = () => {
                   Ligaya works with UST Volunteers for UNICEF to create meaningful connections between volunteers and children in need. 
                   We support Sustainable Development Goal 4 (Quality Education) and Goal 3 (Good Health and Well-being).
                 </p>
-                <Link to="/about" className="inline-block px-8 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300">
+                <Link to="/about-us" className="inline-block px-8 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary/80 transition-all duration-300">
                   Learn More
                 </Link>
               </div>
@@ -228,7 +228,7 @@ const Home = () => {
               Whether you have a few hours or a few days to spare, your contribution matters.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link to="/volunteer" className="inline-block px-8 py-3 bg-secondary text-white font-semibold rounded-full hover:bg-secondary/80 transition-all duration-300">
+              <Link to="/signup" className="inline-block px-8 py-3 bg-secondary text-white font-semibold rounded-full hover:bg-secondary/80 transition-all duration-300">
                 Become a Volunteer
               </Link>
             </div>

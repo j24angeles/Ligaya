@@ -10,8 +10,8 @@
       "id": 1,
       "role": "admin",
       "createdAt": "2025-05-09T06:58:48.972Z",
-      "lastPasswordChange": "2025-05-20T14:31:58.519Z",
-      "updatedAt": "2025-05-20T14:31:58.548Z"
+      "lastPasswordChange": "2025-05-20T17:02:19.532Z",
+      "updatedAt": "2025-05-20T17:02:19.541Z"
     },
     {
       "firstName": "Lyanna",
@@ -169,7 +169,7 @@
       "id": 1747746491443,
       "createdAt": "2025-05-20T13:08:11.443Z",
       "status": "archived",
-      "updatedAt": "2025-05-20T13:08:16.942Z"
+      "updatedAt": "2025-05-20T16:55:45.822Z"
     }
   ],
   "events": [
@@ -213,7 +213,7 @@
     },
     {
       "title": "UST UVU DDay",
-      "description": "The day has come—two decades of love, laughter, and unwavering devotion to the 𝙝𝙚𝙖𝙧𝙩𝙨 𝙤𝙛 𝙘𝙝𝙞𝙡𝙙𝙧𝙚𝙣 now converge in a moment destined by time itself.",
+      "description": "The day has come—two decades of love, laughter, and unwavering devotion to the hearts of children now converge in a moment destined by time itself.",
       "location": "University of Santo Tomas",
       "date": "2024-12-12",
       "time": "12:00",
@@ -221,7 +221,8 @@
       "isPublished": true,
       "id": 1747746849770,
       "createdAt": "2025-05-20T13:14:09.770Z",
-      "volunteers": []
+      "volunteers": [],
+      "updatedAt": "2025-05-20T16:56:58.830Z"
     },
     {
       "title": "Uvulympics",
@@ -298,8 +299,8 @@
           "registeredAt": "2025-05-20T13:48:57.005Z"
         }
       ],
-      "status": "archived",
-      "updatedAt": "2025-05-20T13:48:57.005Z"
+      "updatedAt": "2025-05-20T16:56:44.797Z",
+      "status": "archived"
     }
   ],
   "donations": [
