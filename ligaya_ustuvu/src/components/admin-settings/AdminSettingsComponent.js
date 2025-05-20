@@ -14,8 +14,10 @@ const AdminSettingsComponent = () => {
     setLoading(true);
     
     try {
+      // Pass the current and new password to the API service
       const updatedUser = await updateUser(user.id, updatedData);
       
+      // Update the auth context with the updated user
       updateAuthUser(updatedUser);
       
       showSuccess('Admin password updated successfully!');
@@ -23,6 +25,8 @@ const AdminSettingsComponent = () => {
     } catch (err) {
       console.error('Error updating admin password:', err);
       showError(err.message || 'Failed to update password');
+      // Re-throw the error so the component can handle specific error messages
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -59,7 +63,6 @@ const AdminSettingsComponent = () => {
           >
             Security
           </button>
-    
         </div>
       </div>
 
@@ -72,9 +75,6 @@ const AdminSettingsComponent = () => {
             loading={loading}
           />
         )}
-
-     
-
       </div>
     </div>
   );

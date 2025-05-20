@@ -1,4 +1,3 @@
-// userService.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3001';
@@ -30,36 +29,37 @@ export const getUserById = async (id) => {
 
 export const updateUser = async (id, userData) => {
   try {
-    // If password is being updated, verify current password first
+    // If we're changing the password
     if (userData.currentPassword && userData.newPassword) {
       const user = await getUserById(id);
       
-      // In a real app, you would hash the currentPassword and compare with stored hash
-      // For this example, we're doing plain text comparison (not secure for production)
+      // Verify the current password matches
       if (user.password !== userData.currentPassword) {
         throw new Error('Current password is incorrect');
       }
       
-      // Update the password
+      // Update with new password and record the time of change
       const response = await api.put(`/users/${id}`, {
         ...user,
         password: userData.newPassword,
         lastPasswordChange: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
+      
       return response.data;
-    }
+    } 
     
-    // Regular update without password change
-    const existingUser = await api.get(`/users/${id}`);
+    // For other updates that don't involve password changes
+    const existingUser = await getUserById(id);
     const response = await api.put(`/users/${id}`, {
-      ...existingUser.data,
+      ...existingUser,
       ...userData,
       updatedAt: new Date().toISOString()
     });
+    
     return response.data;
   } catch (error) {
-    throw error.response?.data || error.message || new Error('Failed to update user');
+    throw error.response?.data || error;
   }
 };
 
@@ -97,4 +97,76 @@ export const createUser = async (userData) => {
   } catch (error) {
     throw error.response?.data || error;
   }
+};
+
+export const loginUser = async (email, password) => {
+  try {
+    const response = await api.get(`/users`, {
+      params: { email }
+    });
+    
+    const user = response.data.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+      throw new Error('Invalid email or password');
+    }
+    
+    storeUserSession(user);
+    
+    return user;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const registerUser = async (userData) => {
+  try {
+    const checkResponse = await api.get(`/users`, {
+      params: { email: userData.email }
+    });
+    
+    const existingUsers = checkResponse.data;
+    if (existingUsers.length > 0) {
+      throw new Error('User with this email already exists');
+    }
+
+    const fullName = `${userData.firstName} ${userData.lastName}`;
+    
+    const userDataToSave = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
+      password: userData.password,
+      birthdate: userData.birthdate,
+      name: fullName,
+      id: Date.now(),
+      role: 'volunteer',
+      createdAt: new Date().toISOString()
+    };
+    
+    const createResponse = await api.post('/users', userDataToSave);
+    
+    return createResponse.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+export const storeUserSession = (user) => {
+  const { password, ...userWithoutPassword } = user;
+  localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+};
+
+export const getCurrentUser = () => {
+  const userJson = localStorage.getItem('currentUser');
+  return userJson ? JSON.parse(userJson) : null;
+};
+
+export const isLoggedIn = () => {
+  return localStorage.getItem('currentUser') !== null;
+};
+
+export const logoutUser = () => {
+  localStorage.removeItem('currentUser');
+  window.location.href = '/login';
 };
