@@ -28,7 +28,6 @@ const AdminSettingsComponent = () => {
     }
   };
 
-  // Admin Badge Component
   const AdminBadge = () => (
     <div className="flex items-center bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
       <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -40,7 +39,6 @@ const AdminSettingsComponent = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300 font-poppins">
-      {/* Header with Admin Badge */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <h1 className="text-3xl font-bold text-primary mr-4">Settings</h1>

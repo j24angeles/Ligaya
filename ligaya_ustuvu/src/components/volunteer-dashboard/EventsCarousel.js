@@ -1,9 +1,8 @@
-// src/components/dashboard/EventsCarousel.js
 import React, { useState, useEffect } from 'react';
 import { MdChevronLeft, MdChevronRight, MdCalendarToday } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 
-const EventsCarousel = ({ events = [] }) => {
+const EventsCarousel = ({ events = [], refreshTrigger }) => {
   const { user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -51,7 +50,7 @@ const EventsCarousel = ({ events = [] }) => {
     if (currentIndex >= result.length && result.length > 0) {
       setCurrentIndex(0);
     }
-  }, [events, user, currentIndex]);
+  }, [events, user, currentIndex, refreshTrigger]);
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
@@ -95,7 +94,7 @@ const EventsCarousel = ({ events = [] }) => {
   const renderEventImage = (event) => {
     const imgSrc = event.bannerImage || event.image;
     return (
-    <div className="h-[110px] min-h-[110px] bg-gray-100 overflow-hidden">
+      <div className="h-[110px] min-h-[110px] bg-gray-100 overflow-hidden">
         {imgSrc ? (
           <img
             src={imgSrc}
