@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Sidebar from '../../common/Sidebar';
-import AdminSettingsComponent from '../../components/AdminSettingsComponent';
+import AdminSettingsComponent from '../../components/admin-settings/AdminSettingsComponent';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminSettings = () => {
