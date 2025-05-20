@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useToast } from '../../hooks/ToastProvider';
 
 const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) => {
+  const { showError, showSuccess } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -9,12 +11,131 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
   });
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [editingFields, setEditingFields] = useState({});
+  const [errors, setErrors] = useState({});
+
+  const calculateAge = (birthdate) => {
+    if (!birthdate) return 0;
+    const birthDate = new Date(birthdate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
+  const calculatePasswordStrength = (password) => {
+    if (!password) return 0;
+    
+    let strength = 0;
+    
+    if (password.length >= 6) strength += 1;
+    if (password.length >= 10) strength += 1;
+    
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    
+    return Math.min(strength, 5);
+  };
+
+  const validateField = (field, value) => {
+    const newErrors = { ...errors };
+
+    if (field === 'firstName') {
+      if (!value.trim()) {
+        newErrors.firstName = 'First name is required';
+      } else if (value.length > 50) {
+        newErrors.firstName = 'First name must be 50 characters or less';
+      } else {
+        delete newErrors.firstName;
+      }
+    }
+
+    if (field === 'lastName') {
+      if (!value.trim()) {
+        newErrors.lastName = 'Last name is required';
+      } else if (value.length > 50) {
+        newErrors.lastName = 'Last name must be 50 characters or less';
+      } else {
+        delete newErrors.lastName;
+      }
+    }
+
+    if (field === 'email') {
+      if (!value.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (value.length > 100) {
+        newErrors.email = 'Email must be 100 characters or less';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        newErrors.email = 'Please enter a valid email address';
+      } else {
+        delete newErrors.email;
+      }
+    }
+
+    if (field === 'birthdate') {
+      if (!value) {
+        newErrors.birthdate = 'Birthdate is required';
+      } else {
+        const today = new Date();
+        const birthDate = new Date(value);
+        
+        if (birthDate > today) {
+          newErrors.birthdate = 'Birthdate cannot be in the future';
+        } else if (calculateAge(value) < 13) {
+          newErrors.birthdate = 'You must be at least 13 years old';
+        } else {
+          delete newErrors.birthdate;
+        }
+      }
+    }
+
+    if (field === 'currentPassword') {
+      if (!value.trim()) {
+        newErrors.currentPassword = 'Current password is required';
+      } else {
+        delete newErrors.currentPassword;
+      }
+    }
+
+    if (field === 'newPassword') {
+      if (!value.trim()) {
+        newErrors.newPassword = 'New password is required';
+      } else if (value.length < 6) {
+        newErrors.newPassword = 'Password must have at least 6 characters';
+      } else if (value.length > 50) {
+        newErrors.newPassword = 'Password must be 50 characters or less';
+      } else if (!/(?=.*[A-Z])(?=.*\d)/.test(value)) {
+        newErrors.newPassword = 'Password must contain at least 1 number and 1 capital letter';
+      } else {
+        delete newErrors.newPassword;
+      }
+    }
+
+    if (field === 'confirmPassword') {
+      if (!value.trim()) {
+        newErrors.confirmPassword = 'Please confirm your new password';
+      } else if (passwordData.newPassword !== value) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      } else {
+        delete newErrors.confirmPassword;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleInputChange = (field, value) => {
     setUserProfile(prev => ({
       ...prev,
       [field]: value
     }));
+    validateField(field, value);
   };
 
   const handlePasswordChange = (field, value) => {
@@ -22,6 +143,7 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
       ...prev,
       [field]: value
     }));
+    validateField(field, value);
   };
 
   const handleEditToggle = (field) => {
@@ -29,14 +151,29 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
       ...prev,
       [field]: !prev[field]
     }));
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
-  const handleSave = (field) => {
-    onUpdate({ [field]: userProfile[field] });
-    setEditingFields(prev => ({
-      ...prev,
-      [field]: false
-    }));
+  const handleSave = async (field) => {
+    if (validateField(field, userProfile[field])) {
+      try {
+        await onUpdate({ [field]: userProfile[field] });
+        setEditingFields(prev => ({
+          ...prev,
+          [field]: false
+        }));
+        showSuccess(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
+      } catch (error) {
+        showError(error.message || 'Failed to update profile');
+      }
+    } else {
+      showError(errors[field]);
+    }
   };
 
   const handleCancel = (field) => {
@@ -44,29 +181,45 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
       ...prev,
       [field]: false
     }));
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
-  const handlePasswordUpdate = () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+  const handlePasswordUpdate = async () => {
+    // Validate all password fields
+    const isCurrentValid = validateField('currentPassword', passwordData.currentPassword);
+    const isNewValid = validateField('newPassword', passwordData.newPassword);
+    const isConfirmValid = validateField('confirmPassword', passwordData.confirmPassword);
+    
+    if (!isCurrentValid || !isNewValid || !isConfirmValid) {
+      const firstError = Object.values(errors)[0];
+      if (firstError) {
+        showError(firstError);
+      }
       return;
     }
-    if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters');
-      return;
+
+    try {
+      await onUpdate({ 
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        lastPasswordChange: new Date().toISOString()
+      });
+      
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      });
+      setIsEditingPassword(false);
+      showSuccess('Password updated successfully!');
+    } catch (error) {
+      showError(error.message || 'Failed to update password');
     }
-    
-    onUpdate({ 
-      password: passwordData.newPassword,
-      lastPasswordChange: new Date().toISOString()
-    });
-    
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-    setIsEditingPassword(false);
   };
 
   const formatDate = (dateString) => {
@@ -135,21 +288,26 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       type="text"
                       value={userProfile.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="w-full px-3 py-2.5 pr-20 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent transition-colors duration-200 bg-white text-sm"
+                      className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
+                        errors.firstName ? 'border-error' : 'border-gray-200 focus:border-accent'
+                      }`}
                       placeholder="Enter your first name"
                     />
+                    {errors.firstName && (
+                      <span className="text-xs text-error mt-1">{errors.firstName}</span>
+                    )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
                         onClick={() => handleSave('firstName')}
                         disabled={loading}
-  className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Save"
                       >
                         <SaveIcon />
                       </button>
                       <button
                         onClick={() => handleCancel('firstName')}
-  className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                        className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                         title="Cancel"
                       >
                         <CancelIcon />
@@ -182,21 +340,26 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       type="text"
                       value={userProfile.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="w-full px-3 py-2.5 pr-20 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent transition-colors duration-200 bg-white text-sm"
+                      className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
+                        errors.lastName ? 'border-error' : 'border-gray-200 focus:border-accent'
+                      }`}
                       placeholder="Enter your last name"
                     />
+                    {errors.lastName && (
+                      <span className="text-xs text-error mt-1">{errors.lastName}</span>
+                    )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
                         onClick={() => handleSave('lastName')}
                         disabled={loading}
-  className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Save"
                       >
                         <SaveIcon />
                       </button>
                       <button
                         onClick={() => handleCancel('lastName')}
-  className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                        className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                         title="Cancel"
                       >
                         <CancelIcon />
@@ -229,21 +392,26 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       type="email"
                       value={userProfile.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="w-full px-3 py-2.5 pr-20 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent transition-colors duration-200 bg-white text-sm"
+                      className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
+                        errors.email ? 'border-error' : 'border-gray-200 focus:border-accent'
+                      }`}
                       placeholder="Enter your email address"
                     />
+                    {errors.email && (
+                      <span className="text-xs text-error mt-1">{errors.email}</span>
+                    )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
                         onClick={() => handleSave('email')}
                         disabled={loading}
-  className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Save"
                       >
                         <SaveIcon />
                       </button>
                       <button
                         onClick={() => handleCancel('email')}
-  className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                        className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                         title="Cancel"
                       >
                         <CancelIcon />
@@ -278,20 +446,25 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       type="date"
                       value={formatDate(userProfile.birthdate)}
                       onChange={(e) => handleInputChange('birthdate', e.target.value)}
-                      className="w-full px-3 py-2.5 pr-20 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent transition-colors duration-200 bg-white text-sm"
+                      className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
+                        errors.birthdate ? 'border-error' : 'border-gray-200 focus:border-accent'
+                      }`}
                     />
+                    {errors.birthdate && (
+                      <span className="text-xs text-error mt-1">{errors.birthdate}</span>
+                    )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
                         onClick={() => handleSave('birthdate')}
                         disabled={loading}
-  className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Save"
                       >
                         <SaveIcon />
                       </button>
                       <button
                         onClick={() => handleCancel('birthdate')}
-  className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                        className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                         title="Cancel"
                       >
                         <CancelIcon />
@@ -349,7 +522,9 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       placeholder="Current Password"
                       value={passwordData.currentPassword}
                       onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
+                        errors.currentPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
+                      }`}
                     />
                     <button
                       type="button"
@@ -359,6 +534,9 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
+                    {errors.currentPassword && (
+                      <span className="text-xs text-error mt-1">{errors.currentPassword}</span>
+                    )}
                   </div>
                   <div className="relative">
                     <input
@@ -366,7 +544,9 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       placeholder="New Password"
                       value={passwordData.newPassword}
                       onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
+                        errors.newPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
+                      }`}
                     />
                     <button
                       type="button"
@@ -376,6 +556,9 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
+                    {errors.newPassword && (
+                      <span className="text-xs text-error mt-1">{errors.newPassword}</span>
+                    )}
                   </div>
                   <div className="relative">
                     <input
@@ -383,7 +566,9 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       placeholder="Confirm New Password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
-                      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:border-accent text-sm"
+                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
+                        errors.confirmPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
+                      }`}
                     />
                     <button
                       type="button"
@@ -393,17 +578,20 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
+                    {errors.confirmPassword && (
+                      <span className="text-xs text-error mt-1">{errors.confirmPassword}</span>
+                    )}
                   </div>
                   <div className="flex items-center justify-end space-x-1">
-                   
-                   <button
+                    <button
                       onClick={handlePasswordUpdate}
                       disabled={loading}
-  className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-1.5 bg-secondary text-white rounded hover:bg-secondary-dark transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Save"
                     >
                       <SaveIcon />
-                    </button> <button
+                    </button> 
+                    <button
                       onClick={() => {
                         setIsEditingPassword(false);
                         setPasswordData({
@@ -411,13 +599,18 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                           newPassword: '',
                           confirmPassword: ''
                         });
+                        setErrors(prev => ({
+                          ...prev,
+                          currentPassword: '',
+                          newPassword: '',
+                          confirmPassword: ''
+                        }));
                       }}
-  className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                      className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                       title="Cancel"
                     >
                       <CancelIcon />
                     </button>
-                    
                   </div>
                 </div>
               )}

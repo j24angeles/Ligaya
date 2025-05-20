@@ -1,3 +1,4 @@
+// userService.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3001';
@@ -29,6 +30,27 @@ export const getUserById = async (id) => {
 
 export const updateUser = async (id, userData) => {
   try {
+    // If password is being updated, verify current password first
+    if (userData.currentPassword && userData.newPassword) {
+      const user = await getUserById(id);
+      
+      // In a real app, you would hash the currentPassword and compare with stored hash
+      // For this example, we're doing plain text comparison (not secure for production)
+      if (user.password !== userData.currentPassword) {
+        throw new Error('Current password is incorrect');
+      }
+      
+      // Update the password
+      const response = await api.put(`/users/${id}`, {
+        ...user,
+        password: userData.newPassword,
+        lastPasswordChange: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      return response.data;
+    }
+    
+    // Regular update without password change
     const existingUser = await api.get(`/users/${id}`);
     const response = await api.put(`/users/${id}`, {
       ...existingUser.data,
@@ -37,7 +59,7 @@ export const updateUser = async (id, userData) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || new Error('Failed to update user');
+    throw error.response?.data || error.message || new Error('Failed to update user');
   }
 };
 

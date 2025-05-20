@@ -88,12 +88,10 @@ export default function SignupForm() {
       [name]: processedValue
     }));
     
-    // Update password strength when password changes
     if (name === 'password') {
       setPasswordStrength(calculatePasswordStrength(processedValue));
     }
     
-    // Clear errors when user types
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -102,12 +100,10 @@ export default function SignupForm() {
     }
   };
   
-  // Validate form inputs
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
     
-    // First name validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
       isValid = false;
@@ -116,7 +112,6 @@ export default function SignupForm() {
       isValid = false;
     }
     
-    // Last name validation
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
       isValid = false;
@@ -125,7 +120,6 @@ export default function SignupForm() {
       isValid = false;
     }
     
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
       isValid = false;
@@ -137,7 +131,6 @@ export default function SignupForm() {
       isValid = false;
     }
     
-    // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
@@ -152,13 +145,11 @@ export default function SignupForm() {
       isValid = false;
     }
     
-    // Confirm password validation
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
     
-    // Birthdate validation
     if (!formData.birthdate) {
       newErrors.birthdate = 'Birthdate is required';
       isValid = false;
@@ -175,7 +166,6 @@ export default function SignupForm() {
       }
     }
     
-    // Terms and conditions validation
     if (!termsAccepted) {
       newErrors.terms = 'You must accept the Terms and Conditions';
       isValid = false;
@@ -183,7 +173,6 @@ export default function SignupForm() {
     
     setErrors(newErrors);
     
-    // Show first error if any
     const firstError = Object.values(newErrors)[0];
     if (firstError) {
       showError(firstError);
@@ -192,12 +181,10 @@ export default function SignupForm() {
     return isValid;
   };
   
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAttemptedSubmit(true);
     
-    // Validate form
     if (!validateForm()) return;
     
     setLoading(true);
@@ -222,13 +209,11 @@ export default function SignupForm() {
     }
   };
   
-  // Open terms modal
   const openTermsModal = (e) => {
     e.preventDefault();
     setShowTermsModal(true);
   };
   
-  // Accept terms
   const handleAcceptTerms = () => {
     setTermsAccepted(true);
     if (errors.terms) {
@@ -240,7 +225,6 @@ export default function SignupForm() {
     showSuccess('Terms & Conditions accepted!');
   };
   
-  // Required field marker
   const RequiredMark = () => <span className="text-error ml-1">*</span>;
   
   return (
