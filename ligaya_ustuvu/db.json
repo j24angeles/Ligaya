@@ -4,12 +4,14 @@
       "firstName": "Admin",
       "lastName": "Ligaya",
       "email": "admin@ligaya.com",
-      "password": "admin123",
+      "password": "admin123!",
       "birthdate": "2004-03-22",
       "name": "admin ligaya",
       "id": 1,
       "role": "admin",
-      "createdAt": "2025-05-09T06:58:48.972Z"
+      "createdAt": "2025-05-09T06:58:48.972Z",
+      "lastPasswordChange": "2025-05-20T14:31:58.519Z",
+      "updatedAt": "2025-05-20T14:31:58.548Z"
     },
     {
       "firstName": "Lyanna",
