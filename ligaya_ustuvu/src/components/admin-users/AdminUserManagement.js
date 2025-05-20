@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, AlertCircle, Edit, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, AlertCircle, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import UserFormModal from './AdminUserFormModal';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../../hooks/ToastProvider';
@@ -53,66 +53,27 @@ const AdminUserManagement = () => {
   };
 
   const handleSubmitUser = async (userData) => {
-  if (currentUser) {
     openConfirmationModal({
-      title: "Update Volunteer",
-      message: `Are you sure you want to update ${userData.firstName} ${userData.lastName}'s information?`,
+      title: "Add New Volunteer",
+      message: `Are you sure you want to add ${userData.firstName} ${userData.lastName} as a volunteer?`,
       type: "info",
       onConfirm: async () => {
         setIsLoading(true);
         try {
-          // Only send the fields that are being updated
-          const updatedFields = {
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            email: userData.email,
-            birthdate: userData.birthdate,
-            ...(userData.password && { password: userData.password }) // Only include password if it was changed
-          };
-          
-          await updateUser(currentUser.id, updatedFields);
+          await createUser(userData);
           await fetchUsers();
           setShowModal(false);
-          setCurrentUser(null);
-          showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was updated successfully`);
+          showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was added successfully`);
         } catch (err) {
           setError(err.message);
-          showError(`Failed to update volunteer: ${err.message}`);
+          showError(`Failed to add volunteer: ${err.message}`);
         } finally {
           setIsLoading(false);
         }
       },
-      confirmText: "Update",
+      confirmText: "Add Volunteer",
       cancelText: "Cancel"
     });
-    } else {
-      openConfirmationModal({
-        title: "Add New Volunteer",
-        message: `Are you sure you want to add ${userData.firstName} ${userData.lastName} as a volunteer?`,
-        type: "info",
-        onConfirm: async () => {
-          setIsLoading(true);
-          try {
-            await createUser(userData);
-            await fetchUsers();
-            setShowModal(false);
-            showSuccess(`Volunteer ${userData.firstName} ${userData.lastName} was added successfully`);
-          } catch (err) {
-            setError(err.message);
-            showError(`Failed to add volunteer: ${err.message}`);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        confirmText: "Add Volunteer",
-        cancelText: "Cancel"
-      });
-    }
-  };
-
-  const handleEdit = (user) => {
-    setCurrentUser(user);
-    setShowModal(true);
   };
 
   const handleArchive = (user) => {
@@ -402,22 +363,13 @@ const AdminUserManagement = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         {user.status !== 'archived' ? (
-                          <>
-                            <button
-                              onClick={() => handleEdit(user)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              title="Edit volunteer"
-                            >
-                              <Edit size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleArchive(user)}
-                              className="text-amber-600 hover:text-amber-900"
-                              title="Archive volunteer"
-                            >
-                              <Archive size={18} />
-                            </button>
-                          </>
+                          <button
+                            onClick={() => handleArchive(user)}
+                            className="text-amber-600 hover:text-amber-900"
+                            title="Archive volunteer"
+                          >
+                            <Archive size={18} />
+                          </button>
                         ) : (
                           <>
                             <button

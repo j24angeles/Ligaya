@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, AlertCircle, ArchiveIcon } from 'lucide-react';
+import { Plus, Search, AlertCircle } from 'lucide-react';
 import EventFormModal from './EventFormModal';
 import EventCard from './EventCard';
 import ConfirmationModal from '../ConfirmationModal';
@@ -32,7 +32,13 @@ const EventManagement = () => {
     setIsLoading(true);
     try {
       const data = await getAllEvents();
-      setEvents(data);
+      // Sort events by date (earliest first)
+      const sortedEvents = [...data].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+      });
+      setEvents(sortedEvents);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -54,6 +60,11 @@ const EventManagement = () => {
     today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
     const eventDay = new Date(eventDate);
     return eventDay < today;
+  };
+
+  // Handle time filter changes
+  const handleTimeFilterChange = (value) => {
+    setTimeFilter(value);
   };
 
   // Show confirmation modal
@@ -196,16 +207,22 @@ const EventManagement = () => {
     
     // Apply status filter
     const eventStatus = event.status || 'active'; // Default to active if status is not set
+    const isPast = isEventInPast(event.date);
+    
     let statusMatch = true;
-    if (statusFilter === 'active') statusMatch = eventStatus === 'active';
+    if (statusFilter === 'active') {
+      // Active status should only include upcoming events, not past events
+      statusMatch = eventStatus === 'active' && !isPast;
+    }
     if (statusFilter === 'archived') statusMatch = eventStatus === 'archived';
     if (statusFilter === 'published') statusMatch = event.isPublished && eventStatus === 'active';
     if (statusFilter === 'draft') statusMatch = !event.isPublished && eventStatus === 'active';
+    if (statusFilter === 'all') statusMatch = true;
     
     // Apply time filter
     let timeMatch = true;
-    if (timeFilter === 'upcoming') timeMatch = !isEventInPast(event.date);
-    if (timeFilter === 'past') timeMatch = isEventInPast(event.date);
+    if (timeFilter === 'upcoming') timeMatch = !isPast;
+    if (timeFilter === 'past') timeMatch = isPast;
     
     return matchesSearch && statusMatch && timeMatch;
   });
@@ -256,7 +273,7 @@ const EventManagement = () => {
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button
               type="button"
-              onClick={() => setTimeFilter('all')}
+              onClick={() => handleTimeFilterChange('all')}
               className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
                 timeFilter === 'all'
                   ? 'bg-primary text-white border-primary'
@@ -267,7 +284,7 @@ const EventManagement = () => {
             </button>
             <button
               type="button"
-              onClick={() => setTimeFilter('upcoming')}
+              onClick={() => handleTimeFilterChange('upcoming')}
               className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
                 timeFilter === 'upcoming'
                   ? 'bg-primary text-white border-primary'
@@ -278,7 +295,7 @@ const EventManagement = () => {
             </button>
             <button
               type="button"
-              onClick={() => setTimeFilter('past')}
+              onClick={() => handleTimeFilterChange('past')}
               className={`px-4 py-2 text-sm font-medium border-t border-b border-r rounded-r-lg ${
                 timeFilter === 'past'
                   ? 'bg-primary text-white border-primary'
