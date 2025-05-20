@@ -17,19 +17,16 @@ const DashboardCards = ({ events, donations, users }) => {
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
 
-      // Upcoming Events: Only count published, non-archived, future events
+      // Fixed event filtering logic to match eventService.js structure
       const upcomingEventsCount = events.filter(event => {
-        if (event.status === 'archived' || !event.isPublished) return false;
-        const eventDate = new Date(event.date);
-        return eventDate >= now;
+        // Check if event has a date and is in the future
+        return event.date && new Date(event.date) > now && event.isPublished !== false;
       }).length;
 
-      // Volunteers: Only count active volunteers with role 'volunteer'
       const volunteerCount = users.filter(user => {
         return user.role === 'volunteer' && user.status !== 'archived';
       }).length;
 
-      // Donations: Only count verified donations from current month
       const totalDonationsAmount = donations
         .filter(donation => {
           if (donation.validationStatus !== 'validated') return false;

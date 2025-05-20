@@ -137,9 +137,7 @@ const UpcomingEventsTable = () => {
               >
                 <td className="px-2 py-1">
                   <div className="font-medium">{event.title || 'Untitled Event'}</div>
-                  <div className="text-gray-500 line-clamp-1 text-xs">
-                    {event.description || 'No description'}
-                  </div>
+                  
                 </td>
                 <td className="px-2 py-1 text-gray-600">
                   <div className="flex items-center">

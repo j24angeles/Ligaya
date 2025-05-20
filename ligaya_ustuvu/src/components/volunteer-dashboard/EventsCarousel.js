@@ -90,12 +90,27 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
   const visibleEvents = getVisibleEvents();
   const showNavigation = filteredEvents.length > 3;
 
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const hourNum = parseInt(hours, 10);
+      const ampm = hourNum >= 12 ? 'PM' : 'AM';
+      const displayHour = hourNum % 12 || 12;
+      return `${displayHour}:${minutes} ${ampm}`;
+    } catch {
+      return '';
+    }
+  };
+
   const formatEventDate = (date, time) => {
     if (!date) return 'Date TBD';
     try {
-      const options = { month: 'short', day: 'numeric' };
-      const formatted = new Date(date).toLocaleDateString('en-US', options);
-      return time ? `${formatted} • ${time}` : formatted;
+      const options = { month: 'short', day: 'numeric', year: 'numeric' };
+      const formattedDate = new Date(date).toLocaleDateString('en-US', options);
+      const formattedTime = formatTime(time);
+      return formattedTime ? `${formattedDate} • ${formattedTime}` : formattedDate;
     } catch {
       return 'Date TBD';
     }
@@ -145,19 +160,18 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
             onClick={() => handleEventClick(event)}
           >
             {renderEventImage(event)}
-            <div className="p-2">
-              <div className="mb-1">
-                <span className="inline-block bg-yellow-100 text-yellow-800 text-[10px] px-1.5 py-0.5 rounded-full flex items-center">
-                  <MdCalendarToday className="mr-1" size={10} />
-                  {formatEventDate(event.date, event.time)}
-                </span>
+            <div className="p-2 flex flex-col justify-between h-full">
+              <div>
+                <div className="mb-1">
+                  <span className="inline-block bg-yellow-100 text-yellow-800 text-[10px] px-1.5 py-0.5 rounded-full flex items-center">
+                    <MdCalendarToday className="mr-1" size={10} />
+                    {formatEventDate(event.date, event.time)}
+                  </span>
+                </div>
+<h3 className="font-medium text-gray-900 text-xs line-clamp-2 mt-2">
+                  {event.title || 'Untitled Event'}
+                </h3>
               </div>
-              <h3 className="font-medium text-gray-900 text-xs mb-1 line-clamp-2">
-                {event.title || 'Untitled Event'}
-              </h3>
-              <p className="text-gray-600 text-[11px] line-clamp-2 mb-4">
-                {event.description || 'No description available'}
-              </p>
             </div>
           </div>
         ))}

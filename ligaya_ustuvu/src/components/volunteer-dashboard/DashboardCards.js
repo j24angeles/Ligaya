@@ -31,9 +31,13 @@ const DashboardCards = ({ events, donations }) => {
         return eventDate < now;
       }).length;
 
-      // Calculate user's total donations
-      const userDonations = donations.filter(donation => donation.userId === user.id);
-      const totalDonationsAmount = userDonations.reduce((sum, donation) => {
+      // Calculate user's total donations (only validated ones)
+      // Updated to match the validationStatus field used in RecentDonationsTable
+      const userVerifiedDonations = donations.filter(
+        donation => donation.userId === user.id && donation.validationStatus === 'validated'
+      );
+      
+      const totalDonationsAmount = userVerifiedDonations.reduce((sum, donation) => {
         return sum + (parseFloat(donation.amount) || 0);
       }, 0);
 
