@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { MdChevronLeft, MdChevronRight, MdCalendarToday } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import EventModal from './EventModal'; 
 
 const EventsCarousel = ({ events = [], refreshTrigger }) => {
   const { user } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredEvents, setFilteredEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     if (!Array.isArray(events) || events.length === 0) {
@@ -51,6 +53,14 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
       setCurrentIndex(0);
     }
   }, [events, user, currentIndex, refreshTrigger]);
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+  };
+
+  const closeModal = () => {
+    setSelectedEvent(null);
+  };
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
@@ -129,7 +139,11 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
 
       <div className="flex space-x-3">
         {visibleEvents.map((event, idx) => (
-          <div key={event.id || idx} className="flex-1 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-48">
+          <div 
+            key={event.id || idx} 
+            className="flex-1 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-48 cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => handleEventClick(event)}
+          >
             {renderEventImage(event)}
             <div className="p-2">
               <div className="mb-1">
@@ -141,13 +155,17 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
               <h3 className="font-medium text-gray-900 text-xs mb-1 line-clamp-2">
                 {event.title || 'Untitled Event'}
               </h3>
-              <p className="text-gray-600 text-[11px] line-clamp-2">
+              <p className="text-gray-600 text-[11px] line-clamp-2 mb-4">
                 {event.description || 'No description available'}
               </p>
             </div>
           </div>
         ))}
       </div>
+
+      {selectedEvent && (
+        <EventModal event={selectedEvent} onClose={closeModal} />
+      )}
     </div>
   );
 };
