@@ -38,7 +38,7 @@
       "lastName": "Angeles",
       "email": "joaquinmiguelangeless@gmail.com",
       "birthdate": "2003-11-04",
-      "password": "Joaquin1104!",
+      "password": "Happ1ness!",
       "role": "volunteer",
       "name": "Joaquin Angeles",
       "id": 1747746276492,
@@ -48,12 +48,13 @@
         1747747241791,
         1747746975124
       ],
-      "updatedAt": "2025-05-20T14:43:31.049Z",
+      "updatedAt": "2025-05-20T19:32:06.107Z",
       "donations": [
         1747747589662,
         1747747602412,
         1747747619262
-      ]
+      ],
+      "lastPasswordChange": "2025-05-20T19:32:06.107Z"
     },
     {
       "firstName": "Aeron",

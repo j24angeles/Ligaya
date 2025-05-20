@@ -29,13 +29,21 @@ export const getUserById = async (id) => {
 
 export const updateUser = async (id, userData) => {
   try {
-    // If we're changing the password
     if (userData.currentPassword && userData.newPassword) {
       const user = await getUserById(id);
-      
-      // Verify the current password matches
-      if (user.password !== userData.currentPassword) {
-        throw new Error('Current password is incorrect');
+      try {
+        // Create a dedicated password verification request
+        const verifyResponse = await api.post(`/users/${id}/verify-password`, {
+          password: userData.currentPassword
+        });
+        
+        if (!verifyResponse.data.success) {
+          throw new Error('Current password is incorrect');
+        }
+      } catch (error) {
+        if (user.password !== userData.currentPassword) {
+          throw new Error('Current password is incorrect');
+        }
       }
       
       // Update with new password and record the time of change

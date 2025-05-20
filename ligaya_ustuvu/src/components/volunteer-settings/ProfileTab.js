@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { useToast } from '../../hooks/ToastProvider';
 
 const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) => {
-  const { showError, showSuccess } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -12,6 +10,7 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [editingFields, setEditingFields] = useState({});
   const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   const calculateAge = (birthdate) => {
     if (!birthdate) return 0;
@@ -27,19 +26,33 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
     return age;
   };
 
+  // Calculate password strength
   const calculatePasswordStrength = (password) => {
     if (!password) return 0;
     
     let strength = 0;
     
+    // Length check
     if (password.length >= 6) strength += 1;
     if (password.length >= 10) strength += 1;
     
+    // Character variety checks
     if (/[A-Z]/.test(password)) strength += 1;
     if (/[0-9]/.test(password)) strength += 1;
     if (/[^A-Za-z0-9]/.test(password)) strength += 1;
     
-    return Math.min(strength, 5);
+    return Math.min(strength, 5); // Max score of 5
+  };
+
+  // Get strength label and color
+  const getStrengthInfo = (strength) => {
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const colors = ['#ff4d4d', '#ff9933', '#ffcc00', '#99cc33', '#70cc33', '#33cc33'];
+    
+    return {
+      label: labels[strength],
+      color: colors[strength]
+    };
   };
 
   const validateField = (field, value) => {
@@ -94,38 +107,36 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
       }
     }
 
-    if (field === 'currentPassword') {
-      if (!value.trim()) {
-        newErrors.currentPassword = 'Current password is required';
-      } else {
-        delete newErrors.currentPassword;
-      }
-    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    if (field === 'newPassword') {
-      if (!value.trim()) {
-        newErrors.newPassword = 'New password is required';
-      } else if (value.length < 6) {
-        newErrors.newPassword = 'Password must have at least 6 characters';
-      } else if (value.length > 50) {
+  const validatePasswordForm = () => {
+    const newErrors = {};
+    
+    // Validate current password is not empty
+    if (!passwordData.currentPassword.trim()) {
+      newErrors.currentPassword = 'Current password is required';
+    }
+    
+    // Validate new password
+    if (!passwordData.newPassword.trim()) {
+      newErrors.newPassword = 'New password is required';
+    } else {
+      if (passwordData.newPassword.length < 6) {
+        newErrors.newPassword = 'Password must be at least 6 characters';
+      } else if (passwordData.newPassword.length > 50) {
         newErrors.newPassword = 'Password must be 50 characters or less';
-      } else if (!/(?=.*[A-Z])(?=.*\d)/.test(value)) {
+      } else if (!/(?=.*[A-Z])(?=.*\d)/.test(passwordData.newPassword)) {
         newErrors.newPassword = 'Password must contain at least 1 number and 1 capital letter';
-      } else {
-        delete newErrors.newPassword;
       }
     }
-
-    if (field === 'confirmPassword') {
-      if (!value.trim()) {
-        newErrors.confirmPassword = 'Please confirm your new password';
-      } else if (passwordData.newPassword !== value) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      } else {
-        delete newErrors.confirmPassword;
-      }
+    
+    // Validate password confirmation
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -143,7 +154,19 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
       ...prev,
       [field]: value
     }));
-    validateField(field, value);
+    
+    // Update password strength when new password changes
+    if (field === 'newPassword') {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
+    
+    // Clear errors when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
+    }
   };
 
   const handleEditToggle = (field) => {
@@ -154,7 +177,7 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: ''
+        [field]: null
       }));
     }
   };
@@ -167,12 +190,12 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
           ...prev,
           [field]: false
         }));
-        showSuccess(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
       } catch (error) {
-        showError(error.message || 'Failed to update profile');
+        setErrors(prev => ({
+          ...prev,
+          [field]: error.message || 'Failed to update profile'
+        }));
       }
-    } else {
-      showError(errors[field]);
     }
   };
 
@@ -184,41 +207,38 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: ''
+        [field]: null
       }));
     }
   };
 
   const handlePasswordUpdate = async () => {
-    // Validate all password fields
-    const isCurrentValid = validateField('currentPassword', passwordData.currentPassword);
-    const isNewValid = validateField('newPassword', passwordData.newPassword);
-    const isConfirmValid = validateField('confirmPassword', passwordData.confirmPassword);
-    
-    if (!isCurrentValid || !isNewValid || !isConfirmValid) {
-      const firstError = Object.values(errors)[0];
-      if (firstError) {
-        showError(firstError);
-      }
+    if (!validatePasswordForm()) {
       return;
     }
 
     try {
-      await onUpdate({ 
+      const result = await onUpdate({ 
         currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-        lastPasswordChange: new Date().toISOString()
+        newPassword: passwordData.newPassword
       });
       
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-      setIsEditingPassword(false);
-      showSuccess('Password updated successfully!');
+      if (result) {
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        setIsEditingPassword(false);
+        setPasswordStrength(0);
+      }
     } catch (error) {
-      showError(error.message || 'Failed to update password');
+      // Handle specific password error
+      if (error.message && error.message.includes('Current password is incorrect')) {
+        setErrors({ currentPassword: 'Current password is incorrect' });
+      } else {
+        setErrors({ general: 'Failed to update password. Please try again.' });
+      }
     }
   };
 
@@ -289,12 +309,12 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       value={userProfile.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
-                        errors.firstName ? 'border-error' : 'border-gray-200 focus:border-accent'
+                        errors.firstName ? 'border-red-500' : 'border-gray-200 focus:border-accent'
                       }`}
                       placeholder="Enter your first name"
                     />
                     {errors.firstName && (
-                      <span className="text-xs text-error mt-1">{errors.firstName}</span>
+                      <div className="text-red-500 text-xs mt-1">{errors.firstName}</div>
                     )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
@@ -341,12 +361,12 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       value={userProfile.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                       className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
-                        errors.lastName ? 'border-error' : 'border-gray-200 focus:border-accent'
+                        errors.lastName ? 'border-red-500' : 'border-gray-200 focus:border-accent'
                       }`}
                       placeholder="Enter your last name"
                     />
                     {errors.lastName && (
-                      <span className="text-xs text-error mt-1">{errors.lastName}</span>
+                      <div className="text-red-500 text-xs mt-1">{errors.lastName}</div>
                     )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
@@ -393,12 +413,12 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       value={userProfile.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
-                        errors.email ? 'border-error' : 'border-gray-200 focus:border-accent'
+                        errors.email ? 'border-red-500' : 'border-gray-200 focus:border-accent'
                       }`}
                       placeholder="Enter your email address"
                     />
                     {errors.email && (
-                      <span className="text-xs text-error mt-1">{errors.email}</span>
+                      <div className="text-red-500 text-xs mt-1">{errors.email}</div>
                     )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
@@ -447,11 +467,11 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       value={formatDate(userProfile.birthdate)}
                       onChange={(e) => handleInputChange('birthdate', e.target.value)}
                       className={`w-full px-3 py-2.5 pr-20 border-2 rounded-lg focus:outline-none transition-colors duration-200 bg-white text-sm ${
-                        errors.birthdate ? 'border-error' : 'border-gray-200 focus:border-accent'
+                        errors.birthdate ? 'border-red-500' : 'border-gray-200 focus:border-accent'
                       }`}
                     />
                     {errors.birthdate && (
-                      <span className="text-xs text-error mt-1">{errors.birthdate}</span>
+                      <div className="text-red-500 text-xs mt-1">{errors.birthdate}</div>
                     )}
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
                       <button
@@ -516,16 +536,22 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                 </div>
               ) : (
                 <div className="space-y-3 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  {errors.general && (
+                    <div className="p-2 bg-red-50 text-red-700 text-xs rounded border border-red-200">
+                      {errors.general}
+                    </div>
+                  )}
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Current Password"
                       value={passwordData.currentPassword}
                       onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
-                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
-                        errors.currentPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
-                      }`}
+                      className={`w-full px-3 py-2 pr-10 border ${errors.currentPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.currentPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.currentPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -534,9 +560,6 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
-                    {errors.currentPassword && (
-                      <span className="text-xs text-error mt-1">{errors.currentPassword}</span>
-                    )}
                   </div>
                   <div className="relative">
                     <input
@@ -544,10 +567,11 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       placeholder="New Password"
                       value={passwordData.newPassword}
                       onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
-                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
-                        errors.newPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
-                      }`}
+                      className={`w-full px-3 py-2 pr-10 border ${errors.newPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.newPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.newPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -556,8 +580,25 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
-                    {errors.newPassword && (
-                      <span className="text-xs text-error mt-1">{errors.newPassword}</span>
+                    {/* Password strength indicator */}
+                    {passwordData.newPassword && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex-1 h-1 bg-gray-200 rounded-full">
+                          <div 
+                            className="h-1 rounded-full transition-all duration-300"
+                            style={{ 
+                              width: `${(passwordStrength / 5) * 100}%`,
+                              backgroundColor: getStrengthInfo(passwordStrength).color
+                            }}
+                          />
+                        </div>
+                        <span 
+                          className="text-xs leading-none whitespace-nowrap"
+                          style={{ color: getStrengthInfo(passwordStrength).color }}
+                        >
+                          {getStrengthInfo(passwordStrength).label}
+                        </span>
+                      </div>
                     )}
                   </div>
                   <div className="relative">
@@ -566,10 +607,11 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                       placeholder="Confirm New Password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
-                      className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none text-sm ${
-                        errors.confirmPassword ? 'border-error' : 'border-gray-300 focus:border-accent'
-                      }`}
+                      className={`w-full px-3 py-2 pr-10 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-accent text-sm`}
                     />
+                    {errors.confirmPassword && (
+                      <div className="text-red-500 text-xs mt-1">{errors.confirmPassword}</div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -578,9 +620,6 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                     >
                       {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
-                    {errors.confirmPassword && (
-                      <span className="text-xs text-error mt-1">{errors.confirmPassword}</span>
-                    )}
                   </div>
                   <div className="flex items-center justify-end space-x-1">
                     <button
@@ -599,12 +638,8 @@ const ProfileTab = ({ user, userProfile, setUserProfile, onUpdate, loading }) =>
                           newPassword: '',
                           confirmPassword: ''
                         });
-                        setErrors(prev => ({
-                          ...prev,
-                          currentPassword: '',
-                          newPassword: '',
-                          confirmPassword: ''
-                        }));
+                        setErrors({});
+                        setPasswordStrength(0);
                       }}
                       className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                       title="Cancel"
