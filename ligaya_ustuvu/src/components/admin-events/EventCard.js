@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Users, Edit, Trash2, Archive, RefreshCw } from 'lucide-react';
 import VolunteersModal from './EventVolunteersModal';
 
@@ -16,10 +16,24 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
     });
   };
 
-  // Format time for display
+  // Format time for display with AM/PM
   const formatTime = (timeString) => {
     if (!timeString) return '';
-    return timeString;
+    
+    // Convert 24-hour format to 12-hour format with AM/PM
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours, 10);
+      const minute = parseInt(minutes, 10);
+      
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+      
+      return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+    } catch (e) {
+      // If parsing fails, return the original string
+      return timeString;
+    }
   };
 
   // Truncate description for preview
@@ -40,9 +54,9 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
 
   return (
     <>
-      <div className={`bg-white rounded-lg shadow-md overflow-hidden 
+      <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full
         ${isPastEvent ? 'border-l-4 border-amber-400' : ''} 
-        ${isArchived ? 'border-l-4 border-red-400 opacity-75' : ''}`}>
+        ${isArchived ? 'border-l-4 border-red-400 opacity-75' : ''}">
         {/* Banner image */}
         <div className="relative w-full h-48">
           {event.bannerImage ? (
@@ -83,8 +97,9 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
             )}
           </div>
         </div>
+        
         {/* Content */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-grow">
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             {event.title}
           </h3>
@@ -95,7 +110,9 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
               <span className={isPastEvent ? 'text-amber-600 font-medium' : ''}>
                 {formatDate(event.date)}
               </span>
-              <span className="mx-2">•</span>
+            </div>
+            
+            <div className="flex items-center text-gray-600">
               <Clock size={16} className="mr-2" />
               <span>{formatTime(event.time)}</span>
             </div>
@@ -115,12 +132,12 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
             </div>
           </div>
           
-          <p className="text-gray-700 mb-4">
+          <div className="text-gray-700 mb-4 flex-grow">
             {truncateDescription(event.description)}
-          </p>
+          </div>
           
-          {/* Actions */}
-          <div className="flex justify-between items-center">
+          {/* Actions - Fixed position at bottom of card */}
+          <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
             {/* Event status indicator */}
             {isPastEvent && !isArchived && (
               <div className="text-amber-600 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md">
@@ -130,6 +147,11 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
             {isArchived && (
               <div className="text-red-600 text-xs font-medium bg-red-50 px-2 py-1 rounded-md">
                 Archived event
+              </div>
+            )}
+            {!isPastEvent && !isArchived && (
+              <div className="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-md">
+                Upcoming event
               </div>
             )}
             

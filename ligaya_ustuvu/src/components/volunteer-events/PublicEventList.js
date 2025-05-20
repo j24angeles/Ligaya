@@ -9,7 +9,7 @@ const PublicEventList = ({ currentUser }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all', 'upcoming', or 'past'
+  const [filter, setFilter] = useState('upcoming'); // Changed default to 'upcoming' instead of 'all'
   const { showSuccess, showError } = useToast();
 
   // Fetch all published events
@@ -19,7 +19,15 @@ const PublicEventList = ({ currentUser }) => {
       const data = await getAllEvents();
       // Only show published events
       const publishedEvents = data.filter(event => event.isPublished);
-      setEvents(publishedEvents);
+      
+      // Sort events by date (nearest date first)
+      const sortedEvents = [...publishedEvents].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+      });
+      
+      setEvents(sortedEvents);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -93,6 +101,36 @@ const PublicEventList = ({ currentUser }) => {
     
     // All events
     return matchesSearch;
+  }).sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    
+    // For upcoming events tab, sort by nearest date first
+    if (filter === 'upcoming') {
+      return dateA - dateB;
+    }
+    // For past events tab, sort by most recent past date first
+    else if (filter === 'past') {
+      return dateB - dateA;
+    }
+    // For all events, sort by nearest date first, with upcoming events before past events
+    else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // If one is past and one is upcoming, upcoming comes first
+      const aIsPast = dateA < today;
+      const bIsPast = dateB < today;
+      
+      if (aIsPast && !bIsPast) return 1;
+      if (!aIsPast && bIsPast) return -1;
+      
+      // If both are upcoming, nearest first
+      if (!aIsPast && !bIsPast) return dateA - dateB;
+      
+      // If both are past, most recent first
+      return dateB - dateA;
+    }
   });
 
   return (
@@ -120,29 +158,29 @@ const PublicEventList = ({ currentUser }) => {
           </div>
         </div>
         
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Reordered with upcoming first */}
         <div className="inline-flex rounded-md shadow-sm" role="group">
           <button
             type="button"
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
-              filter === 'all'
-                ? 'bg-primary text-white border-primary'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            All Events
-          </button>
-          <button
-            type="button"
             onClick={() => setFilter('upcoming')}
-            className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+            className={`px-4 py-2 text-sm font-medium border rounded-l-lg ${
               filter === 'upcoming'
                 ? 'bg-primary text-white border-primary'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
             }`}
           >
             Upcoming
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+              filter === 'all'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            All Events
           </button>
           <button
             type="button"
