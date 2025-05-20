@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react'; // Added useEffect import
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
@@ -20,7 +21,15 @@ import UserDonationPage from './pages/volunteer/UserDonationPage';
 import VolunteerSettings from './pages/volunteer/VolunteerSettings';
 import AdminSettings from './pages/admin/AdminSettings';
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 // Enhanced ProtectedRoute component that accepts allowedRoles
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -43,6 +52,7 @@ export default function App() {
     <div className="font-poppins">
       <ToastProvider>
         <Router>
+          <ScrollToTop /> {/* Add ScrollToTop component here */}
           <Routes>
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/home" element={<Home />} />
@@ -97,7 +107,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/admin-settings"
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
@@ -115,7 +125,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/volunteer-donate"
               element={
                 <ProtectedRoute allowedRoles={['volunteer']}>
@@ -123,8 +133,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-
-              <Route
+            <Route
               path="/volunteer-settings"
               element={
                 <ProtectedRoute allowedRoles={['volunteer']}>
@@ -133,7 +142,6 @@ export default function App() {
               }
             />
           </Routes>
-          
         </Router>
       </ToastProvider>
     </div>
