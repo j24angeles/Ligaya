@@ -92,8 +92,12 @@ const PublicEventList = ({ currentUser }) => {
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
+    // Apply registration filter
+    if (filter === 'registered') {
+      return matchesSearch && isUserRegistered(event);
+    }
     // Then apply time filter
-    if (filter === 'upcoming') {
+    else if (filter === 'upcoming') {
       return matchesSearch && !isEventInPast(event.date);
     } else if (filter === 'past') {
       return matchesSearch && isEventInPast(event.date);
@@ -111,6 +115,24 @@ const PublicEventList = ({ currentUser }) => {
     }
     // For past events tab, sort by most recent past date first
     else if (filter === 'past') {
+      return dateB - dateA;
+    }
+    // For registered events, sort by nearest date first, with upcoming events before past events
+    else if (filter === 'registered') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // If one is past and one is upcoming, upcoming comes first
+      const aIsPast = dateA < today;
+      const bIsPast = dateB < today;
+      
+      if (aIsPast && !bIsPast) return 1;
+      if (!aIsPast && bIsPast) return -1;
+      
+      // If both are upcoming, nearest first
+      if (!aIsPast && !bIsPast) return dateA - dateB;
+      
+      // If both are past, most recent first
       return dateB - dateA;
     }
     // For all events, sort by nearest date first, with upcoming events before past events
@@ -158,8 +180,8 @@ const PublicEventList = ({ currentUser }) => {
           </div>
         </div>
         
-        {/* Filter Tabs - Reordered with upcoming first */}
-        <div className="inline-flex rounded-md shadow-sm" role="group">
+        {/* Filter Tabs - Added Registered tab */}
+        <div className="inline-flex rounded-md shadow-sm overflow-x-auto" role="group">
           <button
             type="button"
             onClick={() => setFilter('upcoming')}
@@ -170,6 +192,17 @@ const PublicEventList = ({ currentUser }) => {
             }`}
           >
             Upcoming
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('registered')}
+            className={`px-4 py-2 text-sm font-medium border-t border-b border-r ${
+              filter === 'registered'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            My Registrations
           </button>
           <button
             type="button"
@@ -224,7 +257,9 @@ const PublicEventList = ({ currentUser }) => {
                 ? "There are no upcoming events at this time" 
                 : filter === 'past' 
                   ? "There are no past events to display" 
-                  : "There are no events to display"}
+                  : filter === 'registered'
+                    ? "You haven't registered for any events yet"
+                    : "There are no events to display"}
           </p>
         </div>
       )}

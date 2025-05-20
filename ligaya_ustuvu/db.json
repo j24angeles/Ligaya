@@ -45,11 +45,10 @@
       "id": 1747746276492,
       "createdAt": "2025-05-20T13:04:36.492Z",
       "eventsJoined": [
-        1747746679835,
         1747747241791,
         1747746975124
       ],
-      "updatedAt": "2025-05-20T14:43:31.049Z",
+      "updatedAt": "2025-05-20T18:04:22.939Z",
       "donations": [
         1747747589662,
         1747747602412,
@@ -185,12 +184,6 @@
       "createdAt": "2025-05-20T13:11:19.835Z",
       "volunteers": [
         {
-          "id": 1747746276492,
-          "name": "Joaquin Angeles",
-          "email": "joaquinmiguelangeless@gmail.com",
-          "registeredAt": "2025-05-20T13:26:03.419Z"
-        },
-        {
           "id": 1747745429213,
           "name": "Lyanna Cristobal",
           "email": "lyannacristobal@gmail.com",
@@ -209,7 +202,7 @@
           "registeredAt": "2025-05-20T13:48:58.581Z"
         }
       ],
-      "updatedAt": "2025-05-20T13:48:58.581Z"
+      "updatedAt": "2025-05-20T18:04:22.907Z"
     },
     {
       "title": "UST UVU DDay",
