@@ -75,12 +75,14 @@ const HelpTab = () => {
 
   return (
     <div className="p-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">Help & Support</h2>
-
+<div className="flex items-center mb-6">
+          <div className="w-2 h-8 bg-secondary rounded-full mr-4"></div>
+          <h2 className="text-xl font-bold text-primary">Help & Support</h2>
+        </div>
       <div className="space-y-8">
         {/* Frequently Asked Questions */}
         <section>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Frequently Asked Questions</h3>
+          <h4 className="text-xl font-semibold text-gray-800 mb-4">Frequently Asked Questions</h4>
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div key={index} className="border border-gray-200 rounded-lg p-4">
