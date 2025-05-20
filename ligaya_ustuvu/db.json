@@ -46,10 +46,10 @@
       "createdAt": "2025-05-20T13:04:36.492Z",
       "eventsJoined": [
         1747746679835,
-        1747746975124,
-        1747747241791
+        1747747241791,
+        1747746975124
       ],
-      "updatedAt": "2025-05-20T13:26:59.288Z",
+      "updatedAt": "2025-05-20T14:43:31.049Z",
       "donations": [
         1747747589662,
         1747747602412,
@@ -235,12 +235,6 @@
       "createdAt": "2025-05-20T13:16:15.124Z",
       "volunteers": [
         {
-          "id": 1747746276492,
-          "name": "Joaquin Angeles",
-          "email": "joaquinmiguelangeless@gmail.com",
-          "registeredAt": "2025-05-20T13:26:06.390Z"
-        },
-        {
           "id": 1747745429213,
           "name": "Lyanna Cristobal",
           "email": "lyannacristobal@gmail.com",
@@ -251,9 +245,15 @@
           "name": "Mikko Samaniego",
           "email": "mikko@gmail.com",
           "registeredAt": "2025-05-20T13:48:07.628Z"
+        },
+        {
+          "id": 1747746276492,
+          "name": "Joaquin Angeles",
+          "email": "joaquinmiguelangeless@gmail.com",
+          "registeredAt": "2025-05-20T14:43:31.001Z"
         }
       ],
-      "updatedAt": "2025-05-20T13:48:07.628Z"
+      "updatedAt": "2025-05-20T14:43:31.001Z"
     },
     {
       "title": "Strike a Pot!",

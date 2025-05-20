@@ -5,17 +5,6 @@ import { MdCheckCircle, MdHourglassEmpty, MdCancel } from 'react-icons/md';
 const StatusChart = ({ donations }) => {
   const [chartData, setChartData] = useState([]);
   const [timeFrame, setTimeFrame] = useState('yearly');
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-  
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 890);
-    };
-    
-    handleResize(); // Check initial size
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   
   useEffect(() => {
     if (!donations?.length) return;
@@ -111,67 +100,67 @@ const StatusChart = ({ donations }) => {
     return monthlyData;
   };
   
-  // Fixed: Process data for weekly view
- const processWeeklyData = (donations) => {
-  const weeksData = [];
-  const currentDate = new Date();
-  
-  // Set to start of current week (Sunday)
-  const startOfCurrentWeek = new Date(currentDate);
-  startOfCurrentWeek.setDate(currentDate.getDate() - currentDate.getDay());
-  startOfCurrentWeek.setHours(0, 0, 0, 0);
+  // Process data for weekly view
+  const processWeeklyData = (donations) => {
+    const weeksData = [];
+    const currentDate = new Date();
+    
+    // Set to start of current week (Sunday)
+    const startOfCurrentWeek = new Date(currentDate);
+    startOfCurrentWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    startOfCurrentWeek.setHours(0, 0, 0, 0);
 
-  // Generate data for last 10 weeks (including current week)
-  for (let i = 9; i >= 0; i--) {
-    const weekStartDate = new Date(startOfCurrentWeek);
-    weekStartDate.setDate(startOfCurrentWeek.getDate() - (i * 7));
-    
-    const weekEndDate = new Date(weekStartDate);
-    weekEndDate.setDate(weekStartDate.getDate() + 6);
-    weekEndDate.setHours(23, 59, 59, 999);
-    
-    // Format label
-    const startMonth = weekStartDate.getMonth() + 1;
-    const startDay = weekStartDate.getDate();
-    const endMonth = weekEndDate.getMonth() + 1;
-    const endDay = weekEndDate.getDate();
-    
-    const weekLabel = `${startMonth}/${startDay}-${endMonth}/${endDay}`;
-    
-    weeksData.push({
-      label: weekLabel,
-      verified: 0,
-      pending: 0,
-      rejected: 0,
-      weekStart: new Date(weekStartDate),
-      weekEnd: new Date(weekEndDate)
-    });
-  }
-  
-  // Populate data
-  donations.forEach(({ date, validationStatus }) => {
-    if (!date) return;
-    
-    const donationDate = new Date(date);
-    const status = validationStatus || "pending";
-    
-    // Find which week this donation belongs to
-    for (const weekData of weeksData) {
-      if (donationDate >= weekData.weekStart && donationDate <= weekData.weekEnd) {
-        if (status === "validated") {
-          weekData.verified++;
-        } else if (status === "pending") {
-          weekData.pending++;
-        } else if (status === "rejected") {
-          weekData.rejected++;
-        }
-        break;
-      }
+    // Generate data for last 10 weeks (including current week)
+    for (let i = 9; i >= 0; i--) {
+      const weekStartDate = new Date(startOfCurrentWeek);
+      weekStartDate.setDate(startOfCurrentWeek.getDate() - (i * 7));
+      
+      const weekEndDate = new Date(weekStartDate);
+      weekEndDate.setDate(weekStartDate.getDate() + 6);
+      weekEndDate.setHours(23, 59, 59, 999);
+      
+      // Format label
+      const startMonth = weekStartDate.getMonth() + 1;
+      const startDay = weekStartDate.getDate();
+      const endMonth = weekEndDate.getMonth() + 1;
+      const endDay = weekEndDate.getDate();
+      
+      const weekLabel = `${startMonth}/${startDay}-${endMonth}/${endDay}`;
+      
+      weeksData.push({
+        label: weekLabel,
+        verified: 0,
+        pending: 0,
+        rejected: 0,
+        weekStart: new Date(weekStartDate),
+        weekEnd: new Date(weekEndDate)
+      });
     }
-  });
-  
-  return weeksData;
-};
+    
+    // Populate data
+    donations.forEach(({ date, validationStatus }) => {
+      if (!date) return;
+      
+      const donationDate = new Date(date);
+      const status = validationStatus || "pending";
+      
+      // Find which week this donation belongs to
+      for (const weekData of weeksData) {
+        if (donationDate >= weekData.weekStart && donationDate <= weekData.weekEnd) {
+          if (status === "validated") {
+            weekData.verified++;
+          } else if (status === "pending") {
+            weekData.pending++;
+          } else if (status === "rejected") {
+            weekData.rejected++;
+          }
+          break;
+        }
+      }
+    });
+    
+    return weeksData;
+  };
   
   // Process data for daily view
   const processDailyData = (donations) => {
@@ -216,11 +205,8 @@ const StatusChart = ({ donations }) => {
   };
   
   return (
-    <div 
-      className="bg-white rounded-xl shadow-sm p-3" 
-      style={{ width: isSmallScreen ? '100%' : '890px', maxWidth: '890px' }}
-    >
-      <div className="flex justify-between mb-2 items-center flex-wrap gap-2">
+    <div className="bg-white rounded-xl shadow-sm p-4 h-full">
+      <div className="flex justify-between mb-4 items-center flex-wrap gap-2">
         <h3 className="font-semibold text-base">Donation Tracking</h3>
         <div className="inline-flex rounded-md shadow-sm">
           <button 
@@ -281,9 +267,9 @@ const StatusChart = ({ donations }) => {
         </div>
       </div>
       
-      <div style={{ height: 150 }}>
+      <div className="h-40">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 3, right: 10, left: 0, bottom: 3 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
             <XAxis 
               dataKey="label" 

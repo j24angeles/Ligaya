@@ -25,6 +25,9 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
 
   // Store validation errors
   const [errors, setErrors] = useState({});
+  
+  // Password strength tracking
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   // Initialize form with current user data if editing
   useEffect(() => {
@@ -60,6 +63,35 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
     setIsSubmitted(false);
   }, [currentUser, isOpen]);
 
+  // Calculate password strength
+  const calculatePasswordStrength = (password) => {
+    if (!password) return 0;
+    
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 6) strength += 1;
+    if (password.length >= 10) strength += 1;
+    
+    // Character variety checks
+    if (/[A-Z]/.test(password)) strength += 1;
+    if (/[0-9]/.test(password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    
+    return Math.min(strength, 5); // Max score of 5
+  };
+  
+  // Get strength label and color
+  const getStrengthInfo = (strength) => {
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const colors = ['#ff4d4d', '#ff9933', '#ffcc00', '#99cc33', '#70cc33', '#33cc33'];
+    
+    return {
+      label: labels[strength],
+      color: colors[strength]
+    };
+  };
+
   // Calculate age from birthdate
   const calculateAge = (birthdate) => {
     const birthDate = new Date(birthdate);
@@ -88,25 +120,28 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
       case 'email':
         if (value.trim() === '') return 'Email is required';
         if (value.length > 100) return 'Email must be 100 characters or less';
-        if (!/\S+@\S+\.\S+/.test(value)) return 'Email is invalid';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Please enter a valid email address';
         return '';
       case 'password':
+        // Only require password for new users
         if (!currentUser && value === '') return 'Password is required for new volunteers';
         if (value && value.length < 6) return 'Password must be at least 6 characters';
         if (value && value.length > 50) return 'Password must be 50 characters or less';
+        if (value && !/(?=.*[A-Z])(?=.*\d)/.test(value)) return 'Password must contain at least 1 number and 1 capital letter';
         return '';
       case 'birthdate':
-        if (value) {
-          // Check if date is in the future
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
-          const selectedDate = new Date(value);
-          if (selectedDate > today) return 'Birthdate cannot be in the future';
-          
-          // Check age is at least 13
-          const age = calculateAge(value);
-          if (age < 13) return 'Must be at least 13 years old';
-        }
+        if (value === '') return 'Birthdate is required';
+        
+        // Check if date is in the future
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+        const selectedDate = new Date(value);
+        if (selectedDate > today) return 'Birthdate cannot be in the future';
+        
+        // Check age is at least 13
+        const age = calculateAge(value);
+        if (age < 13) return 'You must be at least 13 years old';
+        
         return '';
       default:
         return '';
@@ -118,14 +153,14 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
     const newErrors = {};
     let isValid = true;
     
-    // Validate all required fields
+    // Validate all fields
     Object.entries(formData).forEach(([key, value]) => {
-      if (['firstName', 'lastName', 'email', 'password', 'birthdate'].includes(key)) {
-        const error = validateField(key, value);
-        if (error) {
-          newErrors[key] = error;
-          isValid = false;
-        }
+      if (key === 'role') return; // Skip role validation as it's fixed
+      
+      const error = validateField(key, value);
+      if (error) {
+        newErrors[key] = error;
+        isValid = false;
       }
     });
 
@@ -137,23 +172,38 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
+    // Enforce max lengths
+    let processedValue = value;
+    if (name === 'firstName' || name === 'lastName') {
+      processedValue = value.slice(0, 50);
+    } else if (name === 'email') {
+      processedValue = value.slice(0, 100);
+    } else if (name === 'password') {
+      processedValue = value.slice(0, 50);
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
     }));
+    
+    // Update password strength when password changes
+    if (name === 'password') {
+      setPasswordStrength(calculatePasswordStrength(processedValue));
+    }
     
     // Validate field if it's been touched or form has been submitted
     if (touched[name] || isSubmitted) {
       setErrors(prev => ({
         ...prev,
-        [name]: validateField(name, value)
+        [name]: validateField(name, processedValue)
       }));
     }
   };
 
   // Handle field blur to mark as touched
   const handleBlur = (e) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
     
     // Mark the field as touched
     setTouched(prev => ({
@@ -164,7 +214,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
     // Validate the field
     setErrors(prev => ({
       ...prev,
-      [name]: validateField(name, value)
+      [name]: validateField(name, formData[name])
     }));
   };
 
@@ -274,7 +324,7 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
             
             <div className="space-y-1">
               <label htmlFor="birthdate" className="block text-sm font-medium text-gray-700">
-                Birthdate
+                Birthdate*
               </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -314,6 +364,27 @@ const AdminUserFormModal = ({ isOpen, onClose, onSubmit, currentUser = null }) =
                 />
               </div>
               {shouldShowError('password') && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              
+              {/* Password strength indicator (only show when password has content) */}
+              {formData.password && (
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="flex-1 h-1 bg-gray-200 rounded-full">
+                    <div 
+                      className="h-1 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${(passwordStrength / 5) * 100}%`,
+                        backgroundColor: getStrengthInfo(passwordStrength).color
+                      }}
+                    />
+                  </div>
+                  <span 
+                    className="text-xs leading-none whitespace-nowrap"
+                    style={{ color: getStrengthInfo(passwordStrength).color }}
+                  >
+                    {getStrengthInfo(passwordStrength).label}
+                  </span>
+                </div>
+              )}
             </div>
             
             <div className="space-y-1">

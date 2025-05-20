@@ -13,7 +13,7 @@ const EventManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('active');
+  const [statusFilter, setStatusFilter] = useState('published'); // Default to published instead of active
   const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'upcoming', or 'past'
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
@@ -151,7 +151,10 @@ const EventManagement = () => {
       async () => {
         setIsLoading(true);
         try {
-          await updateEvent(eventId, { ...event, status: 'active' });
+          // Remove archived status (no 'active' status anymore)
+          const updatedEvent = { ...event };
+          delete updatedEvent.status; // Remove status field completely
+          await updateEvent(eventId, updatedEvent);
           showSuccess('Event restored successfully!');
           await fetchEvents();
         } catch (err) {
@@ -205,18 +208,15 @@ const EventManagement = () => {
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Apply status filter
-    const eventStatus = event.status || 'active'; // Default to active if status is not set
+    // Apply status filter - removed 'active' status
+    const eventStatus = event.status; // Will be undefined/null for regular events, 'archived' for archived ones
     const isPast = isEventInPast(event.date);
     
     let statusMatch = true;
-    if (statusFilter === 'active') {
-      // Active status should only include upcoming events, not past events
-      statusMatch = eventStatus === 'active' && !isPast;
-    }
+    // Status match logic - simplified without 'active' status
+    if (statusFilter === 'published') statusMatch = event.isPublished && !eventStatus;
+    if (statusFilter === 'draft') statusMatch = !event.isPublished && !eventStatus;
     if (statusFilter === 'archived') statusMatch = eventStatus === 'archived';
-    if (statusFilter === 'published') statusMatch = event.isPublished && eventStatus === 'active';
-    if (statusFilter === 'draft') statusMatch = !event.isPublished && eventStatus === 'active';
     if (statusFilter === 'all') statusMatch = true;
     
     // Apply time filter
@@ -306,7 +306,7 @@ const EventManagement = () => {
             </button>
           </div>
           
-          {/* Status Filter */}
+          {/* Status Filter - Removed 'active', defaults to 'published' */}
           <div className="flex items-center">
             <span className="mr-2 text-sm text-gray-600">Status:</span>
             <select
@@ -314,10 +314,9 @@ const EventManagement = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
               <option value="published">Published</option>
               <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
               <option value="all">All</option>
             </select>
           </div>
