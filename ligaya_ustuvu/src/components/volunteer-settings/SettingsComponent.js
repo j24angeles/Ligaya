@@ -34,13 +34,10 @@ const SettingsComponent = () => {
     try {
       const updatedUser = await updateUser(user.id, updatedData);
       
-      // Update the auth context with new user data
       updateAuthUser(updatedUser);
       
-      // Update local state
       setUserProfile(updatedData);
       
-      // Show success toast
       showSuccess('Profile updated successfully!');
       
     } catch (err) {

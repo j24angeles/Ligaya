@@ -18,6 +18,8 @@ import { isLoggedIn, getCurrentUser } from './api/auth';
 import { ToastProvider } from './hooks/ToastProvider';
 import UserDonationPage from './pages/volunteer/UserDonationPage';
 import VolunteerSettings from './pages/volunteer/VolunteerSettings';
+import AdminSettings from './pages/admin/AdminSettings';
+
 
 
 // Enhanced ProtectedRoute component that accepts allowedRoles
@@ -92,6 +94,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDonationPage />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/admin-settings"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminSettings />
                 </ProtectedRoute>
               }
             />
