@@ -20,7 +20,13 @@
       "role": "volunteer",
       "name": "Lyanna Cristobal",
       "id": 1747745429213,
-      "createdAt": "2025-05-20T12:50:29.213Z"
+      "createdAt": "2025-05-20T12:50:29.213Z",
+      "eventsJoined": [
+        1747746679835,
+        1747747241791,
+        1747746975124
+      ],
+      "updatedAt": "2025-05-20T13:40:40.077Z"
     },
     {
       "firstName": "Joaquin",
@@ -163,9 +169,15 @@
           "name": "Joaquin Angeles",
           "email": "joaquinmiguelangeless@gmail.com",
           "registeredAt": "2025-05-20T13:26:03.419Z"
+        },
+        {
+          "id": 1747745429213,
+          "name": "Lyanna Cristobal",
+          "email": "lyannacristobal@gmail.com",
+          "registeredAt": "2025-05-20T13:40:30.411Z"
         }
       ],
-      "updatedAt": "2025-05-20T13:26:03.419Z"
+      "updatedAt": "2025-05-20T13:40:30.411Z"
     },
     {
       "title": "UST UVU DDay",
@@ -195,9 +207,15 @@
           "name": "Joaquin Angeles",
           "email": "joaquinmiguelangeless@gmail.com",
           "registeredAt": "2025-05-20T13:26:06.390Z"
+        },
+        {
+          "id": 1747745429213,
+          "name": "Lyanna Cristobal",
+          "email": "lyannacristobal@gmail.com",
+          "registeredAt": "2025-05-20T13:40:40.024Z"
         }
       ],
-      "updatedAt": "2025-05-20T13:26:06.390Z"
+      "updatedAt": "2025-05-20T13:40:40.024Z"
     },
     {
       "title": "Strike a Pot!",
@@ -228,10 +246,16 @@
           "name": "Joaquin Angeles",
           "email": "joaquinmiguelangeless@gmail.com",
           "registeredAt": "2025-05-20T13:26:10.644Z"
+        },
+        {
+          "id": 1747745429213,
+          "name": "Lyanna Cristobal",
+          "email": "lyannacristobal@gmail.com",
+          "registeredAt": "2025-05-20T13:40:33.766Z"
         }
       ],
       "status": "archived",
-      "updatedAt": "2025-05-20T13:26:10.644Z"
+      "updatedAt": "2025-05-20T13:40:33.766Z"
     }
   ],
   "donations": [
