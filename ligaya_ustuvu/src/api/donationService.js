@@ -47,13 +47,14 @@ export const createDonation = async (donationData) => {
     const donationToSave = {
       ...donationData,
       id: Date.now(),
-      createdAt: new Date().toISOString(),
+      createdAt: donationData.createdAt || new Date().toISOString(),
       status: 'active',
-      validationStatus: 'pending',
-      isValidated: false,
-      rejectionReason: null,
-      validatedAt: null,
-      rejectedAt: null
+      validationStatus: donationData.validationStatus || 'pending',
+      isValidated: donationData.validationStatus === 'validated',
+      rejectionReason: donationData.rejectionReason || null,
+      validatedAt: donationData.validationStatus === 'validated' ? new Date().toISOString() : null,
+      rejectedAt: donationData.validationStatus === 'rejected' ? new Date().toISOString() : null,
+      updatedAt: new Date().toISOString()
     };
     
     const createResponse = await api.post('/donations', donationToSave);

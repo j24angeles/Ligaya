@@ -12,7 +12,14 @@ import {
   ChevronLeft, 
   ChevronRight, 
   CheckCircle,
-  XCircle
+  XCircle,
+  Info,
+  User as UserIcon,
+  DollarSign,
+  Calendar,
+  CreditCard,
+  Hash,
+  X
 } from 'lucide-react';
 import DonationFormModal from './AdminDonationFormModal';
 import ConfirmationModal from '../ConfirmationModal';
@@ -52,6 +59,8 @@ const AdminDonationManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const donationsPerPage = 10;
   const [validationFilter, setValidationFilter] = useState('all');
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedDonation, setSelectedDonation] = useState(null);
 
   const { showSuccess, showError, showInfo } = useToast();
 
@@ -98,7 +107,25 @@ const AdminDonationManagement = () => {
         onConfirm: async () => {
           setIsLoading(true);
           try {
-            await updateDonation(currentDonation.id, donationData);
+            const updatedData = {
+              ...donationData,
+              updatedAt: new Date().toISOString()
+            };
+
+            if (donationData.validationStatus === 'validated' && currentDonation.validationStatus !== 'validated') {
+              updatedData.validatedAt = new Date().toISOString();
+              updatedData.rejectedAt = null;
+              updatedData.rejectionReason = null;
+            } else if (donationData.validationStatus === 'rejected' && currentDonation.validationStatus !== 'rejected') {
+              updatedData.rejectedAt = new Date().toISOString();
+              updatedData.validatedAt = null;
+            } else if (donationData.validationStatus === 'pending' && currentDonation.validationStatus !== 'pending') {
+              updatedData.validatedAt = null;
+              updatedData.rejectedAt = null;
+              updatedData.rejectionReason = null;
+            }
+
+            await updateDonation(currentDonation.id, updatedData);
             await fetchDonations();
             setShowModal(false);
             setCurrentDonation(null);
@@ -121,7 +148,17 @@ const AdminDonationManagement = () => {
         onConfirm: async () => {
           setIsLoading(true);
           try {
-            await createDonation(donationData);
+            const newDonation = {
+              ...donationData,
+              createdAt: new Date().toISOString(),
+              status: 'active',
+              isValidated: donationData.validationStatus === 'validated',
+              validatedAt: donationData.validationStatus === 'validated' ? new Date().toISOString() : null,
+              rejectedAt: donationData.validationStatus === 'rejected' ? new Date().toISOString() : null,
+              updatedAt: new Date().toISOString()
+            };
+
+            await createDonation(newDonation);
             await fetchDonations();
             setShowModal(false);
             showSuccess(`Donation was recorded successfully`);
@@ -138,12 +175,14 @@ const AdminDonationManagement = () => {
     }
   };
 
-  const handleEdit = (donation) => {
+  const handleEdit = (donation, e) => {
+    e.stopPropagation();
     setCurrentDonation(donation);
     setShowModal(true);
   };
 
-  const handleArchive = (donation) => {
+  const handleArchive = (donation, e) => {
+    e.stopPropagation();
     openConfirmationModal({
       title: "Archive Donation",
       message: `Are you sure you want to archive this donation record?`,
@@ -166,7 +205,8 @@ const AdminDonationManagement = () => {
     });
   };
   
-  const handleRestore = (donation) => {
+  const handleRestore = (donation, e) => {
+    e.stopPropagation();
     openConfirmationModal({
       title: "Restore Donation",
       message: `Are you sure you want to restore this donation record to active status?`,
@@ -189,7 +229,8 @@ const AdminDonationManagement = () => {
     });
   };
   
-  const handleDelete = (donation) => {
+  const handleDelete = (donation, e) => {
+    e.stopPropagation();
     openConfirmationModal({
       title: "Delete Donation Permanently",
       message: `Are you sure you want to permanently delete this donation record?`,
@@ -212,7 +253,8 @@ const AdminDonationManagement = () => {
     });
   };
 
-  const handleValidate = (donation) => {
+  const handleValidate = (donation, e) => {
+    e.stopPropagation();
     openConfirmationModal({
       title: "Validate Donation",
       message: `Are you sure you want to validate this donation?`,
@@ -235,7 +277,8 @@ const AdminDonationManagement = () => {
     });
   };
 
-  const handleReject = (donation) => {
+  const handleReject = (donation, e) => {
+    e.stopPropagation();
     openConfirmationModal({
       title: "Reject Donation",
       message: `Are you sure you want to mark this donation as failed/not approved?`,
@@ -295,6 +338,16 @@ const AdminDonationManagement = () => {
       return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
     }
     return null;
+  };
+
+  const handleRowClick = (donation) => {
+    setSelectedDonation(donation);
+    setShowDetailsModal(true);
+  };
+
+  const handleDetailsModalClose = () => {
+    setShowDetailsModal(false);
+    setSelectedDonation(null);
   };
 
   const filteredDonations = donations.filter(donation => {
@@ -510,7 +563,11 @@ const AdminDonationManagement = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {currentDonations.map((donation) => (
-                  <tr key={donation.id} className="hover:bg-gray-50">
+                  <tr 
+                    key={donation.id} 
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleRowClick(donation)}
+                  >
                     <td className="px-4 py-4">
                       <div className="text-sm font-medium text-gray-900">
                         {getDonorName(donation.userId)}
@@ -559,21 +616,24 @@ const AdminDonationManagement = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td 
+                      className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <div className="flex justify-end space-x-2">
                         {donation.status !== 'archived' ? (
                           <>
                             {donation.validationStatus !== 'validated' && donation.validationStatus !== 'rejected' && (
                               <>
                                 <button
-                                  onClick={() => handleValidate(donation)}
+                                  onClick={(e) => handleValidate(donation, e)}
                                   className="text-green-600 hover:text-green-900"
                                   title="Validate donation"
                                 >
                                   <CheckCircle size={18} />
                                 </button>
                                 <button
-                                  onClick={() => handleReject(donation)}
+                                  onClick={(e) => handleReject(donation, e)}
                                   className="text-red-600 hover:text-red-900"
                                   title="Reject donation"
                                 >
@@ -582,14 +642,14 @@ const AdminDonationManagement = () => {
                               </>
                             )}
                             <button
-                              onClick={() => handleEdit(donation)}
+                              onClick={(e) => handleEdit(donation, e)}
                               className="text-indigo-600 hover:text-indigo-900"
                               title="Edit donation"
                             >
                               <Edit size={18} />
                             </button>
                             <button
-                              onClick={() => handleArchive(donation)}
+                              onClick={(e) => handleArchive(donation, e)}
                               className="text-amber-600 hover:text-amber-900"
                               title="Archive donation"
                             >
@@ -599,14 +659,14 @@ const AdminDonationManagement = () => {
                         ) : (
                           <>
                             <button
-                              onClick={() => handleRestore(donation)}
+                              onClick={(e) => handleRestore(donation, e)}
                               className="text-green-600 hover:text-green-900"
                               title="Restore donation"
                             >
                               <RefreshCw size={18} />
                             </button>
                             <button
-                              onClick={() => handleDelete(donation)}
+                              onClick={(e) => handleDelete(donation, e)}
                               className="text-red-600 hover:text-red-900"
                               title="Delete donation"
                             >
@@ -689,6 +749,125 @@ const AdminDonationManagement = () => {
             </div>
           </div>
         </>
+      )}
+
+      {/* Donation Details Modal */}
+      {selectedDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-xl font-semibold text-primary">
+                Donation Details
+              </h2>
+              <button
+                onClick={handleDetailsModalClose}
+                className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="flex items-start space-x-3">
+                <UserIcon className="text-gray-500 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm text-gray-500">Donor</p>
+                  <p className="font-medium">{getDonorName(selectedDonation.userId)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <DollarSign className="text-gray-500 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm text-gray-500">Amount</p>
+                  <p className="font-medium">{formatCurrency(selectedDonation.amount)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Calendar className="text-gray-500 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="font-medium">{formatDate(selectedDonation.date)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <CreditCard className="text-gray-500 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm text-gray-500">Payment Method</p>
+                  <p className="font-medium capitalize">
+                    {selectedDonation.paymentMethod ? selectedDonation.paymentMethod.replace('_', ' ') : 'Unknown'}
+                  </p>
+                </div>
+              </div>
+
+              {selectedDonation.paymentMethod !== 'cash' && selectedDonation.referenceNumber && (
+                <div className="flex items-start space-x-3">
+                  <Hash className="text-gray-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-sm text-gray-500">Reference Number</p>
+                    <p className="font-medium">{selectedDonation.referenceNumber}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-start space-x-3">
+                <Info className="text-gray-500 mt-0.5" size={18} />
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <div className="flex items-center">
+                    {selectedDonation.validationStatus === 'validated' ? (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Validated
+                      </span>
+                    ) : selectedDonation.validationStatus === 'rejected' ? (
+                      <div>
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          Rejected
+                        </span>
+                        {selectedDonation.rejectionReason && (
+                          <p className="text-sm text-gray-700 mt-1">
+                            Reason: {selectedDonation.rejectionReason}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {selectedDonation.validatedAt && (
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="text-green-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-sm text-gray-500">Validated At</p>
+                    <p className="font-medium">{formatDate(selectedDonation.validatedAt)}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedDonation.rejectedAt && (
+                <div className="flex items-start space-x-3">
+                  <XCircle className="text-red-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-sm text-gray-500">Rejected At</p>
+                    <p className="font-medium">{formatDate(selectedDonation.rejectedAt)}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end p-4 border-t space-x-2">
+             
+            
+            </div>
+          </div>
+        </div>
       )}
 
       <DonationFormModal

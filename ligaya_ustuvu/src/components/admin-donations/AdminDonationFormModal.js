@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, DollarSign, Calendar, X, Hash, CreditCard } from 'lucide-react';
+import { User, DollarSign, Calendar, X, Hash, CreditCard, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = null, users = [] }) => {
   const [formData, setFormData] = useState({
@@ -7,25 +7,25 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
     amount: '',
     date: new Date().toISOString().split('T')[0],
     paymentMethod: 'cash',
-    referenceNumber: ''
+    referenceNumber: '',
+    validationStatus: 'pending',
+    rejectionReason: ''
   });
 
-  // Track which fields have been touched by the user
   const [touched, setTouched] = useState({
     userId: false,
     amount: false,
     date: false,
     paymentMethod: false,
-    referenceNumber: false
+    referenceNumber: false,
+    validationStatus: false,
+    rejectionReason: false
   });
 
-  // Track if form has been submitted
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // Store validation errors
   const [errors, setErrors] = useState({});
+  const [showRejectionReason, setShowRejectionReason] = useState(false);
 
-  // Initialize form with current donation data if editing
   useEffect(() => {
     if (currentDonation) {
       setFormData({
@@ -33,31 +33,44 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
         amount: currentDonation.amount || '',
         date: currentDonation.date ? new Date(currentDonation.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         paymentMethod: currentDonation.paymentMethod || 'cash',
-        referenceNumber: currentDonation.referenceNumber || ''
+        referenceNumber: currentDonation.referenceNumber || '',
+        validationStatus: currentDonation.validationStatus || 'pending',
+        rejectionReason: currentDonation.rejectionReason || ''
       });
+      setShowRejectionReason(currentDonation.validationStatus === 'rejected');
     } else {
-      // Reset form when adding new donation
       setFormData({
         userId: '',
         amount: '',
         date: new Date().toISOString().split('T')[0],
         paymentMethod: 'cash',
-        referenceNumber: ''
+        referenceNumber: '',
+        validationStatus: 'pending',
+        rejectionReason: ''
       });
+      setShowRejectionReason(false);
     }
-    // Reset touched states and errors when modal opens/closes or changes between edit/create
+
     setTouched({
       userId: false,
       amount: false,
       date: false,
       paymentMethod: false,
-      referenceNumber: false
+      referenceNumber: false,
+      validationStatus: false,
+      rejectionReason: false
     });
     setErrors({});
     setIsSubmitted(false);
   }, [currentDonation, isOpen]);
 
-  // Validate a single field
+  useEffect(() => {
+    setShowRejectionReason(formData.validationStatus === 'rejected');
+    if (formData.validationStatus !== 'rejected') {
+      setFormData(prev => ({ ...prev, rejectionReason: '' }));
+    }
+  }, [formData.validationStatus]);
+
   const validateField = (name, value) => {
     switch (name) {
       case 'userId':
@@ -75,17 +88,22 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
           return 'Reference number is required for electronic payments';
         }
         return '';
+      case 'validationStatus':
+        return value.trim() === '' ? 'Validation status is required' : '';
+      case 'rejectionReason':
+        if (formData.validationStatus === 'rejected' && value.trim() === '') {
+          return 'Rejection reason is required when status is rejected';
+        }
+        return '';
       default:
         return '';
     }
   };
 
-  // Validate all fields
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
     
-    // Validate all required fields
     Object.entries(formData).forEach(([key, value]) => {
       const error = validateField(key, value);
       if (error) {
@@ -98,7 +116,6 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
     return isValid;
   };
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -107,7 +124,6 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
       [name]: value
     }));
     
-    // If payment method changes, handle reference number validation
     if (name === 'paymentMethod') {
       if (value === 'cash') {
         setFormData(prev => ({
@@ -118,7 +134,6 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
       }
     }
     
-    // Validate field if it's been touched or form has been submitted
     if (touched[name] || isSubmitted) {
       setErrors(prev => ({
         ...prev,
@@ -127,29 +142,24 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
     }
   };
 
-  // Handle field blur to mark as touched
   const handleBlur = (e) => {
     const { name, value } = e.target;
     
-    // Mark the field as touched
     setTouched(prev => ({
       ...prev,
       [name]: true
     }));
     
-    // Validate the field
     setErrors(prev => ({
       ...prev,
       [name]: validateField(name, value)
     }));
   };
 
-  // Helper to determine if error should be shown
   const shouldShowError = (fieldName) => {
     return (touched[fieldName] || isSubmitted) && errors[fieldName];
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
@@ -296,6 +306,59 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   />
                 </div>
                 {shouldShowError('referenceNumber') && <p className="text-red-500 text-xs mt-1">{errors.referenceNumber}</p>}
+              </div>
+            )}
+            
+            <div className="space-y-1">
+              <label htmlFor="validationStatus" className="block text-sm font-medium text-gray-700">
+                Validation Status*
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  {formData.validationStatus === 'validated' ? (
+                    <CheckCircle size={16} className="text-green-500" />
+                  ) : formData.validationStatus === 'rejected' ? (
+                    <XCircle size={16} className="text-red-500" />
+                  ) : (
+                    <Clock size={16} className="text-yellow-500" />
+                  )}
+                </span>
+                <select
+                  id="validationStatus"
+                  name="validationStatus"
+                  value={formData.validationStatus}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 pl-10 border ${shouldShowError('validationStatus') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="validated">Validated</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              {shouldShowError('validationStatus') && (
+                <p className="text-red-500 text-xs mt-1">{errors.validationStatus}</p>
+              )}
+            </div>
+            
+            {showRejectionReason && (
+              <div className="space-y-1 md:col-span-2">
+                <label htmlFor="rejectionReason" className="block text-sm font-medium text-gray-700">
+                  Rejection Reason*
+                </label>
+                <textarea
+                  id="rejectionReason"
+                  name="rejectionReason"
+                  value={formData.rejectionReason}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  className={`w-full p-2 border ${shouldShowError('rejectionReason') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  placeholder="Enter reason for rejection"
+                  rows="2"
+                />
+                {shouldShowError('rejectionReason') && (
+                  <p className="text-red-500 text-xs mt-1">{errors.rejectionReason}</p>
+                )}
               </div>
             )}
           </div>

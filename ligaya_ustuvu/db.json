@@ -71,7 +71,11 @@
       "role": "volunteer",
       "name": "Ryo Cristobal",
       "id": 1747565046120,
-      "createdAt": "2025-05-18T10:44:06.120Z"
+      "createdAt": "2025-05-18T10:44:06.120Z",
+      "donations": [
+        1747721165564
+      ],
+      "updatedAt": "2025-05-20T06:06:05.649Z"
     }
   ],
   "events": [
@@ -270,6 +274,22 @@
       "rejectionReason": null,
       "rejectedAt": null,
       "updatedAt": "2025-05-18T10:59:11.194Z"
+    },
+    {
+      "userId": "1747565046120",
+      "amount": "500",
+      "date": "2025-05-20",
+      "paymentMethod": "cash",
+      "referenceNumber": "",
+      "validationStatus": "rejected",
+      "rejectionReason": "did not receive.",
+      "createdAt": "2025-05-20T06:06:05.564Z",
+      "status": "active",
+      "isValidated": true,
+      "validatedAt": null,
+      "rejectedAt": "2025-05-20T06:06:47.929Z",
+      "updatedAt": "2025-05-20T06:06:47.963Z",
+      "id": 1747721165564
     }
   ]
 }
