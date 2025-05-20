@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, AlertCircle } from 'lucide-react';
+import { Plus, Search, AlertCircle, ArchiveIcon } from 'lucide-react';
 import EventFormModal from './EventFormModal';
 import EventCard from './EventCard';
 import ConfirmationModal from '../ConfirmationModal';
@@ -13,7 +13,7 @@ const EventManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('active');
   const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'upcoming', or 'past'
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
@@ -103,15 +103,76 @@ const EventManagement = () => {
     setShowModal(true);
   };
 
-  // Handle deleting event with confirmation
-  const handleDelete = (id) => {
+  // Handle archiving event
+  const handleArchive = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+
     confirmAction(
-      'Delete Event',
-      'Are you sure you want to delete this event? This action cannot be undone.',
+      'Archive Event',
+      `Are you sure you want to archive "${event.title}"? Archived events will no longer be visible to users.`,
       async () => {
         setIsLoading(true);
         try {
-          await deleteEvent(id);
+          await updateEvent(eventId, { ...event, status: 'archived' });
+          showSuccess('Event archived successfully!');
+          await fetchEvents();
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to archive event: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      'warning',
+      'Archive'
+    );
+  };
+
+  // Handle restoring event
+  const handleRestore = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+
+    confirmAction(
+      'Restore Event',
+      `Are you sure you want to restore "${event.title}"?`,
+      async () => {
+        setIsLoading(true);
+        try {
+          await updateEvent(eventId, { ...event, status: 'active' });
+          showSuccess('Event restored successfully!');
+          await fetchEvents();
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to restore event: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      'success',
+      'Restore'
+    );
+  };
+
+  // Handle deleting event with confirmation
+  const handleDelete = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+    
+    // Only allow deletion of archived events
+    if (event.status !== 'archived') {
+      showError('Only archived events can be deleted. Please archive the event first.');
+      return;
+    }
+
+    confirmAction(
+      'Delete Event Permanently',
+      `Are you sure you want to permanently delete "${event.title}"? This action cannot be undone.`,
+      async () => {
+        setIsLoading(true);
+        try {
+          await deleteEvent(eventId);
           showSuccess('Event deleted successfully!');
           await fetchEvents();
         } catch (err) {
@@ -121,7 +182,8 @@ const EventManagement = () => {
           setIsLoading(false);
         }
       },
-      'delete'
+      'delete',
+      'Delete Permanently'
     );
   };
 
@@ -133,9 +195,12 @@ const EventManagement = () => {
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Apply status filter
+    const eventStatus = event.status || 'active'; // Default to active if status is not set
     let statusMatch = true;
-    if (statusFilter === 'published') statusMatch = event.isPublished;
-    if (statusFilter === 'draft') statusMatch = !event.isPublished;
+    if (statusFilter === 'active') statusMatch = eventStatus === 'active';
+    if (statusFilter === 'archived') statusMatch = eventStatus === 'archived';
+    if (statusFilter === 'published') statusMatch = event.isPublished && eventStatus === 'active';
+    if (statusFilter === 'draft') statusMatch = !event.isPublished && eventStatus === 'active';
     
     // Apply time filter
     let timeMatch = true;
@@ -232,9 +297,11 @@ const EventManagement = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
               <option value="published">Published</option>
               <option value="draft">Draft</option>
+              <option value="all">All</option>
             </select>
           </div>
         </div>
@@ -267,6 +334,8 @@ const EventManagement = () => {
             event={event}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onArchive={handleArchive}
+            onRestore={handleRestore}
             isPastEvent={isEventInPast(event.date)}
           />
         ))}
@@ -288,7 +357,7 @@ const EventManagement = () => {
         message={confirmationData.message}
         onConfirm={confirmationData.onConfirm}
         type={confirmationData.type}
-        confirmText={confirmationData.type === 'delete' ? 'Delete' : 'Confirm'}
+        confirmText={confirmationData.type === 'delete' ? 'Delete' : confirmationData.confirmText}
       />
     </div>
   );
