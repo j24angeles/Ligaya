@@ -7,9 +7,8 @@ const Home = () => {
   return (
     <div className="font-poppins">
       <Navbar />
-      {/* Hero Section with Background Image */}
+      {/* Hero Section */}
       <section className="relative h-screen">
-        {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center" 
           style={{ 
@@ -236,7 +235,6 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Background decoration */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/20 rounded-full -mr-32 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/10 rounded-full -ml-40 -mb-40"></div>
       </section>

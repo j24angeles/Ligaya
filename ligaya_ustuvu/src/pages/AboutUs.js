@@ -4,11 +4,9 @@ import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 
 const AboutUs = () => {
-  // For the gallery slideshow effect
   const [activeSlide, setActiveSlide] = useState(0);
   const [isVisible, setIsVisible] = useState({});
   
-  // Reference images for gallery
   const galleryImages = [
     '/assets/aboutus-pics/1.jpg',
     '/assets/aboutus-pics/2.jpg',
@@ -24,7 +22,6 @@ const AboutUs = () => {
     '/assets/aboutus-pics/12.jpg',
   ];
   
-  // For the achievement counter animation
   const achievements = [
     { number: 19, text: 'Years of Service' },
     { number: 8, text: 'Award and Achievements' },
@@ -32,7 +29,6 @@ const AboutUs = () => {
     { number: 5, text: 'Major Programs' },
   ];
   
-  // Check if element is in viewport for animation triggers
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -68,7 +64,7 @@ const AboutUs = () => {
     <div className="font-poppins min-h-screen flex flex-col">
       <Navbar />
       
-      {/* Hero Section - Full Viewport Height */}
+      {/* Hero Section */}
       <section className="relative h-screen w-full flex items-center justify-center">
         <div 
           className="absolute inset-0 bg-cover bg-center"
@@ -92,7 +88,7 @@ const AboutUs = () => {
         
       </section>
       
-      {/* Our Story Section with Parallax Effect */}
+      {/* Our Story Section */}
       <section className="py-20 bg-white relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-fixed bg-cover bg-center opacity-5"
@@ -196,7 +192,7 @@ const AboutUs = () => {
 </section>
       
       
-      {/* Impact Numbers - Animated Counters */}
+      {/* Impact Numbers */}
       <section className="py-16 bg-primary text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -284,7 +280,7 @@ const AboutUs = () => {
             </div>
           </div>
           
-          {/* Interactive Gallery Grid - Visible on larger screens */}
+          {/* Interactive Gallery Grid */}
           <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-12">
             {galleryImages.map((img, index) => (
               <div 
@@ -321,8 +317,7 @@ const AboutUs = () => {
           </div>
           
           <div className="relative max-w-4xl mx-auto">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-primary"></div>
+\            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-primary"></div>
             
             {/* Timeline Items */}
             <div className="space-y-12">
