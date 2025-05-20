@@ -133,15 +133,14 @@ const Calendar = ({ events }) => {
   const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
   return (
-    <div 
-      className="bg-white rounded-xl shadow-sm p-2 mx-auto w-full max-w-5xl"
-      style={{ maxHeight: 280, overflowY: 'auto' }}
-    >
+    <div className="bg-white rounded-xl shadow-sm p-4 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <button onClick={prevMonth} className="p-1 rounded-full hover:bg-gray-100">
           <MdChevronLeft size={16} />
         </button>
-        <h3 className="font-medium text-xs">{getMonthName()}</h3>
+        <h3 className="font-semibold text-base">
+          {getMonthName()}
+        </h3>
         <button onClick={nextMonth} className="p-1 rounded-full hover:bg-gray-100">
           <MdChevronRight size={16} />
         </button>
@@ -149,18 +148,18 @@ const Calendar = ({ events }) => {
 
       <div className="grid grid-cols-7 gap-[1px] mb-1">
         {weekdays.map((day, index) => (
-          <div key={index} className="text-center text-[9px] font-medium text-gray-500 py-0.5 select-none">
+          <div key={index} className="text-center text-xs font-medium text-gray-500 py-0.5 select-none">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-[1px]">
+      <div className="grid grid-cols-7 gap-[1px] flex-grow">
         {days.map((day, index) => (
           <button
             key={index}
             onClick={() => handleDateClick(day)}
-            className={`relative h-6 flex items-center justify-center text-[10px] rounded-full transition-colors
+            className={`relative h-8 flex items-center justify-center text-sm rounded-full transition-colors
               ${!day.currentMonth ? 'text-gray-400' : ''}
               ${
                 isSameDate(day.date, new Date())
@@ -172,94 +171,91 @@ const Calendar = ({ events }) => {
           >
             {day.date.getDate()}
             {hasEvent(day.date) && (
-              <span className="absolute bottom-[2px] left-1/2 transform -translate-x-1/2 w-1 h-1 bg-secondary rounded-full"></span>
+              <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-secondary rounded-full"></span>
             )}
           </button>
         ))}
       </div>
 
      {eventModal.open && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-  <div className={`bg-white rounded-md p-4 mx-4 ${isSmallScreen ? 'w-full' : 'max-w-lg w-full'}`}>
-  <div className="flex justify-between items-center mb-2">
-    <h3 className="font-semibold text-sm">
-      {selectedDate?.toLocaleDateString('default', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })}
-    </h3>
-    <button onClick={closeEventModal} className="text-gray-500 hover:text-gray-700">
-      <MdClose size={16} />
-    </button>
-  </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className={`bg-white rounded-md p-4 mx-4 ${isSmallScreen ? 'w-full' : 'max-w-lg w-full'}`}>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-semibold text-sm">
+              {selectedDate?.toLocaleDateString('default', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </h3>
+            <button onClick={closeEventModal} className="text-gray-500 hover:text-gray-700">
+              <MdClose size={16} />
+            </button>
+          </div>
 
-  <hr className="mb-2" />
+          <hr className="mb-2" />
 
-  {eventModal.event ? (
-  <>
-   <table className="w-full text-sm text-left text-gray-700 mb-3">
-  <tbody>
-    <tr>
-      <td className="font-medium pr-2 align-top">Event Title:</td>
-      <td>{eventModal.event.title || 'N/A'}</td>
-    </tr>
-    {eventModal.event.description && (
-      <tr>
-        <td className="font-medium pr-2 align-top">Event Details:</td>
-        <td>{eventModal.event.description}</td>
-      </tr>
-    )}
-    {eventModal.event.time && (
-      <tr>
-        <td className="font-medium pr-2 align-top">Event Time:</td>
-        <td className="flex items-center gap-1">
-          <MdSchedule size={14} />
-          {eventModal.event.time}
-        </td>
-      </tr>
-    )}
-    {eventModal.event.location && (
-      <tr>
-        <td className="font-medium pr-2 align-top">Venue:</td>
-        <td className="flex items-center gap-1">
-          <MdPlace size={14} />
-          {eventModal.event.location}
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
+          {eventModal.event ? (
+            <>
+              <table className="w-full text-sm text-left text-gray-700 mb-3">
+                <tbody>
+                  <tr>
+                    <td className="font-medium pr-2 align-top">Event Title:</td>
+                    <td>{eventModal.event.title || 'N/A'}</td>
+                  </tr>
+                  {eventModal.event.description && (
+                    <tr>
+                      <td className="font-medium pr-2 align-top">Event Details:</td>
+                      <td>{eventModal.event.description}</td>
+                    </tr>
+                  )}
+                  {eventModal.event.time && (
+                    <tr>
+                      <td className="font-medium pr-2 align-top">Event Time:</td>
+                      <td className="flex items-center gap-1">
+                        <MdSchedule size={14} />
+                        {eventModal.event.time}
+                      </td>
+                    </tr>
+                  )}
+                  {eventModal.event.location && (
+                    <tr>
+                      <td className="font-medium pr-2 align-top">Venue:</td>
+                      <td className="flex items-center gap-1">
+                        <MdPlace size={14} />
+                        {eventModal.event.location}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
 
+              {eventModal.event.volunteers && eventModal.event.volunteers.length > 0 && (
+                <div className="mt-2">
+                  <h5 className="font-medium mb-1">
+                    Registered Volunteers ({eventModal.event.volunteers.length})
+                  </h5>
+                  <ul className="list-disc list-inside text-xs">
+                    {eventModal.event.volunteers.map((volunteer, idx) => (
+                      <li key={idx}>{volunteer.name}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-gray-600">No event on this date.</p>
+          )}
 
-    {eventModal.event.volunteers && eventModal.event.volunteers.length > 0 && (
-      <div className="mt-2">
-        <h5 className="font-medium mb-1">
-          Registered Volunteers ({eventModal.event.volunteers.length})
-        </h5>
-        <ul className="list-disc list-inside text-xs">
-          {eventModal.event.volunteers.map((volunteer, idx) => (
-            <li key={idx}>{volunteer.name}</li>
-          ))}
-        </ul>
+          <hr className="my-4" />
+
+          <div className="flex justify-end">
+            {/* Action buttons can go here if needed */}
+          </div>
+        </div>
       </div>
     )}
-  </>
-) : (
-  <p className="text-gray-600">No event on this date.</p>
-)}
-
-
-  <hr className="my-4" />
-
-  <div className="flex justify-end">
-   
   </div>
-</div>
-
-        </div>
-      )}
-    </div>
   );
 };
 
