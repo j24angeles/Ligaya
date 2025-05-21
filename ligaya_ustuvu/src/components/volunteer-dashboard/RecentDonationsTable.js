@@ -17,7 +17,13 @@ const RecentDonationsTable = () => {
       try {
         setLoading(true);
         const userDonations = await getDonationsByUserId(user.id);
-        setDonations(userDonations);
+        
+        // Filter out archived donations
+        const activeDonations = userDonations.filter(donation => 
+          donation.status !== 'archived'
+        );
+        
+        setDonations(activeDonations);
         setError(null);
       } catch (err) {
         console.error('Error fetching user donations:', err);

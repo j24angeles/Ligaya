@@ -28,11 +28,14 @@ const Calendar = ({ events }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Filter events to only show those the current user has joined
+  // Filter events to only show those the current user has joined AND that are not archived
   const getUserEvents = () => {
     if (!user || !events) return [];
+    
+    // Filter by user participation and non-archived status
     return events.filter(event => 
-      event.volunteers?.some(volunteer => volunteer.id === user.id)
+      event.volunteers?.some(volunteer => volunteer.id === user.id) && 
+      event.isArchived !== true // Only include events that are explicitly not archived
     );
   };
 

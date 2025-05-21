@@ -14,9 +14,10 @@ const DashboardCards = ({ events, donations }) => {
     if (events && donations && user) {
       const now = new Date();
       
-      // Filter events the user has joined
+      // Filter events the user has joined AND that are not archived
       const userEvents = events.filter(event => 
-        event.volunteers?.some(volunteer => volunteer.id === user.id)
+        event.volunteers?.some(volunteer => volunteer.id === user.id) &&
+        event.status !== 'archived'
       );
 
       // Count upcoming events
@@ -31,10 +32,11 @@ const DashboardCards = ({ events, donations }) => {
         return eventDate < now;
       }).length;
 
-      // Calculate user's total donations (only validated ones)
-      // Updated to match the validationStatus field used in RecentDonationsTable
+      // Calculate user's total donations (only validated ones AND not archived)
       const userVerifiedDonations = donations.filter(
-        donation => donation.userId === user.id && donation.validationStatus === 'validated'
+        donation => donation.userId === user.id && 
+                    donation.validationStatus === 'validated' &&
+                    donation.status !== 'archived'
       );
       
       const totalDonationsAmount = userVerifiedDonations.reduce((sum, donation) => {
