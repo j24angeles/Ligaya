@@ -156,22 +156,35 @@ const EventManagement = () => {
   };
 
   const filteredEvents = events.filter(event => {
+    // Text search filter
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const eventStatus = event.status;
+    // Time filter (past/upcoming)
     const isPast = isEventInPast(event.date);
-    
-    let statusMatch = true;
-    if (statusFilter === 'published') statusMatch = event.isPublished && !eventStatus;
-    if (statusFilter === 'draft') statusMatch = !event.isPublished && !eventStatus;
-    if (statusFilter === 'archived') statusMatch = eventStatus === 'archived';
-    if (statusFilter === 'all') statusMatch = true;
-    
     let timeMatch = true;
     if (timeFilter === 'upcoming') timeMatch = !isPast;
     if (timeFilter === 'past') timeMatch = isPast;
+    
+    // Status filter
+    let statusMatch = false;
+    if (statusFilter === 'published') {
+      // Published: isPublished is true AND status is not 'archived' or 'draft'
+      statusMatch = event.isPublished === true && event.status !== 'archived' && event.status !== 'draft';
+    } 
+    else if (statusFilter === 'draft') {
+      // Draft: status is 'draft' OR isPublished is explicitly false
+      statusMatch = event.status === 'draft' || event.isPublished === false;
+    }
+    else if (statusFilter === 'archived') {
+      // Archived: status is 'archived'
+      statusMatch = event.status === 'archived';
+    }
+    else if (statusFilter === 'all') {
+      // All: no filtering by status
+      statusMatch = true;
+    }
     
     return matchesSearch && statusMatch && timeMatch;
   });

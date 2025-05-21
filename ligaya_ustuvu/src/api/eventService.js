@@ -60,13 +60,28 @@ export const getEventById = async (id) => {
  */
 export const createEvent = async (eventData) => {
   try {
+    // Fix issue where published events could still have draft status
+    // If isPublished is true, we should NOT set status to draft
+    let status = eventData.status;
+    
+    // If isPublished is true but status is 'draft' or not defined, 
+    // we should clear the status field (for published events)
+    if (eventData.isPublished === true) {
+      if (!status || status === 'draft') {
+        status = undefined; // Clear the status for published events
+      }
+    } else {
+      // If not published, default to draft status
+      status = status || 'draft';
+    }
+    
     const response = await api.post('/events', {
       ...eventData,
       id: Date.now(),
       createdAt: new Date().toISOString(),
       volunteers: [],
       isPublished: eventData.isPublished || false,
-      status: eventData.status || "draft"
+      status: status
     });
     return response.data;
   } catch (error) {
@@ -83,8 +98,18 @@ export const createEvent = async (eventData) => {
  */
 export const updateEvent = async (id, eventData) => {
   try {
+    // Fix the same issue for updates: make sure published events don't have draft status
+    let updatedData = { ...eventData };
+    
+    if (updatedData.isPublished === true) {
+      // If event is being published and status is draft, remove the draft status
+      if (updatedData.status === 'draft') {
+        delete updatedData.status;
+      }
+    }
+    
     const response = await api.put(`/events/${id}`, {
-      ...eventData,
+      ...updatedData,
       updatedAt: new Date().toISOString()
     });
     return response.data;
