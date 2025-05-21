@@ -17,26 +17,40 @@ const DashboardCards = ({ events, donations, users }) => {
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
 
-      // Fixed event filtering logic to match eventService.js structure
+      // Count upcoming events
       const upcomingEventsCount = events.filter(event => {
-        // Check if event has a date and is in the future
         return event.date && new Date(event.date) > now && event.isPublished !== false;
       }).length;
 
+      // Count active volunteers
       const volunteerCount = users.filter(user => {
         return user.role === 'volunteer' && user.status !== 'archived';
       }).length;
 
+      // Calculate total donations - ABSOLUTELY NO ARCHIVED DONATIONS
       const totalDonationsAmount = donations
         .filter(donation => {
-          if (donation.validationStatus !== 'validated') return false;
+          // First check if donation is archived - this takes priority over everything
+          if (donation.status === 'archived') {
+            return false; // Immediately exclude if archived
+          }
+          
+          // Then check validation status
+          if (donation.validationStatus !== 'validated') {
+            return false;
+          }
+          
+          // Finally check date
           const donationDate = new Date(donation.createdAt);
           return (
             donationDate.getMonth() === currentMonth &&
             donationDate.getFullYear() === currentYear
           );
         })
-        .reduce((sum, donation) => sum + (parseFloat(donation.amount) || 0), 0);
+        .reduce((sum, donation) => {
+          const amount = parseFloat(donation.amount) || 0;
+          return sum + amount;
+        }, 0);
 
       setStats({
         upcomingEvents: upcomingEventsCount,

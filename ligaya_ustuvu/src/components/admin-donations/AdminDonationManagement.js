@@ -357,8 +357,10 @@ const AdminDonationManagement = () => {
       donorName.includes(searchTerm.toLowerCase()) || 
       (donation.referenceNumber && donation.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const donationStatus = donation.status || 'active';
-    const matchesStatus = statusFilter === 'all' || donationStatus === statusFilter;
+    const matchesStatus = 
+      statusFilter === 'all' || 
+      (statusFilter === 'active' && donation.status !== 'archived') || 
+      (statusFilter === 'archived' && donation.status === 'archived');
     
     const validationStatus = donation.validationStatus || 'pending';
     const matchesValidation = 

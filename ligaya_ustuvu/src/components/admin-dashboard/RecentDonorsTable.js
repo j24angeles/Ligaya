@@ -1,3 +1,4 @@
+// RecentDonorsTable.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaUser } from 'react-icons/fa';
@@ -12,7 +13,8 @@ const RecentDonorsTable = () => {
     const fetchData = async () => {
       try {
         const [donRes, userRes] = await Promise.all([
-          axios.get('http://localhost:3001/donations?_sort=date,createdAt&_order=desc&_limit=3'),
+          // Added status=active filter to exclude archived donations
+          axios.get('http://localhost:3001/donations?status=active&_sort=date,createdAt&_order=desc&_limit=3'),
           axios.get('http://localhost:3001/users'),
         ]);
         

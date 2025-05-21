@@ -1,46 +1,76 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { FaUser, FaTrophy } from 'react-icons/fa';
 
-const TopDonorsList = ({ donations = [], users = [], max = 3 }) => {
+const TopDonorsList = () => {
+  const [donations, setDonations] = useState([]);
+  const [users, setUsers] = useState([]);
   const [topDonors, setTopDonors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const max = 3;
 
   useEffect(() => {
-    const processTopDonors = () => {
-      const now = new Date();
-
-      const thisMonthDonations = donations.filter(d => {
-        const dDate = new Date(d.date || d.createdAt);
-        return (
-          d.isValidated &&
-          dDate.getFullYear() === now.getFullYear() &&
-          dDate.getMonth() === now.getMonth()
-        );
-      });
-
-      // Sum total donations per userId
-      const totalsMap = thisMonthDonations.reduce((acc, d) => {
-        const amt = parseFloat(d.amount) || 0;
-        acc[d.userId] = (acc[d.userId] || 0) + amt;
-        return acc;
-      }, {});
-
-      // Sort and format result
-      const sorted = Object.entries(totalsMap)
-        .map(([userId, total]) => {
-          const u = users.find(u => u.id.toString() === userId.toString());
-          const name = u ? (u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim()) : 'Unknown';
-          return { userId, total, name };
-        })
-        .sort((a, b) => b.total - a.total)
-        .slice(0, max);
-
-      setTopDonors(sorted);
-      setLoading(false);
+    const fetchData = async () => {
+      try {
+        const [donRes, userRes] = await Promise.all([
+          // Only get active donations, not archived ones
+          axios.get('http://localhost:3001/donations?status=active'),
+          axios.get('http://localhost:3001/users'),
+        ]);
+        
+        setDonations(donRes.data);
+        setUsers(userRes.data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load donations or users:', err);
+        setError('Failed to load top donors data');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    processTopDonors();
-  }, [donations, users, max]);
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (donations.length > 0 && users.length > 0) {
+      processTopDonors();
+    }
+  }, [donations, users]);
+
+  const processTopDonors = () => {
+    const now = new Date();
+
+    const thisMonthDonations = donations.filter(d => {
+      const dDate = new Date(d.date || d.createdAt);
+      return (
+        // Changed to check validationStatus for consistency and status is already filtered in API call
+        d.validationStatus === 'validated' &&
+        dDate.getFullYear() === now.getFullYear() &&
+        dDate.getMonth() === now.getMonth()
+      );
+    });
+
+    // Sum total donations per userId
+    const totalsMap = thisMonthDonations.reduce((acc, d) => {
+      const amt = parseFloat(d.amount) || 0;
+      acc[d.userId] = (acc[d.userId] || 0) + amt;
+      return acc;
+    }, {});
+
+    // Sort and format result
+    const sorted = Object.entries(totalsMap)
+      .map(([userId, total]) => {
+        const u = users.find(u => u.id.toString() === userId.toString());
+        const name = u ? (u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.username) : 'Unknown';
+        return { userId, total, name };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, max);
+
+    setTopDonors(sorted);
+  };
 
   const getDonorInitials = (userId) => {
     const user = users.find(u => u.id.toString() === userId.toString());
@@ -78,6 +108,14 @@ const TopDonorsList = ({ donations = [], users = [], max = 3 }) => {
         <div className="text-center text-gray-500 my-4 text-xs">
           Loading top donors...
         </div>
+      </TableWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <TableWrapper>
+        <div className="text-center text-red-500 my-4 text-xs">{error}</div>
       </TableWrapper>
     );
   }

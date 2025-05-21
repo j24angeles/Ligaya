@@ -375,7 +375,7 @@
       "rejectionReason": null,
       "validatedAt": "2025-05-20T13:28:53.758Z",
       "rejectedAt": null,
-      "updatedAt": "2025-05-20T13:28:53.758Z"
+      "updatedAt": "2025-05-21T00:16:37.726Z"
     },
     {
       "userId": 1747746276492,
@@ -385,13 +385,13 @@
       "referenceNumber": "132141452341",
       "id": 1747747602412,
       "createdAt": "2025-05-20T13:26:42.412Z",
-      "status": "active",
+      "status": "archived",
       "validationStatus": "validated",
       "isValidated": true,
       "rejectionReason": null,
       "validatedAt": "2025-05-20T13:28:56.163Z",
       "rejectedAt": null,
-      "updatedAt": "2025-05-20T13:28:56.163Z"
+      "updatedAt": "2025-05-20T23:57:01.852Z"
     },
     {
       "userId": 1747746276492,
@@ -449,13 +449,13 @@
       "referenceNumber": "",
       "id": 1747748951136,
       "createdAt": "2025-05-20T13:49:11.136Z",
-      "status": "active",
+      "status": "archived",
       "validationStatus": "rejected",
       "isValidated": false,
       "rejectionReason": "",
       "validatedAt": null,
       "rejectedAt": "2025-05-20T13:49:47.081Z",
-      "updatedAt": "2025-05-20T13:49:47.081Z"
+      "updatedAt": "2025-05-20T23:56:40.970Z"
     },
     {
       "userId": 1747746301057,
