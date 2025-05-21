@@ -32,23 +32,25 @@ const DonationTable = ({ donations }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDonation, setSelectedDonation] = useState(null);
 
-  // Filter donations - Fixed status matching
-const filteredDonations = donations.filter(donation => {
-  const matchesSearch = 
-    donation.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    donation.amount.toString().includes(searchTerm);
+  // Only show active donations (filter out archived ones)
+  const activeDonations = donations.filter(donation => 
+    donation.status !== 'archived'
+  );
 
-  // Fallback if the validationStatus is undefined
-  const donationStatus = donation.validationStatus || 'pending'; 
+  // Filter donations based on user criteria
+  const filteredDonations = activeDonations.filter(donation => {
+    const matchesSearch = 
+      donation.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donation.amount.toString().includes(searchTerm);
 
-  const statusMatch = filterStatus === 'all' || donationStatus.toLowerCase() === filterStatus.toLowerCase();
-  const methodMatch = filterMethod === 'all' || donation.paymentMethod === filterMethod;
+    // Fallback if the validationStatus is undefined
+    const donationStatus = donation.validationStatus || 'pending'; 
 
-  return matchesSearch && statusMatch && methodMatch;
-});
+    const statusMatch = filterStatus === 'all' || donationStatus.toLowerCase() === filterStatus.toLowerCase();
+    const methodMatch = filterMethod === 'all' || donation.paymentMethod === filterMethod;
 
-
-
+    return matchesSearch && statusMatch && methodMatch;
+  });
 
   // Sort donations
   const sortedDonations = [...filteredDonations].sort((a, b) => {
@@ -101,7 +103,7 @@ const filteredDonations = donations.filter(donation => {
     return sortConfig.direction === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
   };
 
-  if (donations.length === 0) {
+  if (activeDonations.length === 0) {
     return (
       <div className="text-center py-8">
         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

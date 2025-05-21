@@ -17,11 +17,15 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
 
     const filterEvents = () => {
       if (!user || !user.id) {
-        return events.filter(event => event.isPublished !== false);
+        return events.filter(event => 
+          event.isPublished !== false && 
+          event.status !== 'archived'
+        );
       }
 
       return events.filter(event => {
-        if (event.isPublished === false) return false;
+        // Exclude unpublished or archived events
+        if (event.isPublished === false || event.status === 'archived') return false;
 
         if ((event.userId && String(event.userId) === String(user.id)) ||
             (event.creatorId && String(event.creatorId) === String(user.id))) {
@@ -168,7 +172,7 @@ const EventsCarousel = ({ events = [], refreshTrigger }) => {
                     {formatEventDate(event.date, event.time)}
                   </span>
                 </div>
-<h3 className="font-medium text-gray-900 text-xs line-clamp-2 mt-2">
+                <h3 className="font-medium text-gray-900 text-xs line-clamp-2 mt-2">
                   {event.title || 'Untitled Event'}
                 </h3>
               </div>

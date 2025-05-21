@@ -19,7 +19,8 @@ const UpcomingEventsTable = () => {
 
         const now = new Date();
         const upcoming = userEvents.filter((event) => {
-          if (!event.date) return false;
+          // Filter out archived events and make sure the date is in the future
+          if (!event.date || event.status === 'archived') return false;
           const eventDate = new Date(event.date);
           return eventDate > now;
         });
