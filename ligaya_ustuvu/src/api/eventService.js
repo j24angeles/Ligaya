@@ -1,14 +1,11 @@
 import axios from 'axios';
-
 const API_URL = 'http://localhost:3001';
-
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
 });
-
 /**
  * Fetches all events from the server
  * @returns {Promise<Array>} Array of event objects
@@ -20,6 +17,24 @@ export const getAllEvents = async () => {
   } catch (error) {
     console.error('Error fetching all events:', error);
     throw error.response?.data || new Error('Failed to fetch events');
+  }
+};
+
+/**
+ * Fetches all published events that are not archived
+ * @returns {Promise<Array>} Array of published, non-archived event objects
+ */
+export const getPublishedEvents = async () => {
+  try {
+    const response = await api.get('/events');
+    // Filter to only include published and non-archived events
+    return response.data.filter(event => 
+      event.isPublished === true && 
+      event.status !== "archived"
+    );
+  } catch (error) {
+    console.error('Error fetching published events:', error);
+    throw error.response?.data || new Error('Failed to fetch published events');
   }
 };
 
@@ -50,7 +65,8 @@ export const createEvent = async (eventData) => {
       id: Date.now(),
       createdAt: new Date().toISOString(),
       volunteers: [],
-      isPublished: eventData.isPublished || false
+      isPublished: eventData.isPublished || false,
+      status: eventData.status || "draft"
     });
     return response.data;
   } catch (error) {
@@ -94,6 +110,25 @@ export const deleteEvent = async (id) => {
 };
 
 /**
+ * Archives an event instead of deleting it
+ * @param {string|number} id - Event ID
+ * @returns {Promise<Object>} Updated event object
+ */
+export const archiveEvent = async (id) => {
+  try {
+    const event = await getEventById(id);
+    const updatedEvent = await updateEvent(id, {
+      ...event,
+      status: "archived"
+    });
+    return updatedEvent;
+  } catch (error) {
+    console.error(`Error archiving event ${id}:`, error);
+    throw error.response?.data || new Error('Failed to archive event');
+  }
+};
+
+/**
  * Registers a user for an event
  * @param {string|number} eventId - Event ID
  * @param {Object} userData - User data
@@ -103,6 +138,16 @@ export const registerForEvent = async (eventId, userData) => {
   try {
     const event = await getEventById(eventId);
     
+    // Check if the event is archived
+    if (event.status === "archived") {
+      throw new Error('Cannot register for an archived event');
+    }
+    
+    // Check if the event is published
+    if (event.isPublished !== true) {
+      throw new Error('Cannot register for an unpublished event');
+    }
+    
     // Check if already registered
     const isRegistered = event.volunteers?.some(
       v => String(v.id) === String(userData.id)
@@ -111,7 +156,6 @@ export const registerForEvent = async (eventId, userData) => {
     if (isRegistered) {
       throw new Error('User already registered for this event');
     }
-
     const updatedEvent = await updateEvent(eventId, {
       ...event,
       volunteers: [
@@ -124,7 +168,6 @@ export const registerForEvent = async (eventId, userData) => {
         }
       ]
     });
-
     await updateUserEvents(userData.id, eventId);
     return updatedEvent;
   } catch (error) {
@@ -142,14 +185,18 @@ export const registerForEvent = async (eventId, userData) => {
 export const cancelEventRegistration = async (eventId, userId) => {
   try {
     const event = await getEventById(eventId);
-
+    
+    // Check if the event is archived
+    if (event.status === "archived") {
+      throw new Error('Cannot modify registration for an archived event');
+    }
+    
     const updatedEvent = await updateEvent(eventId, {
       ...event,
       volunteers: (event.volunteers || []).filter(
         v => String(v.id) !== String(userId)
       )
     });
-
     await removeUserEvent(userId, eventId);
     return updatedEvent;
   } catch (error) {
@@ -169,8 +216,14 @@ export const getUserEvents = async (userId) => {
       api.get(`/users/${userId}`),
       getAllEvents()
     ]);
-
+    
+    // Filter out archived events from user's events
     return allEvents.filter(event => {
+      // Skip archived events
+      if (event.status === "archived") {
+        return false;
+      }
+      
       const isVolunteer = event.volunteers?.some(
         v => String(v.id) === String(userId)
       );
@@ -192,7 +245,6 @@ export const getUpcomingUserEvents = async (userId) => {
   try {
     const userEvents = await getUserEvents(userId);
     const now = new Date();
-
     return userEvents
       .filter(event => event.date && new Date(event.date) > now)
       .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -235,10 +287,12 @@ const removeUserEvent = async (userId, eventId) => {
 
 export default {
   getAllEvents,
+  getPublishedEvents,
   getEventById,
   createEvent,
   updateEvent,
   deleteEvent,
+  archiveEvent,
   registerForEvent,
   cancelEventRegistration,
   getUserEvents,
