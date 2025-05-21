@@ -5,7 +5,6 @@ import {
   AlertCircle, 
   Edit, 
   Archive, 
-  Trash2, 
   ChevronDown, 
   ChevronUp, 
   RefreshCw, 
@@ -28,7 +27,6 @@ import {
   getAllDonations, 
   createDonation, 
   updateDonation, 
-  deleteDonation, 
   archiveDonation, 
   restoreDonation, 
   validateDonation,
@@ -225,30 +223,6 @@ const AdminDonationManagement = () => {
         }
       },
       confirmText: "Restore",
-      cancelText: "Cancel"
-    });
-  };
-  
-  const handleDelete = (donation, e) => {
-    e.stopPropagation();
-    openConfirmationModal({
-      title: "Delete Donation Permanently",
-      message: `Are you sure you want to permanently delete this donation record?`,
-      type: "delete",
-      onConfirm: async () => {
-        setIsLoading(true);
-        try {
-          await deleteDonation(donation.id);
-          await fetchDonations();
-          showSuccess(`Donation record was permanently deleted`);
-        } catch (err) {
-          setError(err.message);
-          showError(`Failed to delete donation: ${err.message}`);
-        } finally {
-          setIsLoading(false);
-        }
-      },
-      confirmText: "Delete Permanently",
       cancelText: "Cancel"
     });
   };
@@ -659,22 +633,13 @@ const AdminDonationManagement = () => {
                             </button>
                           </>
                         ) : (
-                          <>
-                            <button
-                              onClick={(e) => handleRestore(donation, e)}
-                              className="text-green-600 hover:text-green-900"
-                              title="Restore donation"
-                            >
-                              <RefreshCw size={18} />
-                            </button>
-                            <button
-                              onClick={(e) => handleDelete(donation, e)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Delete donation"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </>
+                          <button
+                            onClick={(e) => handleRestore(donation, e)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Restore donation"
+                          >
+                            <RefreshCw size={18} />
+                          </button>
                         )}
                       </div>
                     </td>
