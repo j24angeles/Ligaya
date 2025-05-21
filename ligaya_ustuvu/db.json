@@ -129,7 +129,9 @@
       "role": "volunteer",
       "name": "Ralph De Guzman",
       "id": 1747746436357,
-      "createdAt": "2025-05-20T13:07:16.357Z"
+      "createdAt": "2025-05-20T13:07:16.357Z",
+      "status": "archived",
+      "updatedAt": "2025-05-21T00:17:54.308Z"
     },
     {
       "firstName": "Mikko",

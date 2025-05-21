@@ -15,6 +15,7 @@ const Calendar = ({ events }) => {
     event: null,
   });
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [filteredEvents, setFilteredEvents] = useState([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,6 +26,38 @@ const Calendar = ({ events }) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Filter out archived events - More robust check
+  useEffect(() => {
+    if (!events || !Array.isArray(events)) {
+      setFilteredEvents([]);
+      return;
+    }
+    
+    console.log('Original events received:', events.length);
+    
+    // More robust filter that handles all possible archive indicators
+    const activeEvents = events.filter(event => {
+      // If any archive indicator is present, filter out the event
+      if (event.isArchived === true) return false;
+      if (event.status === 'archived') return false;
+      
+      // Double check for any archived property with any case variation
+      const eventKeys = Object.keys(event);
+      for (const key of eventKeys) {
+        const lowerKey = key.toLowerCase();
+        if (lowerKey.includes('archive') && event[key] === true) return false;
+        if (lowerKey === 'status' && String(event[key]).toLowerCase() === 'archived') return false;
+      }
+      
+      return true;
+    });
+    
+    console.log('Filtered events:', activeEvents.length, 'out of', events.length);
+    console.log('Events removed:', events.length - activeEvents.length);
+    
+    setFilteredEvents(activeEvents);
+  }, [events]);
 
   const generateCalendarDays = () => {
     const year = currentMonth.getFullYear();
@@ -92,13 +125,29 @@ const Calendar = ({ events }) => {
   };
 
   const hasEvent = (date) => {
-    if (!events || !events.length) return false;
-    return events.some(event => isSameDate(date, event.date));
+    if (!filteredEvents || !filteredEvents.length) return false;
+    
+    // Double-check to make sure no archived events slip through
+    return filteredEvents.some(event => {
+      // Skip any archived events that might have slipped through
+      if (event.isArchived || event.status === 'archived') return false;
+      
+      // Only after verifying it's not archived, check the date
+      return isSameDate(date, event.date);
+    });
   };
 
   const getEventForDate = (date) => {
-    if (!events || !events.length) return null;
-    return events.find(event => isSameDate(date, event.date));
+    if (!filteredEvents || !filteredEvents.length) return null;
+    
+    // Double-check to make sure no archived events slip through
+    return filteredEvents.find(event => {
+      // Skip any archived events that might have slipped through
+      if (event.isArchived || event.status === 'archived') return false;
+      
+      // Only after verifying it's not archived, check the date
+      return isSameDate(date, event.date);
+    });
   };
 
   const handleDateClick = (day) => {
