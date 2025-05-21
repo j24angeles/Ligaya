@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
-import { getAllEvents, registerForEvent, cancelEventRegistration } from '../../api/eventService';
+import { getPublishedEvents, registerForEvent, cancelEventRegistration } from '../../api/eventService';
 import PublicEventCard from './PublicEventCard';
 import { useToast } from '../../hooks/ToastProvider';
 
@@ -16,9 +16,8 @@ const PublicEventList = ({ currentUser }) => {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const data = await getAllEvents();
-      // Only show published events
-      const publishedEvents = data.filter(event => event.isPublished);
+      // Use the getPublishedEvents function which already filters out archived events
+      const publishedEvents = await getPublishedEvents();
       
       // Sort events by date (nearest date first)
       const sortedEvents = [...publishedEvents].sort((a, b) => {
@@ -86,74 +85,77 @@ const PublicEventList = ({ currentUser }) => {
   };
 
   // Filter events based on search term and filter type
-  const filteredEvents = events.filter(event => {
-    // First apply search filter
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Apply registration filter
-    if (filter === 'registered') {
-      return matchesSearch && isUserRegistered(event);
-    }
-    // Then apply time filter
-    else if (filter === 'upcoming') {
-      return matchesSearch && !isEventInPast(event.date);
-    } else if (filter === 'past') {
-      return matchesSearch && isEventInPast(event.date);
-    }
-    
-    // All events
-    return matchesSearch;
-  }).sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    
-    // For upcoming events tab, sort by nearest date first
-    if (filter === 'upcoming') {
-      return dateA - dateB;
-    }
-    // For past events tab, sort by most recent past date first
-    else if (filter === 'past') {
-      return dateB - dateA;
-    }
-    // For registered events, sort by nearest date first, with upcoming events before past events
-    else if (filter === 'registered') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+  const filteredEvents = events
+    // Make sure no archived events are shown in any view
+    .filter(event => event.status !== "archived") 
+    .filter(event => {
+      // First apply search filter
+      const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // If one is past and one is upcoming, upcoming comes first
-      const aIsPast = dateA < today;
-      const bIsPast = dateB < today;
+      // Apply registration filter
+      if (filter === 'registered') {
+        return matchesSearch && isUserRegistered(event);
+      }
+      // Then apply time filter
+      else if (filter === 'upcoming') {
+        return matchesSearch && !isEventInPast(event.date);
+      } else if (filter === 'past') {
+        return matchesSearch && isEventInPast(event.date);
+      }
       
-      if (aIsPast && !bIsPast) return 1;
-      if (!aIsPast && bIsPast) return -1;
+      // All events
+      return matchesSearch;
+    }).sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
       
-      // If both are upcoming, nearest first
-      if (!aIsPast && !bIsPast) return dateA - dateB;
-      
-      // If both are past, most recent first
-      return dateB - dateA;
-    }
-    // For all events, sort by nearest date first, with upcoming events before past events
-    else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      // If one is past and one is upcoming, upcoming comes first
-      const aIsPast = dateA < today;
-      const bIsPast = dateB < today;
-      
-      if (aIsPast && !bIsPast) return 1;
-      if (!aIsPast && bIsPast) return -1;
-      
-      // If both are upcoming, nearest first
-      if (!aIsPast && !bIsPast) return dateA - dateB;
-      
-      // If both are past, most recent first
-      return dateB - dateA;
-    }
-  });
+      // For upcoming events tab, sort by nearest date first
+      if (filter === 'upcoming') {
+        return dateA - dateB;
+      }
+      // For past events tab, sort by most recent past date first
+      else if (filter === 'past') {
+        return dateB - dateA;
+      }
+      // For registered events, sort by nearest date first, with upcoming events before past events
+      else if (filter === 'registered') {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // If one is past and one is upcoming, upcoming comes first
+        const aIsPast = dateA < today;
+        const bIsPast = dateB < today;
+        
+        if (aIsPast && !bIsPast) return 1;
+        if (!aIsPast && bIsPast) return -1;
+        
+        // If both are upcoming, nearest first
+        if (!aIsPast && !bIsPast) return dateA - dateB;
+        
+        // If both are past, most recent first
+        return dateB - dateA;
+      }
+      // For all events, sort by nearest date first, with upcoming events before past events
+      else {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // If one is past and one is upcoming, upcoming comes first
+        const aIsPast = dateA < today;
+        const bIsPast = dateB < today;
+        
+        if (aIsPast && !bIsPast) return 1;
+        if (!aIsPast && bIsPast) return -1;
+        
+        // If both are upcoming, nearest first
+        if (!aIsPast && !bIsPast) return dateA - dateB;
+        
+        // If both are past, most recent first
+        return dateB - dateA;
+      }
+    });
 
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
@@ -274,6 +276,7 @@ const PublicEventList = ({ currentUser }) => {
             isPastEvent={isEventInPast(event.date)}
             onRegister={() => handleRegister(event.id)}
             onCancelRegistration={() => handleCancelRegistration(event.id)}
+            currentUserId={currentUser.id}
           />
         ))}
       </div>

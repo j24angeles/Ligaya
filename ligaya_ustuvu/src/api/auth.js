@@ -21,6 +21,11 @@ export const loginUser = async (email, password) => {
       throw new Error('Invalid email or password');
     }
     
+    // Check if account is archived/suspended
+    if (user.status === 'archived' || user.archived === true) {
+      throw new Error('This account has been suspended. Please wait for further instructions or contact support.');
+    }
+    
     storeUserSession(user);
     
     return user;
@@ -51,7 +56,9 @@ export const registerUser = async (userData) => {
       name: fullName,
       id: Date.now(),
       role: 'volunteer',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      status: 'active', // Adding explicit active status
+      archived: false // Ensuring archived flag is explicitly set to false
     };
     
     const createResponse = await api.post('/users', userDataToSave);
@@ -79,4 +86,8 @@ export const isLoggedIn = () => {
 export const logoutUser = () => {
   localStorage.removeItem('currentUser');
   window.location.href = '/login';
+};
+
+export const isAccountSuspended = (user) => {
+  return user.status === 'archived' || user.archived === true;
 };
