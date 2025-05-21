@@ -3,7 +3,6 @@ import {
   Plus, 
   Search, 
   AlertCircle, 
-  Edit, 
   Archive, 
   ChevronDown, 
   ChevronUp, 
@@ -171,12 +170,6 @@ const AdminDonationManagement = () => {
         cancelText: "Cancel"
       });
     }
-  };
-
-  const handleEdit = (donation, e) => {
-    e.stopPropagation();
-    setCurrentDonation(donation);
-    setShowModal(true);
   };
 
   const handleArchive = (donation, e) => {
@@ -617,13 +610,6 @@ const AdminDonationManagement = () => {
                                 </button>
                               </>
                             )}
-                            <button
-                              onClick={(e) => handleEdit(donation, e)}
-                              className="text-indigo-600 hover:text-indigo-900"
-                              title="Edit donation"
-                            >
-                              <Edit size={18} />
-                            </button>
                             <button
                               onClick={(e) => handleArchive(donation, e)}
                               className="text-amber-600 hover:text-amber-900"

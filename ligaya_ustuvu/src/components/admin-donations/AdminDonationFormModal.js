@@ -25,6 +25,7 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [showRejectionReason, setShowRejectionReason] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
 
   useEffect(() => {
     if (currentDonation) {
@@ -38,6 +39,7 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
         rejectionReason: currentDonation.rejectionReason || ''
       });
       setShowRejectionReason(currentDonation.validationStatus === 'rejected');
+      setIsViewMode(true); // Set to view mode when showing existing donation
     } else {
       setFormData({
         userId: '',
@@ -49,6 +51,7 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
         rejectionReason: ''
       });
       setShowRejectionReason(false);
+      setIsViewMode(false); // Set to add mode when creating new donation
     }
 
     setTouched({
@@ -117,6 +120,8 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
   };
 
   const handleInputChange = (e) => {
+    if (isViewMode) return; // Prevent changes in view mode
+    
     const { name, value } = e.target;
     
     setFormData(prev => ({
@@ -143,6 +148,8 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
   };
 
   const handleBlur = (e) => {
+    if (isViewMode) return; // Prevent validation in view mode
+    
     const { name, value } = e.target;
     
     setTouched(prev => ({
@@ -162,6 +169,8 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isViewMode) return; // Prevent submission in view mode
+    
     setIsSubmitted(true);
     
     if (validateForm()) {
@@ -176,7 +185,7 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold text-primary">
-            {currentDonation ? 'Edit Donation' : 'Record New Donation'}
+            {isViewMode ? 'Donation Details' : 'Record New Donation'}
           </h2>
           <button
             onClick={onClose}
@@ -202,7 +211,12 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.userId}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 pl-10 border ${shouldShowError('userId') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 pl-10 border ${
+                    shouldShowError('userId') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isViewMode}
                 >
                   <option value="">Select a donor</option>
                   {users.map(user => (
@@ -232,8 +246,13 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.amount}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 pl-10 border ${shouldShowError('amount') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 pl-10 border ${
+                    shouldShowError('amount') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                   placeholder="Enter donation amount"
+                  disabled={isViewMode}
                 />
               </div>
               {shouldShowError('amount') && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
@@ -254,7 +273,12 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.date}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 pl-10 border ${shouldShowError('date') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 pl-10 border ${
+                    shouldShowError('date') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isViewMode}
                 />
               </div>
               {shouldShowError('date') && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
@@ -274,7 +298,12 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.paymentMethod}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 pl-10 border ${shouldShowError('paymentMethod') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 pl-10 border ${
+                    shouldShowError('paymentMethod') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isViewMode}
                 >
                   <option value="cash">Cash</option>
                   <option value="gcash">GCash</option>
@@ -301,8 +330,13 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                     value={formData.referenceNumber}
                     onChange={handleInputChange}
                     onBlur={handleBlur}
-                    className={`w-full p-2 pl-10 border ${shouldShowError('referenceNumber') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                    className={`w-full p-2 pl-10 border ${
+                      shouldShowError('referenceNumber') ? 'border-red-500' : 'border-gray-300'
+                    } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                      isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                     placeholder="Enter payment reference number"
+                    disabled={isViewMode}
                   />
                 </div>
                 {shouldShowError('referenceNumber') && <p className="text-red-500 text-xs mt-1">{errors.referenceNumber}</p>}
@@ -329,7 +363,12 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.validationStatus}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 pl-10 border ${shouldShowError('validationStatus') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 pl-10 border ${
+                    shouldShowError('validationStatus') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
+                  disabled={isViewMode}
                 >
                   <option value="pending">Pending</option>
                   <option value="validated">Validated</option>
@@ -352,9 +391,14 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
                   value={formData.rejectionReason}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
-                  className={`w-full p-2 border ${shouldShowError('rejectionReason') ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-primary`}
+                  className={`w-full p-2 border ${
+                    shouldShowError('rejectionReason') ? 'border-red-500' : 'border-gray-300'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+                    isViewMode ? 'bg-gray-100 cursor-not-allowed' : ''
+                  }`}
                   placeholder="Enter reason for rejection"
                   rows="2"
+                  disabled={isViewMode}
                 />
                 {shouldShowError('rejectionReason') && (
                   <p className="text-red-500 text-xs mt-1">{errors.rejectionReason}</p>
@@ -369,14 +413,16 @@ const AdminDonationFormModal = ({ isOpen, onClose, onSubmit, currentDonation = n
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              {isViewMode ? 'Close' : 'Cancel'}
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-            >
-              {currentDonation ? 'Update Donation' : 'Record Donation'}
-            </button>
+            {!isViewMode && (
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+              >
+                Record Donation
+              </button>
+            )}
           </div>
         </form>
       </div>

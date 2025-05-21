@@ -6,10 +6,7 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 });
-/**
- * Fetches all events from the server
- * @returns {Promise<Array>} Array of event objects
- */
+
 export const getAllEvents = async () => {
   try {
     const response = await api.get('/events');
@@ -20,14 +17,9 @@ export const getAllEvents = async () => {
   }
 };
 
-/**
- * Fetches all published events that are not archived
- * @returns {Promise<Array>} Array of published, non-archived event objects
- */
 export const getPublishedEvents = async () => {
   try {
     const response = await api.get('/events');
-    // Filter to only include published and non-archived events
     return response.data.filter(event => 
       event.isPublished === true && 
       event.status !== "archived"
@@ -38,11 +30,6 @@ export const getPublishedEvents = async () => {
   }
 };
 
-/**
- * Fetches a single event by ID
- * @param {string|number} id - Event ID
- * @returns {Promise<Object>} Event object
- */
 export const getEventById = async (id) => {
   try {
     const response = await api.get(`/events/${id}`);
@@ -53,25 +40,15 @@ export const getEventById = async (id) => {
   }
 };
 
-/**
- * Creates a new event
- * @param {Object} eventData - Event data to create
- * @returns {Promise<Object>} Created event object
- */
 export const createEvent = async (eventData) => {
   try {
-    // Fix issue where published events could still have draft status
-    // If isPublished is true, we should NOT set status to draft
     let status = eventData.status;
     
-    // If isPublished is true but status is 'draft' or not defined, 
-    // we should clear the status field (for published events)
     if (eventData.isPublished === true) {
       if (!status || status === 'draft') {
-        status = undefined; // Clear the status for published events
+        status = undefined;
       }
     } else {
-      // If not published, default to draft status
       status = status || 'draft';
     }
     
@@ -90,19 +67,11 @@ export const createEvent = async (eventData) => {
   }
 };
 
-/**
- * Updates an existing event
- * @param {string|number} id - Event ID
- * @param {Object} eventData - Updated event data
- * @returns {Promise<Object>} Updated event object
- */
 export const updateEvent = async (id, eventData) => {
   try {
-    // Fix the same issue for updates: make sure published events don't have draft status
     let updatedData = { ...eventData };
     
     if (updatedData.isPublished === true) {
-      // If event is being published and status is draft, remove the draft status
       if (updatedData.status === 'draft') {
         delete updatedData.status;
       }
@@ -119,11 +88,6 @@ export const updateEvent = async (id, eventData) => {
   }
 };
 
-/**
- * Archives an event instead of deleting it
- * @param {string|number} id - Event ID
- * @returns {Promise<Object>} Updated event object
- */
 export const archiveEvent = async (id) => {
   try {
     const event = await getEventById(id);
@@ -138,27 +102,18 @@ export const archiveEvent = async (id) => {
   }
 };
 
-/**
- * Registers a user for an event
- * @param {string|number} eventId - Event ID
- * @param {Object} userData - User data
- * @returns {Promise<Object>} Updated event object
- */
 export const registerForEvent = async (eventId, userData) => {
   try {
     const event = await getEventById(eventId);
     
-    // Check if the event is archived
     if (event.status === "archived") {
       throw new Error('Cannot register for an archived event');
     }
     
-    // Check if the event is published
     if (event.isPublished !== true) {
       throw new Error('Cannot register for an unpublished event');
     }
     
-    // Check if already registered
     const isRegistered = event.volunteers?.some(
       v => String(v.id) === String(userData.id)
     );
@@ -186,17 +141,10 @@ export const registerForEvent = async (eventId, userData) => {
   }
 };
 
-/**
- * Cancels a user's event registration
- * @param {string|number} eventId - Event ID
- * @param {string|number} userId - User ID
- * @returns {Promise<Object>} Updated event object
- */
 export const cancelEventRegistration = async (eventId, userId) => {
   try {
     const event = await getEventById(eventId);
     
-    // Check if the event is archived
     if (event.status === "archived") {
       throw new Error('Cannot modify registration for an archived event');
     }
@@ -215,11 +163,6 @@ export const cancelEventRegistration = async (eventId, userId) => {
   }
 };
 
-/**
- * Gets all events a user is registered for
- * @param {string|number} userId - User ID
- * @returns {Promise<Array>} Array of event objects
- */
 export const getUserEvents = async (userId) => {
   try {
     const [user, allEvents] = await Promise.all([
@@ -227,9 +170,7 @@ export const getUserEvents = async (userId) => {
       getAllEvents()
     ]);
     
-    // Filter out archived events from user's events
     return allEvents.filter(event => {
-      // Skip archived events
       if (event.status === "archived") {
         return false;
       }
@@ -246,11 +187,6 @@ export const getUserEvents = async (userId) => {
   }
 };
 
-/**
- * Gets only upcoming events a user is registered for
- * @param {string|number} userId - User ID
- * @returns {Promise<Array>} Array of upcoming event objects, sorted by date
- */
 export const getUpcomingUserEvents = async (userId) => {
   try {
     const userEvents = await getUserEvents(userId);
@@ -264,7 +200,6 @@ export const getUpcomingUserEvents = async (userId) => {
   }
 };
 
-// Helper functions
 const updateUserEvents = async (userId, eventId) => {
   try {
     const user = await api.get(`/users/${userId}`);
