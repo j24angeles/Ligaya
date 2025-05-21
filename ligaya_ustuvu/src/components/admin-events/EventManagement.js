@@ -167,23 +167,27 @@ const EventManagement = () => {
     if (timeFilter === 'upcoming') timeMatch = !isPast;
     if (timeFilter === 'past') timeMatch = isPast;
     
-    // Status filter
+    // Status filter - Fixed logic to properly handle archived events
     let statusMatch = false;
-    if (statusFilter === 'published') {
-      // Published: isPublished is true AND status is not 'archived' or 'draft'
-      statusMatch = event.isPublished === true && event.status !== 'archived' && event.status !== 'draft';
-    } 
-    else if (statusFilter === 'draft') {
-      // Draft: status is 'draft' OR isPublished is explicitly false
-      statusMatch = event.status === 'draft' || event.isPublished === false;
+    
+    // Archived events should ONLY appear in the archived filter
+    if (event.status === 'archived') {
+      statusMatch = statusFilter === 'archived' || statusFilter === 'all';
     }
-    else if (statusFilter === 'archived') {
-      // Archived: status is 'archived'
-      statusMatch = event.status === 'archived';
-    }
-    else if (statusFilter === 'all') {
-      // All: no filtering by status
-      statusMatch = true;
+    // For non-archived events, apply the appropriate filter
+    else {
+      if (statusFilter === 'published') {
+        // Published: isPublished is true AND not draft
+        statusMatch = event.isPublished === true && event.status !== 'draft';
+      } 
+      else if (statusFilter === 'draft') {
+        // Draft: status is 'draft' OR isPublished is explicitly false
+        statusMatch = event.status === 'draft' || event.isPublished === false;
+      }
+      else if (statusFilter === 'all') {
+        // All: any non-archived event
+        statusMatch = true;
+      }
     }
     
     return matchesSearch && statusMatch && timeMatch;
