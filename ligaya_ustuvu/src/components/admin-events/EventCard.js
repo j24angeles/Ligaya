@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Users, Edit, Trash2, Archive, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Edit, Archive, RefreshCw } from 'lucide-react';
 import VolunteersModal from './EventVolunteersModal';
 
-const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent }) => {
+const EventCard = ({ event, onEdit, onArchive, onRestore, isPastEvent }) => {
   const [showVolunteers, setShowVolunteers] = useState(false);
   
   // Format date for display
@@ -50,20 +50,18 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
     setShowVolunteers(true);
   };
 
-  const isArchived = event.status === 'archived';
-
   return (
     <>
       <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full
         ${isPastEvent ? 'border-l-4 border-amber-400' : ''} 
-        ${isArchived ? 'border-l-4 border-red-400 opacity-75' : ''}">
+        ${event.status === 'archived' ? 'border-l-4 border-red-400 opacity-75' : ''}">
         {/* Banner image */}
         <div className="relative w-full h-48">
           {event.bannerImage ? (
             <img 
               src={event.bannerImage} 
               alt={event.title} 
-              className={`w-full h-full object-cover ${isPastEvent || isArchived ? 'opacity-70' : ''}`}
+              className={`w-full h-full object-cover ${isPastEvent || event.status === 'archived' ? 'opacity-70' : ''}`}
             />
           ) : (
             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -74,21 +72,21 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
           {/* Status badges */}
           <div className="absolute top-4 right-4 flex flex-col gap-2">
             {/* Archived event badge */}
-            {isArchived && (
+            {event.status === 'archived' && (
               <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
                 Archived
               </span>
             )}
             
             {/* Past event badge */}
-            {isPastEvent && !isArchived && (
+            {isPastEvent && event.status !== 'archived' && (
               <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
                 Past Event
               </span>
             )}
             
             {/* Published status badge */}
-            {!isArchived && (
+            {event.status !== 'archived' && (
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                 event.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}>
@@ -139,24 +137,24 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
           {/* Actions - Fixed position at bottom of card */}
           <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
             {/* Event status indicator */}
-            {isPastEvent && !isArchived && (
+            {isPastEvent && event.status !== 'archived' && (
               <div className="text-amber-600 text-xs font-medium bg-amber-50 px-2 py-1 rounded-md">
                 Event has passed
               </div>
             )}
-            {isArchived && (
+            {event.status === 'archived' && (
               <div className="text-red-600 text-xs font-medium bg-red-50 px-2 py-1 rounded-md">
                 Archived event
               </div>
             )}
-            {!isPastEvent && !isArchived && (
+            {!isPastEvent && event.status !== 'archived' && (
               <div className="text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-md">
                 Upcoming event
               </div>
             )}
             
             <div className="flex ml-auto">
-              {!isArchived ? (
+              {event.status !== 'archived' ? (
                 <>
                   <button
                     onClick={() => onEdit(event)}
@@ -174,22 +172,13 @@ const EventCard = ({ event, onEdit, onDelete, onArchive, onRestore, isPastEvent 
                   </button>
                 </>
               ) : (
-                <>
-                  <button
-                    onClick={() => onRestore(event.id)}
-                    className="p-1 rounded-full hover:bg-gray-100 text-gray-600 hover:text-green-600 transition-colors mr-2"
-                    title="Restore event"
-                  >
-                    <RefreshCw size={18} />
-                  </button>
-                  <button
-                    onClick={() => onDelete(event.id)}
-                    className="p-1 rounded-full hover:bg-gray-100 text-gray-600 hover:text-red-500 transition-colors"
-                    title="Delete event permanently"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </>
+                <button
+                  onClick={() => onRestore(event.id)}
+                  className="p-1 rounded-full hover:bg-gray-100 text-gray-600 hover:text-green-600 transition-colors"
+                  title="Restore event"
+                >
+                  <RefreshCw size={18} />
+                </button>
               )}
             </div>
           </div>

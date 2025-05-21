@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, AlertCircle, Archive, Trash2, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, AlertCircle, Archive, ChevronDown, ChevronUp, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import UserFormModal from './AdminUserFormModal';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../../hooks/ToastProvider';
-import { getAllUsers, createUser, updateUser, deleteUser } from '../../api/userService';
+import { getAllUsers, createUser, updateUser } from '../../api/userService';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -118,29 +118,6 @@ const AdminUserManagement = () => {
         }
       },
       confirmText: "Restore",
-      cancelText: "Cancel"
-    });
-  };
-  
-  const handleDelete = (user) => {
-    openConfirmationModal({
-      title: "Delete Volunteer Permanently",
-      message: `Are you sure you want to permanently delete ${user.firstName} ${user.lastName}?`,
-      type: "delete",
-      onConfirm: async () => {
-        setIsLoading(true);
-        try {
-          await deleteUser(user.id);
-          await fetchUsers();
-          showSuccess(`Volunteer ${user.firstName} ${user.lastName} was permanently deleted`);
-        } catch (err) {
-          setError(err.message);
-          showError(`Failed to delete volunteer: ${err.message}`);
-        } finally {
-          setIsLoading(false);
-        }
-      },
-      confirmText: "Delete Permanently",
       cancelText: "Cancel"
     });
   };
@@ -371,22 +348,13 @@ const AdminUserManagement = () => {
                             <Archive size={18} />
                           </button>
                         ) : (
-                          <>
-                            <button
-                              onClick={() => handleRestore(user)}
-                              className="text-green-600 hover:text-green-900"
-                              title="Restore volunteer"
-                            >
-                              <RefreshCw size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(user)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Delete volunteer"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </>
+                          <button
+                            onClick={() => handleRestore(user)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Restore volunteer"
+                          >
+                            <RefreshCw size={18} />
+                          </button>
                         )}
                       </div>
                     </td>

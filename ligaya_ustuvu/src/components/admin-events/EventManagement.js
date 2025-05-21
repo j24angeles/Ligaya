@@ -3,7 +3,7 @@ import { Plus, Search, AlertCircle } from 'lucide-react';
 import EventFormModal from './EventFormModal';
 import EventCard from './EventCard';
 import ConfirmationModal from '../ConfirmationModal';
-import { getAllEvents, createEvent, updateEvent, deleteEvent } from '../../api/eventService';
+import { getAllEvents, createEvent, updateEvent } from '../../api/eventService';
 import { useToast } from '../../hooks/ToastProvider';
 
 const EventManagement = () => {
@@ -13,8 +13,8 @@ const EventManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('published'); // Default to published instead of active
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'upcoming', or 'past'
+  const [statusFilter, setStatusFilter] = useState('published');
+  const [timeFilter, setTimeFilter] = useState('all');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationData, setConfirmationData] = useState({
     title: '',
@@ -24,15 +24,12 @@ const EventManagement = () => {
     confirmText: 'Confirm'
   });
 
-  // Use toast context
-  const { showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
 
-  // Fetch all events
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
       const data = await getAllEvents();
-      // Sort events by date (earliest first)
       const sortedEvents = [...data].sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
@@ -48,32 +45,27 @@ const EventManagement = () => {
     }
   };
 
-  // Load events on component mount
   useEffect(() => {
     fetchEvents();
   }, []);
 
-  // Check if event is in the past
   const isEventInPast = (eventDate) => {
     if (!eventDate) return false;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+    today.setHours(0, 0, 0, 0);
     const eventDay = new Date(eventDate);
     return eventDay < today;
   };
 
-  // Handle time filter changes
   const handleTimeFilterChange = (value) => {
     setTimeFilter(value);
   };
 
-  // Show confirmation modal
   const confirmAction = (title, message, onConfirm, type = 'info', confirmText = 'Confirm') => {
     setConfirmationData({ title, message, onConfirm, type, confirmText });
     setShowConfirmation(true);
   };
 
-  // Handle creating and updating events with confirmation
   const handleSubmitEvent = async (eventData) => {
     const isUpdate = !!currentEvent;
     
@@ -85,11 +77,9 @@ const EventManagement = () => {
         
         try {
           if (isUpdate) {
-            // Update existing event
             await updateEvent(currentEvent.id, eventData);
             showSuccess('Event updated successfully!');
           } else {
-            // Create new event
             await createEvent(eventData);
             showSuccess('Event created successfully!');
           }
@@ -108,13 +98,11 @@ const EventManagement = () => {
     );
   };
 
-  // Handle editing event
   const handleEdit = (event) => {
     setCurrentEvent(event);
     setShowModal(true);
   };
 
-  // Handle archiving event
   const handleArchive = (eventId) => {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
@@ -140,7 +128,6 @@ const EventManagement = () => {
     );
   };
 
-  // Handle restoring event
   const handleRestore = (eventId) => {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
@@ -151,9 +138,8 @@ const EventManagement = () => {
       async () => {
         setIsLoading(true);
         try {
-          // Remove archived status (no 'active' status anymore)
           const updatedEvent = { ...event };
-          delete updatedEvent.status; // Remove status field completely
+          delete updatedEvent.status;
           await updateEvent(eventId, updatedEvent);
           showSuccess('Event restored successfully!');
           await fetchEvents();
@@ -169,57 +155,20 @@ const EventManagement = () => {
     );
   };
 
-  // Handle deleting event with confirmation
-  const handleDelete = (eventId) => {
-    const event = events.find(e => e.id === eventId);
-    if (!event) return;
-    
-    // Only allow deletion of archived events
-    if (event.status !== 'archived') {
-      showError('Only archived events can be deleted. Please archive the event first.');
-      return;
-    }
-
-    confirmAction(
-      'Delete Event Permanently',
-      `Are you sure you want to permanently delete "${event.title}"? This action cannot be undone.`,
-      async () => {
-        setIsLoading(true);
-        try {
-          await deleteEvent(eventId);
-          showSuccess('Event deleted successfully!');
-          await fetchEvents();
-        } catch (err) {
-          setError(err.message);
-          showError(`Failed to delete event: ${err.message}`);
-        } finally {
-          setIsLoading(false);
-        }
-      },
-      'delete',
-      'Delete Permanently'
-    );
-  };
-
-  // Filter events based on search term, status and time filter
   const filteredEvents = events.filter(event => {
-    // First apply search filter
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.location.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Apply status filter - removed 'active' status
-    const eventStatus = event.status; // Will be undefined/null for regular events, 'archived' for archived ones
+    const eventStatus = event.status;
     const isPast = isEventInPast(event.date);
     
     let statusMatch = true;
-    // Status match logic - simplified without 'active' status
     if (statusFilter === 'published') statusMatch = event.isPublished && !eventStatus;
     if (statusFilter === 'draft') statusMatch = !event.isPublished && !eventStatus;
     if (statusFilter === 'archived') statusMatch = eventStatus === 'archived';
     if (statusFilter === 'all') statusMatch = true;
     
-    // Apply time filter
     let timeMatch = true;
     if (timeFilter === 'upcoming') timeMatch = !isPast;
     if (timeFilter === 'past') timeMatch = isPast;
@@ -243,7 +192,6 @@ const EventManagement = () => {
         </button>
       </div>
 
-      {/* Error alert */}
       {error && (
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 flex items-start" role="alert">
           <AlertCircle size={20} className="mr-2 mt-0.5" />
@@ -251,9 +199,7 @@ const EventManagement = () => {
         </div>
       )}
 
-      {/* Search and filter */}
       <div className="mb-6 flex flex-col space-y-4">
-        {/* Search */}
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search size={18} className="text-gray-400" />
@@ -267,9 +213,7 @@ const EventManagement = () => {
           />
         </div>
         
-        {/* Filter controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Time Filter Tabs */}
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button
               type="button"
@@ -306,7 +250,6 @@ const EventManagement = () => {
             </button>
           </div>
           
-          {/* Status Filter - Removed 'active', defaults to 'published' */}
           <div className="flex items-center">
             <span className="mr-2 text-sm text-gray-600">Status:</span>
             <select
@@ -323,14 +266,12 @@ const EventManagement = () => {
         </div>
       </div>
 
-      {/* Loading state */}
       {isLoading && (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       )}
 
-      {/* No events message */}
       {!isLoading && filteredEvents.length === 0 && (
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center">
           <h3 className="text-lg font-medium text-gray-600 mb-2">No events found</h3>
@@ -342,14 +283,12 @@ const EventManagement = () => {
         </div>
       )}
 
-      {/* Events grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map(event => (
           <EventCard 
             key={event.id}
             event={event}
             onEdit={handleEdit}
-            onDelete={handleDelete}
             onArchive={handleArchive}
             onRestore={handleRestore}
             isPastEvent={isEventInPast(event.date)}
@@ -357,7 +296,6 @@ const EventManagement = () => {
         ))}
       </div>
 
-      {/* Event form modal */}
       <EventFormModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -365,7 +303,6 @@ const EventManagement = () => {
         currentEvent={currentEvent}
       />
 
-      {/* Confirmation modal */}
       <ConfirmationModal
         show={showConfirmation}
         onClose={() => setShowConfirmation(false)}
@@ -373,7 +310,7 @@ const EventManagement = () => {
         message={confirmationData.message}
         onConfirm={confirmationData.onConfirm}
         type={confirmationData.type}
-        confirmText={confirmationData.type === 'delete' ? 'Delete' : confirmationData.confirmText}
+        confirmText={confirmationData.confirmText}
       />
     </div>
   );

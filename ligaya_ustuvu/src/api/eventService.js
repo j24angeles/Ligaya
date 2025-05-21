@@ -95,21 +95,6 @@ export const updateEvent = async (id, eventData) => {
 };
 
 /**
- * Deletes an event
- * @param {string|number} id - Event ID
- * @returns {Promise<boolean>} True if successful
- */
-export const deleteEvent = async (id) => {
-  try {
-    await api.delete(`/events/${id}`);
-    return true;
-  } catch (error) {
-    console.error(`Error deleting event ${id}:`, error);
-    throw error.response?.data || new Error('Failed to delete event');
-  }
-};
-
-/**
  * Archives an event instead of deleting it
  * @param {string|number} id - Event ID
  * @returns {Promise<Object>} Updated event object
@@ -291,7 +276,6 @@ export default {
   getEventById,
   createEvent,
   updateEvent,
-  deleteEvent,
   archiveEvent,
   registerForEvent,
   cancelEventRegistration,

@@ -2,24 +2,21 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Users, X } from 'lucide-react';
 
 const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
-  // Function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'Date TBA';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Function to format time
   const formatTime = (timeString) => {
     if (!timeString) return 'Time TBA';
     return timeString;
   };
   
-  // Check if event is in the past
   const isEventInPast = (eventDate) => {
     if (!eventDate) return false;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+    today.setHours(0, 0, 0, 0);
     const eventDay = new Date(eventDate);
     return eventDay < today;
   };
@@ -27,13 +24,11 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
   const isPastEvent = isEventInPast(event.date);
   const volunteerCount = event.volunteers?.length || 0;
 
-  // If modal is not open, don't render anything
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-        {/* Modal Header with close button */}
         <div className="sticky top-0 bg-white p-4 border-b border-gray-200 flex justify-between items-center z-10">
           <h2 className="text-2xl font-bold text-gray-800">Event Details</h2>
           <button 
@@ -44,7 +39,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
           </button>
         </div>
         
-        {/* Event Banner Image */}
         <div className="w-full h-64 relative">
           {event.bannerImage ? (
             typeof event.bannerImage === 'string' ? (
@@ -66,7 +60,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
             </div>
           )}
           
-          {/* Event status badge */}
           {isPastEvent && (
             <div className="absolute top-4 right-4">
               <span className="bg-gray-800 text-white text-sm font-medium px-3 py-1 rounded-full">
@@ -76,7 +69,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
           )}
         </div>
         
-        {/* Event Content */}
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">{event.title}</h1>
           
@@ -100,7 +92,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
             </div>
             
             <div className="space-y-4">
-              {/* Updated Volunteers section */}
               <div className="flex items-start">
                 <Users size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
                 <div>
@@ -132,7 +123,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
             </div>
           </div>
           
-          {/* Status indicator for past events */}
           {isPastEvent && (
             <div className="mt-4 mb-6 p-3 bg-gray-100 rounded-lg text-gray-700 flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +132,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
             </div>
           )}
           
-          {/* Modal action button */}
           <div className="mt-8 flex justify-end">
             <button
               onClick={onClose}
@@ -157,7 +146,6 @@ const VisitorEventDetailsModal = ({ event, isOpen, onClose }) => {
   );
 };
 
-// Updated VisitorEventCard component with modal functionality
 const VisitorEventCard = ({ event }) => {
   const [showModal, setShowModal] = useState(false);
   
@@ -167,11 +155,10 @@ const VisitorEventCard = ({ event }) => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
   
-  // Check if event is in the past
   const isEventInPast = (eventDate) => {
     if (!eventDate) return false;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate date comparison
+    today.setHours(0, 0, 0, 0);
     const eventDay = new Date(eventDate);
     return eventDay < today;
   };
@@ -179,10 +166,12 @@ const VisitorEventCard = ({ event }) => {
   const isPastEvent = isEventInPast(event.date);
   const volunteerCount = event.volunteers?.length || 0;
 
+  // Don't render if event is archived
+  if (event.status === 'archived') return null;
+
   return (
     <>
-      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        {/* Event Image */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
         <div className="h-48 bg-gray-100 relative">
           {event.bannerImage ? (
             typeof event.bannerImage === 'string' ? (
@@ -206,7 +195,6 @@ const VisitorEventCard = ({ event }) => {
             </div>
           )}
           
-          {/* Past event badge */}
           {isPastEvent && (
             <div className="absolute top-2 right-2">
               <span className="bg-gray-800 text-white text-xs font-medium px-2 py-1 rounded-full">
@@ -220,40 +208,39 @@ const VisitorEventCard = ({ event }) => {
           </div>
         </div>
         
-        {/* Event Content */}
-        <div className="p-6">
-          <div className="flex items-center text-gray-600 mb-3">
-            <Calendar size={16} className="mr-2" />
-            <span>{formatDate(event.date)}</span>
+        <div className="p-6 flex flex-col flex-grow">
+          <div className="flex-grow">
+            <div className="flex items-center text-gray-600 mb-3">
+              <Calendar size={16} className="mr-2" />
+              <span>{formatDate(event.date)}</span>
+            </div>
+            
+            <div className="flex items-center text-gray-600 mb-4">
+              <MapPin size={16} className="mr-2" />
+              <span>{event.location || 'Location TBA'}</span>
+            </div>
+            
+            <div className="flex items-center text-gray-600 mb-4">
+              <Users size={16} className="mr-2" />
+              <span>{volunteerCount} volunteer{volunteerCount !== 1 ? 's' : ''} registered</span>
+            </div>
+            
+            <p className="text-gray-700 mb-6 line-clamp-3">
+              {event.description || 'Join us for this exciting event!'}
+            </p>
           </div>
-          
-          <div className="flex items-center text-gray-600 mb-4">
-            <MapPin size={16} className="mr-2" />
-            <span>{event.location || 'Location TBA'}</span>
-          </div>
-          
-          {/* Volunteer count in card */}
-          <div className="flex items-center text-gray-600 mb-4">
-            <Users size={16} className="mr-2" />
-            <span>{volunteerCount} volunteer{volunteerCount !== 1 ? 's' : ''} registered</span>
-          </div>
-          
-          <p className="text-gray-700 mb-6 line-clamp-3">
-            {event.description || 'Join us for this exciting event!'}
-          </p>
           
           <button
             onClick={() => setShowModal(true)}
             className={`w-full py-2 ${
               isPastEvent ? 'bg-gray-500' : 'bg-primary'
-            } text-white rounded-lg hover:bg-opacity-90 transition-colors inline-block text-center`}
+            } text-white rounded-lg hover:bg-opacity-90 transition-colors inline-block text-center mt-auto`}
           >
             View Details
           </button>
         </div>
       </div>
       
-      {/* Event Details Modal */}
       <VisitorEventDetailsModal 
         event={event} 
         isOpen={showModal} 
