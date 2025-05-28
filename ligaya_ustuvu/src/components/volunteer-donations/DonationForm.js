@@ -5,6 +5,7 @@ import AmountInput from './form-components/AmountInput';
 import DateInput from './form-components/DateInput';
 import PaymentMethodSelect from './form-components/PaymentMethodSelector';
 import ReferenceNumberInput from './form-components/ReferenceNumberInput';
+import ProofOfReceiptUpload from './form-components/ProofOfReceiptUpload';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../../hooks/ToastProvider';
 
@@ -14,6 +15,7 @@ const DonationForm = ({ userId, onSuccess }) => {
     date: new Date().toISOString().split('T')[0],
     paymentMethod: '',
     referenceNumber: '',
+    proofOfReceipt: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -55,6 +57,11 @@ const DonationForm = ({ userId, onSuccess }) => {
       newErrors.referenceNumber = 'Reference number is required for this payment method';
     }
     
+    // Only require proof of receipt for non-cash payments
+    if (formData.paymentMethod !== 'cash' && !formData.proofOfReceipt) {
+      newErrors.proofOfReceipt = 'Proof of receipt is required for this payment method';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -87,6 +94,7 @@ const formatPaymentMethod = (method) => {
         date: formData.date,
         paymentMethod: formData.paymentMethod,
         referenceNumber: formData.paymentMethod === 'cash' ? '' : formData.referenceNumber,
+        proofOfReceipt: formData.paymentMethod === 'cash' ? '' : formData.proofOfReceipt,
       };
       
       const createdDonation = await createDonation(donationData);
@@ -98,6 +106,7 @@ const formatPaymentMethod = (method) => {
         date: new Date().toISOString().split('T')[0],
         paymentMethod: '',
         referenceNumber: '',
+        proofOfReceipt: '',
       });
       
       showSuccess('Donation submitted successfully!');
@@ -157,6 +166,13 @@ const formatPaymentMethod = (method) => {
             error={errors.referenceNumber}
             show={formData.paymentMethod && formData.paymentMethod !== 'cash'}
             className="mb-2"
+          />
+
+          <ProofOfReceiptUpload
+            value={formData.proofOfReceipt}
+            onChange={(value) => handleChange('proofOfReceipt', value)}
+            error={errors.proofOfReceipt}
+            show={formData.paymentMethod && formData.paymentMethod !== 'cash'}
           />
 
           {submitError && (

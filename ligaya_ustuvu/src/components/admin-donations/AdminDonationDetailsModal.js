@@ -2,8 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { X, ZoomIn, Image } from 'lucide-react';
 
 const formatDate = (dateString) => {
+  if (!dateString) return 'Not provided';
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
   return new Date(dateString).toLocaleDateString(undefined, options);
+};
+
+const formatCurrency = (amount) => {
+  return `₱${parseFloat(amount).toFixed(2)}`;
 };
 
 const formatPaymentMethod = (method) => {
@@ -183,7 +188,7 @@ const ImageModal = ({ src, onClose }) => {
   );
 };
 
-const DonationDetailsModal = ({ donation, onClose }) => {
+const AdminDonationDetailsModal = ({ donation, users, onClose }) => {
   const [showImageModal, setShowImageModal] = useState(false);
 
   // Add event listener to prevent body scrolling when modal is open
@@ -199,8 +204,13 @@ const DonationDetailsModal = ({ donation, onClose }) => {
       };
     }
   }, [donation]);
-  
+
   if (!donation) return null;
+
+  const getDonorName = (userId) => {
+    const user = users.find(user => user.id.toString() === userId.toString());
+    return user ? `${user.firstName} ${user.lastName}` : 'Unknown Donor';
+  };
 
   const handleImageClick = () => {
     setShowImageModal(true);
@@ -209,7 +219,7 @@ const DonationDetailsModal = ({ donation, onClose }) => {
   const handleImageModalClose = () => {
     setShowImageModal(false);
   };
-  
+
   return (
     <>
       <div className="fixed inset-0 z-50 overflow-hidden">
@@ -232,8 +242,13 @@ const DonationDetailsModal = ({ donation, onClose }) => {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                  <p className="text-sm text-gray-500">Donor</p>
+                  <p className="font-medium">{getDonorName(donation.userId)}</p>
+                </div>
+
+                <div>
                   <p className="text-sm text-gray-500">Amount</p>
-                  <p className="font-medium">₱{parseFloat(donation.amount).toFixed(2)}</p>
+                  <p className="font-medium">{formatCurrency(donation.amount)}</p>
                 </div>
                 
                 <div>
@@ -269,6 +284,20 @@ const DonationDetailsModal = ({ donation, onClose }) => {
                   <div>
                     <p className="text-sm text-gray-500">Reference Number</p>
                     <p className="font-medium">{donation.referenceNumber}</p>
+                  </div>
+                )}
+
+                {donation.validatedAt && (
+                  <div>
+                    <p className="text-sm text-gray-500">Validated At</p>
+                    <p className="font-medium">{formatDate(donation.validatedAt)}</p>
+                  </div>
+                )}
+
+                {donation.rejectedAt && (
+                  <div>
+                    <p className="text-sm text-gray-500">Rejected At</p>
+                    <p className="font-medium">{formatDate(donation.rejectedAt)}</p>
                   </div>
                 )}
                 
@@ -333,4 +362,4 @@ const DonationDetailsModal = ({ donation, onClose }) => {
   );
 };
 
-export default DonationDetailsModal;
+export default AdminDonationDetailsModal;

@@ -54,7 +54,9 @@ export const createDonation = async (donationData) => {
       rejectionReason: donationData.rejectionReason || null,
       validatedAt: donationData.validationStatus === 'validated' ? new Date().toISOString() : null,
       rejectedAt: donationData.validationStatus === 'rejected' ? new Date().toISOString() : null,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      // Include proof of receipt if provided
+      proofOfReceipt: donationData.proofOfReceipt || ''
     };
     
     const createResponse = await api.post('/donations', donationToSave);
@@ -92,7 +94,6 @@ export const archiveDonation = async (id) => {
     throw error.response?.data?.message || error.message || 'Failed to archive donation';
   }
 };
-
 
 export const restoreDonation = async (id) => {
   try {

@@ -11,16 +11,11 @@ import {
   ChevronRight, 
   CheckCircle,
   XCircle,
-  Info,
-  User as UserIcon,
-  DollarSign,
-  Calendar,
-  CreditCard,
-  Hash,
   X
 } from 'lucide-react';
 import DonationFormModal from './AdminDonationFormModal';
 import ConfirmationModal from '../ConfirmationModal';
+import AdminDonationDetailsModal from './AdminDonationDetailsModal';
 import { useToast } from '../../hooks/ToastProvider';
 import { 
   getAllDonations, 
@@ -32,6 +27,23 @@ import {
   rejectDonation
 } from '../../api/donationService';
 import { getAllUsers } from '../../api/userService';
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'Not provided';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'PHP'
+  }).format(amount);
+};
 
 const AdminDonationManagement = () => {
   const [donations, setDonations] = useState([]);
@@ -56,7 +68,6 @@ const AdminDonationManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const donationsPerPage = 10;
   const [validationFilter, setValidationFilter] = useState('all');
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedDonation, setSelectedDonation] = useState(null);
 
   const { showSuccess, showError, showInfo } = useToast();
@@ -269,23 +280,6 @@ const AdminDonationManagement = () => {
     });
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Not provided';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'PHP'
-    }).format(amount);
-  };
-
   const getDonorName = (userId) => {
     const user = users.find(user => user.id.toString() === userId.toString());
     return user ? `${user.firstName} ${user.lastName}` : 'Unknown Donor';
@@ -309,11 +303,9 @@ const AdminDonationManagement = () => {
 
   const handleRowClick = (donation) => {
     setSelectedDonation(donation);
-    setShowDetailsModal(true);
   };
 
   const handleDetailsModalClose = () => {
-    setShowDetailsModal(false);
     setSelectedDonation(null);
   };
 
@@ -704,125 +696,6 @@ const AdminDonationManagement = () => {
         </>
       )}
 
-      {/* Donation Details Modal */}
-      {selectedDonation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-xl font-semibold text-primary">
-                Donation Details
-              </h2>
-              <button
-                onClick={handleDetailsModalClose}
-                className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="flex items-start space-x-3">
-                <UserIcon className="text-gray-500 mt-0.5" size={18} />
-                <div>
-                  <p className="text-sm text-gray-500">Donor</p>
-                  <p className="font-medium">{getDonorName(selectedDonation.userId)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <DollarSign className="text-gray-500 mt-0.5" size={18} />
-                <div>
-                  <p className="text-sm text-gray-500">Amount</p>
-                  <p className="font-medium">{formatCurrency(selectedDonation.amount)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <Calendar className="text-gray-500 mt-0.5" size={18} />
-                <div>
-                  <p className="text-sm text-gray-500">Date</p>
-                  <p className="font-medium">{formatDate(selectedDonation.date)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <CreditCard className="text-gray-500 mt-0.5" size={18} />
-                <div>
-                  <p className="text-sm text-gray-500">Payment Method</p>
-                  <p className="font-medium capitalize">
-                    {selectedDonation.paymentMethod ? selectedDonation.paymentMethod.replace('_', ' ') : 'Unknown'}
-                  </p>
-                </div>
-              </div>
-
-              {selectedDonation.paymentMethod !== 'cash' && selectedDonation.referenceNumber && (
-                <div className="flex items-start space-x-3">
-                  <Hash className="text-gray-500 mt-0.5" size={18} />
-                  <div>
-                    <p className="text-sm text-gray-500">Reference Number</p>
-                    <p className="font-medium">{selectedDonation.referenceNumber}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-start space-x-3">
-                <Info className="text-gray-500 mt-0.5" size={18} />
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <div className="flex items-center">
-                    {selectedDonation.validationStatus === 'validated' ? (
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Validated
-                      </span>
-                    ) : selectedDonation.validationStatus === 'rejected' ? (
-                      <div>
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                          Rejected
-                        </span>
-                        {selectedDonation.rejectionReason && (
-                          <p className="text-sm text-gray-700 mt-1">
-                            Reason: {selectedDonation.rejectionReason}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                        Pending
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {selectedDonation.validatedAt && (
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="text-green-500 mt-0.5" size={18} />
-                  <div>
-                    <p className="text-sm text-gray-500">Validated At</p>
-                    <p className="font-medium">{formatDate(selectedDonation.validatedAt)}</p>
-                  </div>
-                </div>
-              )}
-
-              {selectedDonation.rejectedAt && (
-                <div className="flex items-start space-x-3">
-                  <XCircle className="text-red-500 mt-0.5" size={18} />
-                  <div>
-                    <p className="text-sm text-gray-500">Rejected At</p>
-                    <p className="font-medium">{formatDate(selectedDonation.rejectedAt)}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end p-4 border-t space-x-2">
-             
-            
-            </div>
-          </div>
-        </div>
-      )}
-
       <DonationFormModal
         isOpen={showModal}
         onClose={handleModalClose}
@@ -840,6 +713,12 @@ const AdminDonationManagement = () => {
         type={confirmationConfig.type}
         confirmText={confirmationConfig.confirmText}
         cancelText={confirmationConfig.cancelText}
+      />
+
+      <AdminDonationDetailsModal
+        donation={selectedDonation}
+        users={users}
+        onClose={handleDetailsModalClose}
       />
     </div>
   );
