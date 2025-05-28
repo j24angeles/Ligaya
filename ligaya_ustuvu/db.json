@@ -502,12 +502,12 @@
       "id": 1748434446466,
       "createdAt": "2025-05-28T12:14:06.466Z",
       "status": "active",
-      "validationStatus": "pending",
+      "validationStatus": "rejected",
       "isValidated": false,
       "rejectionReason": null,
       "validatedAt": null,
-      "rejectedAt": null,
-      "updatedAt": "2025-05-28T12:14:06.466Z"
+      "rejectedAt": "2025-05-28T14:59:17.705Z",
+      "updatedAt": "2025-05-28T14:59:17.736Z"
     }
   ]
 }

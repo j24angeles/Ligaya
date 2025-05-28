@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Plus, 
   Search, 
   AlertCircle, 
   Archive, 
@@ -11,15 +10,14 @@ import {
   ChevronRight, 
   CheckCircle,
   XCircle,
-  X
+  Edit
 } from 'lucide-react';
-import DonationFormModal from './AdminDonationFormModal';
 import ConfirmationModal from '../ConfirmationModal';
 import AdminDonationDetailsModal from './AdminDonationDetailsModal';
+import EditDonationModal from './EditDonationModal';
 import { useToast } from '../../hooks/ToastProvider';
 import { 
   getAllDonations, 
-  createDonation, 
   updateDonation, 
   archiveDonation, 
   restoreDonation, 
@@ -38,6 +36,7 @@ const formatDate = (dateString) => {
   });
 };
 
+
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -51,11 +50,12 @@ const AdminDonationManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [currentDonation, setCurrentDonation] = useState(null);
   const [statusFilter, setStatusFilter] = useState('active');
   const [sortField, setSortField] = useState('date');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+const [selectedDonationForEdit, setSelectedDonationForEdit] = useState(null);
+
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [confirmationConfig, setConfirmationConfig] = useState({
     title: '',
@@ -69,6 +69,8 @@ const AdminDonationManagement = () => {
   const donationsPerPage = 10;
   const [validationFilter, setValidationFilter] = useState('all');
   const [selectedDonation, setSelectedDonation] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingDonation, setEditingDonation] = useState(null);
 
   const { showSuccess, showError, showInfo } = useToast();
 
@@ -86,6 +88,7 @@ const AdminDonationManagement = () => {
     }
   };
 
+  
   const fetchUsers = async () => {
     try {
       const data = await getAllUsers();
@@ -106,81 +109,63 @@ const AdminDonationManagement = () => {
     setShowConfirmationModal(true);
   };
 
-  const handleSubmitDonation = async (donationData) => {
-    if (currentDonation) {
-      openConfirmationModal({
-        title: "Update Donation",
-        message: `Are you sure you want to update this donation record?`,
-        type: "info",
-        onConfirm: async () => {
-          setIsLoading(true);
-          try {
-            const updatedData = {
-              ...donationData,
-              updatedAt: new Date().toISOString()
-            };
+ const handleEditDonation = (donation) => {
+  setSelectedDonationForEdit(donation);
+  setIsEditModalOpen(true);
+};
 
-            if (donationData.validationStatus === 'validated' && currentDonation.validationStatus !== 'validated') {
-              updatedData.validatedAt = new Date().toISOString();
-              updatedData.rejectedAt = null;
-              updatedData.rejectionReason = null;
-            } else if (donationData.validationStatus === 'rejected' && currentDonation.validationStatus !== 'rejected') {
-              updatedData.rejectedAt = new Date().toISOString();
-              updatedData.validatedAt = null;
-            } else if (donationData.validationStatus === 'pending' && currentDonation.validationStatus !== 'pending') {
-              updatedData.validatedAt = null;
-              updatedData.rejectedAt = null;
-              updatedData.rejectionReason = null;
-            }
+// Function to close edit modal
+const handleCloseEditModal = () => {
+  setIsEditModalOpen(false);
+  setSelectedDonationForEdit(null);
+};
 
-            await updateDonation(currentDonation.id, updatedData);
-            await fetchDonations();
-            setShowModal(false);
-            setCurrentDonation(null);
-            showSuccess(`Donation record was updated successfully`);
-          } catch (err) {
-            setError(err.message);
-            showError(`Failed to update donation: ${err.message}`);
-          } finally {
-            setIsLoading(false);
+  const handleEditSubmit = async (statusData) => {
+    if (!editingDonation) return;
+
+    openConfirmationModal({
+      title: "Update Donation Status",
+      message: `Are you sure you want to update the status of this donation?`,
+      type: "info",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          const updatedData = {
+            ...statusData,
+            updatedAt: new Date().toISOString()
+          };
+
+          if (statusData.validationStatus === 'validated' && editingDonation.validationStatus !== 'validated') {
+            updatedData.validatedAt = new Date().toISOString();
+            updatedData.rejectedAt = null;
+            updatedData.rejectionReason = null;
+            updatedData.isValidated = true;
+          } else if (statusData.validationStatus === 'rejected' && editingDonation.validationStatus !== 'rejected') {
+            updatedData.rejectedAt = new Date().toISOString();
+            updatedData.validatedAt = null;
+            updatedData.isValidated = false;
+          } else if (statusData.validationStatus === 'pending' && editingDonation.validationStatus !== 'pending') {
+            updatedData.validatedAt = null;
+            updatedData.rejectedAt = null;
+            updatedData.rejectionReason = null;
+            updatedData.isValidated = false;
           }
-        },
-        confirmText: "Update",
-        cancelText: "Cancel"
-      });
-    } else {
-      openConfirmationModal({
-        title: "Record New Donation",
-        message: `Are you sure you want to record this donation?`,
-        type: "info",
-        onConfirm: async () => {
-          setIsLoading(true);
-          try {
-            const newDonation = {
-              ...donationData,
-              createdAt: new Date().toISOString(),
-              status: 'active',
-              isValidated: donationData.validationStatus === 'validated',
-              validatedAt: donationData.validationStatus === 'validated' ? new Date().toISOString() : null,
-              rejectedAt: donationData.validationStatus === 'rejected' ? new Date().toISOString() : null,
-              updatedAt: new Date().toISOString()
-            };
 
-            await createDonation(newDonation);
-            await fetchDonations();
-            setShowModal(false);
-            showSuccess(`Donation was recorded successfully`);
-          } catch (err) {
-            setError(err.message);
-            showError(`Failed to record donation: ${err.message}`);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        confirmText: "Record Donation",
-        cancelText: "Cancel"
-      });
-    }
+          await updateDonation(editingDonation.id, updatedData);
+          await fetchDonations();
+          setShowEditModal(false);
+          setEditingDonation(null);
+          showSuccess(`Donation status was updated successfully`);
+        } catch (err) {
+          setError(err.message);
+          showError(`Failed to update donation: ${err.message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      confirmText: "Update",
+      cancelText: "Cancel"
+    });
   };
 
   const handleArchive = (donation, e) => {
@@ -280,6 +265,16 @@ const AdminDonationManagement = () => {
     });
   };
 
+  const refreshDonations = async () => {
+  try {
+    const data = await getAllDonations();
+    setDonations(data);
+  } catch (error) {
+    console.error('Failed to refresh donations:', error);
+  }
+};
+
+
   const getDonorName = (userId) => {
     const user = users.find(user => user.id.toString() === userId.toString());
     return user ? `${user.firstName} ${user.lastName}` : 'Unknown Donor';
@@ -307,6 +302,11 @@ const AdminDonationManagement = () => {
 
   const handleDetailsModalClose = () => {
     setSelectedDonation(null);
+  };
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
+    setEditingDonation(null);
   };
 
   const filteredDonations = donations.filter(donation => {
@@ -367,11 +367,6 @@ const AdminDonationManagement = () => {
     showInfo('Refreshing donation list...');
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    setCurrentDonation(null);
-  };
-
   return (
     <div className="p-6 max-w-7xl mx-auto transition-all duration-300">
       <div className="flex justify-between items-center mb-6">
@@ -383,16 +378,6 @@ const AdminDonationManagement = () => {
             title="Refresh donation list"
           >
             <RefreshCw size={18} />
-          </button>
-          <button
-            onClick={() => {
-              setCurrentDonation(null);
-              setShowModal(true);
-            }}
-            className="flex items-center justify-center bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Plus size={18} />
-            <span className="hidden sm:inline ml-2">Record Donation</span>
           </button>
         </div>
       </div>
@@ -460,7 +445,7 @@ const AdminDonationManagement = () => {
           <p className="text-gray-500">
             {searchTerm || statusFilter !== 'active' || validationFilter !== 'all'
               ? "Try adjusting your search or filters" 
-              : "Click the '+' button to record your first donation"}
+              : "No donations available at the moment"}
           </p>
         </div>
       )}
@@ -584,6 +569,13 @@ const AdminDonationManagement = () => {
                       <div className="flex justify-end space-x-2">
                         {donation.status !== 'archived' ? (
                           <>
+                            <button
+                              onClick={(e) => handleEditDonation(donation, e)}
+                              className="text-blue-600 hover:text-blue-900"
+                              title="Edit donation status"
+                            >
+                              <Edit size={18} />
+                            </button>
                             {donation.validationStatus !== 'validated' && donation.validationStatus !== 'rejected' && (
                               <>
                                 <button
@@ -696,14 +688,6 @@ const AdminDonationManagement = () => {
         </>
       )}
 
-      <DonationFormModal
-        isOpen={showModal}
-        onClose={handleModalClose}
-        onSubmit={handleSubmitDonation}
-        currentDonation={currentDonation}
-        users={users}
-      />
-
       <ConfirmationModal
         show={showConfirmationModal}
         onClose={() => setShowConfirmationModal(false)}
@@ -720,6 +704,14 @@ const AdminDonationManagement = () => {
         users={users}
         onClose={handleDetailsModalClose}
       />
+
+    <EditDonationModal
+  isOpen={isEditModalOpen}
+  onClose={handleCloseEditModal}
+  donation={selectedDonationForEdit}
+  users={users}
+  onSuccess={refreshDonations}
+/>
     </div>
   );
 };
