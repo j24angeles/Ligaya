@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import DonationDetailsModal from './DonationDetailsModal';
+import { updateDonation } from '../../api/donationService';
 
 const formatDate = (dateString) => {
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -23,7 +24,7 @@ const statusStyles = {
   rejected: 'bg-red-100 text-red-800'
 };
 
-const DonationTable = ({ donations }) => {
+const DonationTable = ({ donations, setDonations }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [filterMethod, setFilterMethod] = useState('all');
@@ -32,27 +33,22 @@ const DonationTable = ({ donations }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDonation, setSelectedDonation] = useState(null);
 
-  // Only show active donations (filter out archived ones)
   const activeDonations = donations.filter(donation => 
     donation.status !== 'archived'
   );
 
-  // Filter donations based on user criteria
   const filteredDonations = activeDonations.filter(donation => {
     const matchesSearch = 
       donation.referenceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       donation.amount.toString().includes(searchTerm);
 
-    // Fallback if the validationStatus is undefined
     const donationStatus = donation.validationStatus || 'pending'; 
-
     const statusMatch = filterStatus === 'all' || donationStatus.toLowerCase() === filterStatus.toLowerCase();
     const methodMatch = filterMethod === 'all' || donation.paymentMethod === filterMethod;
 
     return matchesSearch && statusMatch && methodMatch;
   });
 
-  // Sort donations
   const sortedDonations = [...filteredDonations].sort((a, b) => {
     let aValue = a[sortConfig.key];
     let bValue = b[sortConfig.key];
@@ -84,7 +80,6 @@ const DonationTable = ({ donations }) => {
     return 0;
   });
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedDonations.slice(indexOfFirstItem, indexOfLastItem);
@@ -103,6 +98,18 @@ const DonationTable = ({ donations }) => {
     return sortConfig.direction === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
   };
 
+  const handleUpdateDonation = async (updatedDonation) => {
+    try {
+      await updateDonation(updatedDonation.id, updatedDonation);
+      setDonations(prev => prev.map(d => 
+        d.id === updatedDonation.id ? updatedDonation : d
+      ));
+      setSelectedDonation(updatedDonation);
+    } catch (error) {
+      console.error('Failed to update donation:', error);
+    }
+  };
+
   if (activeDonations.length === 0) {
     return (
       <div className="text-center py-8">
@@ -117,7 +124,6 @@ const DonationTable = ({ donations }) => {
 
   return (
     <div className="space-y-4">
-      {/* Search and Filters */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -164,7 +170,6 @@ const DonationTable = ({ donations }) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden border border-gray-200 rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -240,7 +245,6 @@ const DonationTable = ({ donations }) => {
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4 sm:gap-0">
           <div className="text-sm text-gray-700">
@@ -311,11 +315,11 @@ const DonationTable = ({ donations }) => {
         </div>
       )}
 
-      {/* Donation Details Modal */}
       {selectedDonation && (
         <DonationDetailsModal 
           donation={selectedDonation} 
-          onClose={() => setSelectedDonation(null)} 
+          onClose={() => setSelectedDonation(null)}
+          onUpdate={handleUpdateDonation}
         />
       )}
     </div>

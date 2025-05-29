@@ -6,7 +6,7 @@ const ReferenceNumberInput = ({ value, onChange, error, show }) => {
   return (
     <div className="mb-3">
       <label className="block text-gray-700 text-sm font-medium mb-1" htmlFor="referenceNumber">
-        Reference Number
+  Reference Number <span className="text-red-500">*</span>
       </label>
       <input
         type="text"

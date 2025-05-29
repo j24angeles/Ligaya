@@ -81,7 +81,7 @@ const ProofOfReceiptUpload = ({ value, onChange, error, show = true }) => {
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
         <Image size={16} className="inline mr-1" />
-        Proof of Receipt
+  Proof of Receipt <span className="text-red-500">*</span>
       </label>
       <p className="text-xs text-gray-500 mb-2">
         Upload a clear photo of your payment receipt or transaction screenshot
