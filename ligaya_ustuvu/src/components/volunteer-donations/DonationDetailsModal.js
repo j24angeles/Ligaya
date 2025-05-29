@@ -181,6 +181,11 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
   const [editedDonation, setEditedDonation] = useState({ ...donation });
   const fileInputRef = useRef(null);
 
+  // Update editedDonation when the donation prop changes
+  useEffect(() => {
+    setEditedDonation({ ...donation });
+  }, [donation]);
+
   useEffect(() => {
     if (donation) {
       document.body.style.overflow = 'hidden';
@@ -204,8 +209,16 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    onUpdate(editedDonation);
+  const handleSave = async () => {
+    // Call the parent update function
+    if (onUpdate) {
+      await onUpdate(editedDonation);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedDonation({ ...donation }); // Reset to original donation data
     setIsEditing(false);
   };
 
@@ -238,12 +251,27 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         setEditedDonation(prev => ({
           ...prev,
           proofOfReceipt: event.target.result
         }));
+      };
+      reader.onerror = () => {
+        alert('Error reading file');
       };
       reader.readAsDataURL(file);
     }
@@ -284,16 +312,25 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                     <Edit size={20} />
                   </button>
                 ) : (
-                  <button 
-                    onClick={handleSave}
-                    className="text-gray-600 hover:text-primary transition-colors p-1 rounded"
-                  >
-                    <Save size={20} />
-                  </button>
+                  <>
+                    <button 
+                      onClick={handleCancel}
+                      className="text-gray-600 hover:text-gray-800 transition-colors px-3 py-1 rounded text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleSave}
+                      className="bg-blue-500 text-white hover:bg-blue-600 transition-colors px-3 py-1 rounded text-sm flex items-center space-x-1"
+                    >
+                      <Save size={14} />
+                      <span>Save</span>
+                    </button>
+                  </>
                 )}
                 <button 
                   onClick={onClose} 
-                  className="text-gray-400 hover:text-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  className="text-gray-400 hover:text-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                 >
                   <X size={20} />
                 </button>
@@ -307,13 +344,14 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                   {isEditing ? (
                     <input
                       type="number"
+                      step="0.01"
                       name="amount"
                       value={editedDonation.amount}
                       onChange={handleChange}
-                      className="font-medium border rounded p-1 w-full"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="font-medium">₱{parseFloat(donation.amount).toFixed(2)}</p>
+                    <p className="font-medium">₱{parseFloat(editedDonation.amount).toFixed(2)}</p>
                   )}
                 </div>
                 
@@ -325,10 +363,10 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                       name="date"
                       value={editedDonation.date.split('T')[0]}
                       onChange={handleChange}
-                      className="font-medium border rounded p-1 w-full"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   ) : (
-                    <p className="font-medium">{formatDate(donation.date)}</p>
+                    <p className="font-medium">{formatDate(editedDonation.date)}</p>
                   )}
                 </div>
                 
@@ -339,7 +377,7 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                       name="paymentMethod"
                       value={editedDonation.paymentMethod}
                       onChange={handleChange}
-                      className="font-medium border rounded p-1 w-full"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="cash">Cash</option>
                       <option value="gcash">GCash</option>
@@ -347,7 +385,7 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                       <option value="bank_transfer">Bank Transfer</option>
                     </select>
                   ) : (
-                    <p className="font-medium">{formatPaymentMethod(donation.paymentMethod)}</p>
+                    <p className="font-medium">{formatPaymentMethod(editedDonation.paymentMethod)}</p>
                   )}
                 </div>
                 
@@ -355,15 +393,15 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                   <p className="text-sm text-gray-500">Status</p>
                   <p className="font-medium">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      donation.validationStatus === 'validated' 
+                      editedDonation.validationStatus === 'validated' 
                         ? 'bg-green-100 text-green-800' 
-                        : donation.validationStatus === 'rejected' 
+                        : editedDonation.validationStatus === 'rejected' 
                           ? 'bg-red-100 text-red-800' 
                           : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {donation.validationStatus === 'validated' 
+                      {editedDonation.validationStatus === 'validated' 
                         ? 'Verified' 
-                        : donation.validationStatus === 'rejected' 
+                        : editedDonation.validationStatus === 'rejected' 
                           ? 'Rejected' 
                           : 'Pending'}
                     </span>
@@ -377,36 +415,37 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                       <input
                         type="text"
                         name="referenceNumber"
-                        value={editedDonation.referenceNumber}
+                        value={editedDonation.referenceNumber || ''}
                         onChange={handleChange}
-                        className="font-medium border rounded p-1 w-full"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     ) : (
-                      <p className="font-medium">{donation.referenceNumber}</p>
+                      <p className="font-medium">{editedDonation.referenceNumber}</p>
                     )}
                   </div>
                 )}
                 
-                {donation.notes && (
+                {editedDonation.notes && (
                   <div className="md:col-span-2">
                     <p className="text-sm text-gray-500">Notes</p>
                     {isEditing ? (
                       <textarea
                         name="notes"
-                        value={editedDonation.notes}
+                        value={editedDonation.notes || ''}
                         onChange={handleChange}
-                        className="font-medium border rounded p-1 w-full"
+                        rows={3}
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     ) : (
-                      <p className="font-medium">{donation.notes}</p>
+                      <p className="font-medium">{editedDonation.notes}</p>
                     )}
                   </div>
                 )}
                 
-                {donation.rejectionReason && (
+                {editedDonation.rejectionReason && (
                   <div className="md:col-span-2">
                     <p className="text-sm text-gray-500">Rejection Reason</p>
-                    <p className="font-medium text-red-600">{donation.rejectionReason}</p>
+                    <p className="font-medium text-red-600">{editedDonation.rejectionReason}</p>
                   </div>
                 )}
               </div>
@@ -455,6 +494,10 @@ const DonationDetailsModal = ({ donation, onClose, onUpdate }) => {
                         alt="Proof of receipt"
                         className="w-full h-64 object-contain bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
                         onClick={handleImageClick}
+                        onError={(e) => {
+                          console.error('Image failed to load:', e);
+                          e.target.style.display = 'none';
+                        }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center cursor-pointer" onClick={handleImageClick}>
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white rounded-full p-2 shadow-lg">

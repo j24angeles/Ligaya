@@ -104,6 +104,7 @@ const DonationTable = ({ donations, setDonations }) => {
       setDonations(prev => prev.map(d => 
         d.id === updatedDonation.id ? updatedDonation : d
       ));
+      // Update the selected donation in state as well
       setSelectedDonation(updatedDonation);
     } catch (error) {
       console.error('Failed to update donation:', error);
