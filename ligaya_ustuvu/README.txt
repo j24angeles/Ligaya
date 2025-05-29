@@ -171,7 +171,7 @@ The application uses JSON Server for development with RESTful endpoints:
 ## Project Structure
 
 ```
-LIGAYA_USTUVU/
+ligaya_ustuvu/
 ├── build/                 # Production build files
 ├── node_modules/          # Dependencies
 ├── public/               # Static assets
